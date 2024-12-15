@@ -7,6 +7,7 @@ ARG USER_GID="1000"
 ARG DOCKER_GID="989"
 ARG USERNAME="devops"
 ARG JUGGLEBOT_REPO_SSH_URL="git@github.com:joewalp/Jugglebot.git"
+ARG JUGGLEBOT_REPO_BRANCH="main"
 ARG ENVIRONMENTS_DIR="/home/$USERNAME/Jugglebot/environments"
 
 # TASK [Upgrade the packages and restore the man command]
@@ -136,17 +137,17 @@ ENV USER="$USERNAME" SHELL="/bin/bash" HOME="/home/$USERNAME"
 
 WORKDIR "/home/$USERNAME"
 
-# TASK [Clone the Jugglebot git repo
+# TASK [Clone the Jugglebot git repo]
 
 RUN --mount=type=ssh,mode=0666 mkdir --mode 700 "/home/$USERNAME/.ssh" \
     && ssh-keyscan -t rsa github.com > /home/$USERNAME/.ssh/known_hosts \
-    && git clone $JUGGLEBOT_REPO_SSH_URL "/home/$USERNAME/Jugglebot"
+    && git clone "$JUGGLEBOT_REPO_SSH_URL" "/home/$USERNAME/Jugglebot"
 
-# TASK [Checkout the current feature branch]
+# TASK [Ensure that the specified branch is checked out]
 
 WORKDIR "/home/$USERNAME/Jugglebot"
 
-RUN --mount=type=ssh,mode=0666 git checkout docker-native-platform
+RUN --mount=type=ssh,mode=0666 git checkout "${JUGGLEBOT_REPO_BRANCH}"
 
 WORKDIR "/home/$USERNAME"
 
@@ -154,7 +155,7 @@ WORKDIR "/home/$USERNAME"
 
 RUN "/home/$USERNAME/Jugglebot/environments/ubuntu-common/base_setup.sh" \
       --jugglebot-conda-env-filepath "$ENVIRONMENTS_DIR/ubuntu-common/jugglebot_conda_env.yml" \
-      --ansible-playbook-command "ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ANSIBLE_BECOME_PASS=$USERNAME ansible-playbook $ENVIRONMENTS_DIR/ubuntu_20.04-docker-native/main_playbook.yml -e upgrade_software=yes"
+      --ansible-playbook-command "ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ANSIBLE_BECOME_PASS='$USERNAME' ansible-playbook '$ENVIRONMENTS_DIR/ubuntu_20.04-docker-native/main_playbook.yml' -e upgrade_software=yes"
 
 # TASK [Install entrypoint.sh]
 
@@ -175,12 +176,21 @@ ENV SHELL=/usr/bin/zsh GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
 ENTRYPOINT [ "tini", "--", "/entrypoint/entrypoint.sh" ]
 
-# TASK [When running the environment as a service, send /var/log/syslog to stdout]
-
-#CMD [ "/usr/bin/tail", "-F", "/var/log/syslog" ]
-
-# TASK [Retain a couple alternative CMDs for reference]
+# TASK [Sleep to keep the container alive as a service]
 
 CMD [ "sleep", "infinity" ]
-#CMD [ "/usr/bin/zsh" ]
+
+# TASK [Retain a couple alternative CMDs for reference]
+#
+# The follwing tail CMD won't work because the container isn't producing system
+# logs. (As I recall, the rsyslog package provisions the standard Ubuntu system
+# logging.) We may end up using a tail command similar to this to expose a log
+# of ROS2 application events.
+#
+# CMD [ "/usr/bin/tail", "-F", "/var/log/syslog" ]
+#
+# The following CMD can be helpful during debugging when paired with `docker
+# run -it [...]` or `docker container start --attach [...]`.
+#
+# CMD [ "/usr/bin/zsh" ]
 

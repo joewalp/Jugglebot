@@ -46,6 +46,11 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    -b|--debug-git-branch)
+      GIT_BRANCH="$2"
+      shift
+      shift
+      ;;
     -*|--*)
       echo "[ERROR]: Unknown option $1"
       exit 1
@@ -70,6 +75,12 @@ if [[ -z "${ENVIRONMENTS_DIR:-}" ]]; then
   ENVIRONMENTS_DIR="${HOME}/Jugglebot/environments"
 else
   echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-environments-dir' flag should only be used when testing this script.\n"
+fi
+
+if [[ -z "${GIT_BRANCH:-}" ]]; then
+  GIT_BRANCH='main'
+else
+  echo -e "\n[WARNING]: Using git branch ${GIT_BRANCH} instead of main\n"
 fi
 
 DEV_ENV_USERNAME='devops' # This is also the default password for the user.
@@ -100,6 +111,7 @@ docker buildx build \
   --build-arg "USER_GID=$(id --group)" \
   --build-arg "DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)" \
   --build-arg "USERNAME=${DEV_ENV_USERNAME}" \
+  --build-arg "JUGGLEBOT_REPO_BRANCH=${GIT_BRANCH}" \
   --ssh "default=${SSH_AUTH_SOCK}" \
   --progress=tty \
   -t "${IMAGE_NAME}" \
