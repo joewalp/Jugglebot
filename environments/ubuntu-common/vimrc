@@ -1,4 +1,4 @@
-" TASK [Set basic appearance and behavior] ********
+" TASK [Set basic appearance and behavior]
 
 syntax on
 set background=dark
@@ -24,7 +24,7 @@ set cursorline       " Highlight the current line
 
 hi CursorLine term=bold cterm=none ctermbg=233 guibg=Grey40
 
-" TASK [Save and restore buffer state and cursor location] ********
+" TASK [Save and restore buffer state and cursor location]
 "
 " ref: https://vim.fandom.com/wiki/Restore_cursor_to_file_position_in_previous_editing_session
 
@@ -49,7 +49,7 @@ augroup resCur
   autocmd BufWinEnter * call ResCur()
 augroup END
 
-" TASK [Enable Ctrl+s to write the buffer] ********
+" TASK [Enable Ctrl+s to write the buffer]
 "
 " note: This requires reclaiming Ctrl+s from the terminal via `stty -ixon` in ~/.zshrc
 
@@ -57,11 +57,11 @@ noremap <silent> <C-S>   :update<CR>
 vnoremap <silent> <C-S>  <C-C>:update<CR>
 inoremap <silent> <C-S>  <C-O>:update<CR>
 
-" TASK [Apply indentation rules and plugins according by filetype] ********
+" TASK [Apply indentation rules and plugins according by filetype]
 
 filetype plugin indent on
 
-" TASK [Apply settings that are recommended in the Ubuntu default vimrc] ********
+" TASK [Apply settings that are recommended in the Ubuntu default vimrc]
 
 set showcmd      " Show (partial) command in status line.
 set showmatch    " Show matching brackets.
@@ -73,15 +73,15 @@ set incsearch    " Used for incremental searching
 set hidden       " Don't prompt to save upon changing the active buffer
 " set mouse=a    " Enable mouse usage (all modes)
 
-" TASK [Enable wrap for markdown files] ********
+" TASK [Enable wrap for markdown files]
 
 autocmd FileType markdown setlocal wrap linebreak nolist textwidth=80 formatoptions+=t
 
-" TASK [Disable saving cursor position for the git commit message buffer] ********
+" TASK [Disable saving cursor position for the git commit message buffer]
 
 autocmd FileType gitcommit setlocal nobuflisted
 
-" TASK [Signify the editor mode using the cursor shape] ********
+" TASK [Signify the editor mode using the cursor shape]
 
 if &term =~? 'rxvt' || &term =~? 'xterm' || &term =~? 'st-'
     " 1 or 0 -> blinking block
