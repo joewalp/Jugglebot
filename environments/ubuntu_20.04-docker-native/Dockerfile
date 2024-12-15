@@ -182,7 +182,7 @@ CMD [ "sleep", "infinity" ]
 
 # TASK [Retain a couple alternative CMDs for reference]
 #
-# The follwing tail CMD won't work because the container isn't producing system
+# The following tail CMD won't work because the container isn't producing system
 # logs. (As I recall, the rsyslog package provisions the standard Ubuntu system
 # logging.) We may end up using a tail command similar to this to expose a log
 # of ROS2 application events.
