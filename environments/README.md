@@ -210,7 +210,7 @@ Within the WSL2 environment, run the setup script for the docker native platform
 environment. This will take some time.
 
 ```bash
-~/Jugglebot/environments/ubuntu_20.04-docker-native/setup.sh --ssh-keypair-name id_ed25519
+~/Jugglebot/environments/ubuntu_20.04-docker-native/setup.sh --ssh-keypair-name id_ed25519 --debug-git-branch dev-env-provisioning
 ```
 
 ### Step 10. Run the ~/bin/docker-native-env script
