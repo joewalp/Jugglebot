@@ -3,6 +3,8 @@ set -o nounset -o pipefail -o errexit
 IFS=$'\t\n' # Stricter IFS settings
 rc=0
 
+# TASK [Parse the command line arguments]
+
 while [[ $# -gt 0 ]]; do
   case $1 in
     -e|--event-type)
@@ -24,7 +26,7 @@ done
 if [[ "${EVENT_TYPE}" == "activate" ]]; then
  
   
-  # TASK [Activate] ********
+  # TASK [Activate]
 
   export JUGGLEBOT_REPO_DIR="${HOME}/Jugglebot"
   export JUGGLEBOT_CONFIG_DIR="${HOME}/.jugglebot"
@@ -33,7 +35,7 @@ if [[ "${EVENT_TYPE}" == "activate" ]]; then
 elif [[ "${EVENT_TYPE}" == "deactivate" ]]; then
 
   
-  # TASK [Deactivate] ********
+  # TASK [Deactivate]
 
   unset JUGGLEBOT_REPO_DIR
   unset JUGGLEBOT_CONFIG_DIR
