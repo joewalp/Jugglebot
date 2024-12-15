@@ -8,6 +8,10 @@ integration installed and that has the Qemu arm64 emulator registered and (2) an
 Ubuntu-20.04 docker container that uses a native platform base image. Ansible
 tasks and a Dockerfile perform the bulk of the provisioning.
 
+Neither environment has ROS2 installed.
+
+The next step is to enable editing code within each of these environments using VSCode for Windows.
+
 ## Instructions
 
 
@@ -239,11 +243,6 @@ container. The native platform environment is considerably faster than the arm64
 platform environment, so I want to use it for iterating on features before
 confirming that the same provisioning and features work within the arm64
 platform environment.
-
-Neither environment has ROS2 installed.
-
-The next step is to enable editing code within each of these environments using
-VSCode for Windows.
 
 ## Noteworthy future milestones
 
