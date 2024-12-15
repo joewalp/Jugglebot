@@ -1,4 +1,4 @@
-# TASK [Educate about this default zshrc] ********
+# TASK [Educate about this default zshrc]
 #
 # This default ~/.zshrc was adapted from the default zshrc provided by Oh My 
 # Zsh. It was provisioned by an Ansible task that was run by the host setup
@@ -7,7 +7,7 @@
 # `~/.jugglebot/host_setup/diffs`.
 
 
-# TASK [Educate about Jugglebot environment variables] ********
+# TASK [Educate about Jugglebot environment variables]
 #
 # You should prefer to define project-related configuration variables within 
 # `~/.jugglebot/conda_env.sh`. For example, that script defines 
@@ -17,7 +17,7 @@
 # made changes, it will produce a diff in `~/.jugglebot/host_setup/diffs`.
 
 
-# TASK [Include the Oh My Zsh configuration] ********
+# TASK [Include the Oh My Zsh configuration]
 # ...
 
 # If you come from bash you might have to change your $PATH.
@@ -33,7 +33,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 
 
-# TASK [Enable H. Low's preferred Oh My Zsh theme] ********
+# TASK [Enable H. Low's preferred Oh My Zsh theme]
 
 ZSH_THEME='clean'
 
@@ -51,7 +51,7 @@ ZSH_THEME='clean'
 # HYPHEN_INSENSITIVE="true"
 
 
-# TASK [Disable automatic updates for Oh My Zsh] ********
+# TASK [Disable automatic updates for Oh My Zsh]
 
 # Uncomment one of the following lines to change the auto-update behavior
 zstyle ':omz:update' mode disabled  # disable automatic updates
@@ -102,20 +102,22 @@ zstyle ':omz:update' mode disabled  # disable automatic updates
 # Add wisely, as too many plugins slow down shell startup.
 
 
-# TASK [Enable the bundled per-directory-history plugin] ********
+# TASK [Enable the bundled per-directory-history plugin]
 
 plugins=( git per-directory-history )
 
 
-# TASK [Configure the per-directory-history plugin] ********
+# TASK [Configure the per-directory-history plugin]
 #
 # Note 1: H. Low uses the per-directory-history Oh My Zsh plugin within his
-#   development workflow. Change $HISTORY_START_WITH_GLOBAL to false to enable
-#   the per-directory behavior by default.
+# development workflow. Change $HISTORY_START_WITH_GLOBAL to false to enable
+# the per-directory behavior by default.
+# 
 # Note 2: You can change this value either (a) by editing it here or (b) by
-#   setting it within a zsh script within the $ZSH_CUSTOM directory.
+# setting it within a zsh script within the $ZSH_CUSTOM directory.
+# 
 # Note 3: See the per-directory-history repo for instructions:
-#   https://github.com/jimhester/per-directory-history
+# https://github.com/jimhester/per-directory-history
 
 export HISTORY_START_WITH_GLOBAL=true
 
@@ -151,30 +153,31 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 
-# TASK [Provide an alias to edit the aliases file] ********
+# TASK [Provide an alias to edit the aliases file]
 
 alias paliases='"${EDITOR:-vim}" "${ZSH_CUSTOM}/aliases.zsh" && source "${ZSH_CUSTOM}/aliases.zsh"'
 
 
-# TASK [Enable keychain] ********
+# TASK [Enable keychain]
 #
 # Note 1: Keychain remembers ssh-agent keys across logins during a host
-#   uptime session
+# uptime session
+# 
 # Note 2: Keychain does not work inside a docker container because it cannot
-#   inherit the identities within an auth socket.
+# inherit the identities within an auth socket.
 
 if [[ ! -f /.dockerenv ]]; then
   eval "$(keychain --eval --quiet --agents ssh)"
 fi
 
-# TASK [Reclaim Ctrl+s and Ctrl+q from the terminal] ********
+# TASK [Reclaim Ctrl+s and Ctrl+q from the terminal]
 #
 # Note: This enables vim to bind Ctrl+s.
 
 stty -ixon
 
 
-# TASK [Include the conda initialize block] ********
+# TASK [Include the conda initialize block]
 # ...
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -192,19 +195,19 @@ unset __conda_setup
 # <<< conda initialize <<<
 
 
-# TASK [Activate the jugglebot conda environment] ********
+# TASK [Activate the jugglebot conda environment]
 
 conda activate jugglebot
 
 
-# TASK [Add ~/bin to the $PATH] ********
+# TASK [Add ~/bin to the $PATH]
 
 if [ -d "${HOME}/bin" ]; then
   export PATH="${HOME}/bin:${PATH}"
 fi
 
 
-# TASK [Ensure that we start in $HOME] ********
+# TASK [Ensure that we start in $HOME]
 #
 # Note: This is a workaround for the issue that running 
 # `wsl -d <Distribution Name>` from PowerShell will begin in the working
