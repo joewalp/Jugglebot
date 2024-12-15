@@ -32,11 +32,12 @@
 
 - name: Ensure that the docker Python SDK is installed
   # Note 1: This should have been installed during the creation of the
-  #   jugglebot environment, but we include it here for good measure because
-  #   the Ansible community.docker modules rely on it.
+  # jugglebot environment, but we include it here for good measure because
+  # the Ansible community.docker modules rely on it.
+  # 
   # Note 2: We don't install the conda docker package because we prefer to use
-  #   the official docker apt package repo to manage the docker service & CLI 
-  #   binaries.
+  # the official docker apt package repo to manage the docker service & CLI 
+  # binaries.
   pip:
     name: docker
     state: present
@@ -50,13 +51,13 @@
 
 - name: Run the Qemu installer image
   # Note: As of this writing, the following page recommends using the
-  #   tonistiigi/binfmt executable image to install Qemu and to register Qemu
-  #   emulators. However, we found that to be unreliable. Instead, we install
-  #   the OS packages and then use the multiarch/qemu-user-static image to
-  #   register the emulators.
+  # tonistiigi/binfmt executable image to install Qemu and to register Qemu
+  # emulators. However, we found that to be unreliable. Instead, we install
+  # the OS packages and then use the multiarch/qemu-user-static image to
+  # register the emulators.
   #
-  #   ref: https://docs.docker.com/build/building/multi-platform/
-  #   ref: https://github.com/multiarch/qemu-user-static
+  # ref: https://docs.docker.com/build/building/multi-platform/
+  # ref: https://github.com/multiarch/qemu-user-static
   community.docker.docker_container:
     name: qemu_installer
     image: multiarch/qemu-user-static
