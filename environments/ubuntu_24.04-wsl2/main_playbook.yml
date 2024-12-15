@@ -52,7 +52,7 @@
       line: 'nameserver 8.8.8.8'
     become: yes
 
-  - name: Create ~/.hushlogin
+  - name: Disable the WSL welcome message
     file:
       path: "{{ home_dir }}/.hushlogin"
       state: touch
