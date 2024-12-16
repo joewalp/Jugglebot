@@ -35,15 +35,3 @@
       name: docker-ce-cli
       state: present
     become: yes
-
-  - name: Ensure that the docker Python SDK is installed
-    # Note 1: This should have been installed during the creation of the
-    #   jugglebot environment, but we include it here for good measure because
-    #   the Ansible community.docker modules rely on it.
-    # Note 2: We don't install the conda docker package because we prefer to use
-    #   the official docker apt package repo to manage the docker service & CLI 
-    #   binaries.
-    pip:
-      name: docker
-      state: present
- 
