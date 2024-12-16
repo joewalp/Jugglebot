@@ -7,7 +7,7 @@ task() {
 task 'Assert that a jugglebot Conda env config file was specified'
 
 if [[ -z "${JUGGLEBOT_CONDA_ENV_FILEPATH:-}" ]]; then
-  echo '[ERROR]: A jugglebot Conda env config file is required. Invoke this command with the `--jugglebot-conda-env-filepath "[config filepath]"` switch'
+  echo -e '[ERROR]: A jugglebot Conda env config file is required. Set\nJUGGLEBOT_CONDA_ENV_FILEPATH before sourcing this script.'
   exit 2
 fi
 
