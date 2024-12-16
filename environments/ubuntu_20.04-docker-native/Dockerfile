@@ -151,11 +151,15 @@ RUN --mount=type=ssh,mode=0666 git checkout "${JUGGLEBOT_REPO_BRANCH}"
 
 WORKDIR "/home/$USERNAME"
 
-# TASK [Run base_setup.sh with the main_playbook.yml for this environment]
+# TASK [Run base_setup.sh and then the Ansible playbook]
 
 RUN "/home/$USERNAME/Jugglebot/environments/ubuntu-common/base_setup.sh" \
       --jugglebot-conda-env-filepath "$ENVIRONMENTS_DIR/ubuntu-common/jugglebot_conda_env.yml" \
-      --ansible-playbook-command "ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ANSIBLE_BECOME_PASS='$USERNAME' ansible-playbook '$ENVIRONMENTS_DIR/ubuntu_20.04-docker-native/main_playbook.yml' -e upgrade_software=yes"
+    && ANSIBLE_LOCALHOST_WARNING=False \
+    ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
+    ANSIBLE_BECOME_PASS="$USERNAME" \
+    ansible-playbook "$ENVIRONMENTS_DIR/ubuntu_20.04-docker-native/main_playbook.yml" \
+      -e upgrade_software=yes
 
 # TASK [Install entrypoint.sh]
 

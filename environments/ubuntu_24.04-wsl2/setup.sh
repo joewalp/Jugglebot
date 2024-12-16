@@ -88,19 +88,29 @@ ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 task 'Build the ansible-playbook command'
 
 read -r -d '' ANSIBLE_PLAYBOOK_COMMAND << EndOfText || true
-echo -e "\\nEnter your password to enable the ansible playbook to perform privileged operations" \\
-&& ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \\
-"${ENVIRONMENTS_DIR}/ubuntu_24.04-wsl2/main_playbook.yml" \\
---ask-become-pass \\
--e upgrade_software=yes \\
--e "ssh_keypair_name='${SSH_KEYPAIR_NAME}'" \\
--e "git_name='${GIT_NAME}'" \\
--e "git_email='${GIT_EMAIL}'"
 EndOfText
 
 task 'Invoke ubuntu-common/base_setup.sh'
 
 "${ENVIRONMENTS_DIR}/ubuntu-common/base_setup.sh" \
-  --jugglebot-conda-env-filepath "${JUGGLEBOT_CONDA_ENV_FILEPATH}" \
-  --ansible-playbook-command "${ANSIBLE_PLAYBOOK_COMMAND}"
+  --jugglebot-conda-env-filepath "${JUGGLEBOT_CONDA_ENV_FILEPATH}"
+
+task 'Run the Ansible playbook'
+
+echo -e "\nEnter your password to enable the ansible playbook to perform privileged operations"
+
+ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
+  "${ENVIRONMENTS_DIR}/ubuntu_24.04-wsl2/main_playbook.yml" \
+  --ask-become-pass \
+  -e upgrade_software=yes \
+  -e "ssh_keypair_name='${SSH_KEYPAIR_NAME}'" \
+  -e "git_name='${GIT_NAME}'" \
+  -e "git_email='${GIT_EMAIL}'" || rc="$?"
+
+# failed_when: the return code is nonzero
+
+if [[ $rc -ne 0 ]]; then
+  echo -e "[ERROR]: The ansible playbook failed with return code ${rc}."
+  exit $rc
+fi
 

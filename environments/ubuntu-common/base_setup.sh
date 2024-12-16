@@ -17,11 +17,6 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
-    -p|--ansible-playbook-command)
-      ANSIBLE_PLAYBOOK_COMMAND="$2"
-      shift
-      shift
-      ;;
     -*|--*)
       echo "[ERROR]: Unknown option $1"
       exit 1
@@ -37,13 +32,6 @@ task 'Assert that a jugglebot Conda env config file was specified'
 
 if [[ -z "${JUGGLEBOT_CONDA_ENV_FILEPATH:-}" ]]; then
   echo '[ERROR]: A jugglebot Conda env config file is required. Invoke this command with the `--jugglebot-conda-env-filepath "[config filepath]"` switch'
-  exit 2
-fi
-
-task 'Assert that an ansible playbook command was specified'
-
-if [[ -z "${ANSIBLE_PLAYBOOK_COMMAND:-}" ]]; then
-  echo '[ERROR]: An ansible playbook command is required. Invoke this command with the `--ansible-playbook-command "[playbook command]"` switch'
   exit 2
 fi
 
@@ -131,15 +119,4 @@ conda activate jugglebot
 task 'Disable shell prompt modification by conda'
 
 conda config --set changeps1 False
-
-task 'Run the specified main playbook'
-
-eval "${ANSIBLE_PLAYBOOK_COMMAND}" || rc="$?"
-
-# failed_when: the return code is nonzero
-
-if [[ $rc -ne 0 ]]; then
-  echo -e "[ERROR]: The ansible playbook failed with return code ${rc}. This is how the playbook was invoked:\n\n${ANSIBLE_PLAYBOOK_COMMAND}"
-  exit $rc
-fi
 
