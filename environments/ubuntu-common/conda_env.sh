@@ -23,26 +23,25 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ "${EVENT_TYPE}" == "activate" ]]; then
- 
+case "${EVENT_TYPE}" in
+  activate)
+    
+    # TASK [Activate]
+    
+    export JUGGLEBOT_REPO_DIR="${HOME}/Jugglebot"
+    export JUGGLEBOT_CONFIG_DIR="${HOME}/.jugglebot"
+    ;;
   
-  # TASK [Activate]
-
-  export JUGGLEBOT_REPO_DIR="${HOME}/Jugglebot"
-  export JUGGLEBOT_CONFIG_DIR="${HOME}/.jugglebot"
-
-
-elif [[ "${EVENT_TYPE}" == "deactivate" ]]; then
-
+  deactivate}
   
-  # TASK [Deactivate]
+    # TASK [Deactivate]
 
-  unset JUGGLEBOT_REPO_DIR
-  unset JUGGLEBOT_CONFIG_DIR
+    unset JUGGLEBOT_REPO_DIR
+    unset JUGGLEBOT_CONFIG_DIR
+    ;;
 
-
-else
-  echo -e "\n[ERROR]: Unrecognized event type (${EVENT_TYPE})."
-  exit 2
-fi
-
+  *)
+    echo -e "\n[ERROR]: Unrecognized event type (${EVENT_TYPE})."
+    exit 2
+    ;;
+esac
