@@ -55,6 +55,10 @@ while [[ $# -gt 0 ]]; do
       BUILD_NO_CACHE_OPTION='--no-cache'
       shift
       ;;
+    --no-repo-cache)
+      REPO_CACHE_ID="$(date +%s)"
+      shift
+      ;;
     -*|--*)
       echo "[ERROR]: Unknown option $1"
       exit 1
@@ -88,6 +92,7 @@ else
 fi
 
 BUILD_NO_CACHE_OPTION="${BUILD_NO_CACHE_OPTION:-}"
+REPO_CACHE_ID="${REPO_CACHE_ID:-0}"
 DEV_ENV_USERNAME='devops' # This is also the default password for the user.
 SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
 BUILD_CONTEXT_DIR="${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native"
@@ -117,6 +122,7 @@ docker buildx build ${BUILD_NO_CACHE_OPTION} \
   --build-arg "DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)" \
   --build-arg "USERNAME=${DEV_ENV_USERNAME}" \
   --build-arg "JUGGLEBOT_REPO_BRANCH=${GIT_BRANCH}" \
+  --build-arg "REPO_CACHE_ID=${REPO_CACHE_ID}" \
   --ssh "default=${SSH_AUTH_SOCK}" \
   --progress=tty \
   -t "${IMAGE_NAME}" \

@@ -8,6 +8,7 @@ ARG DOCKER_GID="989"
 ARG USERNAME="devops"
 ARG JUGGLEBOT_REPO_SSH_URL="git@github.com:joewalp/Jugglebot.git"
 ARG JUGGLEBOT_REPO_BRANCH="main"
+ARG REPO_CACHE_ID="0"
 ARG ENVIRONMENTS_DIR="/home/$USERNAME/Jugglebot/environments"
 
 # TASK [Upgrade the packages and restore the man command]
@@ -141,6 +142,7 @@ WORKDIR "/home/$USERNAME"
 
 RUN --mount=type=ssh,mode=0666 mkdir --mode 700 "/home/$USERNAME/.ssh" \
     && ssh-keyscan -t rsa github.com > /home/$USERNAME/.ssh/known_hosts \
+    && echo "$REPO_CACHE_ID" \
     && git clone "$JUGGLEBOT_REPO_SSH_URL" "/home/$USERNAME/Jugglebot"
 
 # TASK [Ensure that the specified branch is checked out]
