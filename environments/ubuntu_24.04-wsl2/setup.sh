@@ -90,10 +90,9 @@ task 'Build the ansible-playbook command'
 read -r -d '' ANSIBLE_PLAYBOOK_COMMAND << EndOfText || true
 EndOfText
 
-task 'Invoke ubuntu-common/base_setup.sh'
+task 'Source ubuntu-common/base_setup.sh'
 
-eval "${ENVIRONMENTS_DIR}/ubuntu-common/base_setup.sh" \
-  --jugglebot-conda-env-filepath "${JUGGLEBOT_CONDA_ENV_FILEPATH}"
+source "${ENVIRONMENTS_DIR}/ubuntu-common/base_setup.sh"
 
 task 'Run the Ansible playbook'
 
