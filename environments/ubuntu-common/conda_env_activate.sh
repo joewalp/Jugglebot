@@ -1,3 +1,3 @@
-#!/bin/sh
-${HOME}/.jugglebot/conda_env.sh --event-type activate
+EVENT_TYPE='activate'
+source "${HOME}/.jugglebot/conda_env.sh"
 
