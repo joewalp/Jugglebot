@@ -51,6 +51,10 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    --no-cache)
+      BUILD_NO_CACHE_OPTION='--no-cache'
+      shift
+      ;;
     -*|--*)
       echo "[ERROR]: Unknown option $1"
       exit 1
@@ -83,6 +87,7 @@ else
   echo -e "\n[WARNING]: Using git branch ${GIT_BRANCH} instead of main\n"
 fi
 
+BUILD_NO_CACHE_OPTION="${BUILD_NO_CACHE_OPTION:-}"
 DEV_ENV_USERNAME='devops' # This is also the default password for the user.
 SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
 BUILD_CONTEXT_DIR="${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native"
@@ -106,7 +111,7 @@ install -D -T "${HOME}/.gitconfig" "${BUILD_CONTEXT_DIR}/build/gitconfig"
 
 task "Build the docker image named ${IMAGE_NAME}"
 
-docker buildx build \
+docker buildx build ${BUILD_NO_CACHE_OPTION} \
   --build-arg "USER_UID=$(id --user)" \
   --build-arg "USER_GID=$(id --group)" \
   --build-arg "DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)" \
