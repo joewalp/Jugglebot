@@ -32,7 +32,7 @@ case "${EVENT_TYPE}" in
     export JUGGLEBOT_CONFIG_DIR="${HOME}/.jugglebot"
     ;;
   
-  deactivate}
+  deactivate)
   
     # TASK [Deactivate]
 
