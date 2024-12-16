@@ -51,7 +51,7 @@ augroup END
 
 " TASK [Enable Ctrl+s to write the buffer]
 "
-" note: This requires reclaiming Ctrl+s from the terminal via `stty -ixon` in ~/.zshrc
+" Note: This requires reclaiming Ctrl+s from the terminal via `stty -ixon` in ~/.zshrc
 
 noremap <silent> <C-S>   :update<CR>
 vnoremap <silent> <C-S>  <C-C>:update<CR>
