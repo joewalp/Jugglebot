@@ -68,7 +68,7 @@
   become: yes
   changed_when: False
 
-- name: Remove the Qemu installer Docker image
+- name: Remove the Qemu installer Docker container
   community.docker.docker_container:
     name: qemu_installer
     state: absent
@@ -87,10 +87,9 @@
   failed_when: not verify_docker_and_qemu_result.container.Output is search('aarch64 Linux')
   changed_when: False
 
-- name: Remove the arm64 Docker image that was used to verify
+- name: Remove the arm64 Docker container that was used to verify
   community.docker.docker_container:
     name: qemu_verifier
     state: absent
   become: yes
   changed_when: False
-
