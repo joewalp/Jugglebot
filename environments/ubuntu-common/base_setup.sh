@@ -1,3 +1,6 @@
+set -o nounset -o pipefail -o errexit
+IFS=$'\t\n' # Stricter IFS settings
+rc=0
 
 task() {
   local task_desc="$1"
