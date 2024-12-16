@@ -1,32 +1,8 @@
-#!/usr/bin/env bash
-set -o nounset -o pipefail -o errexit
-IFS=$'\t\n' # Stricter IFS settings
-rc=0
 
 task() {
   local task_desc="$1"
   echo -e "\nTASK [${task_desc}] ********"
 }
-
-task 'Parse the command line arguments'
-
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    -c|--jugglebot-conda-env-filepath)
-      JUGGLEBOT_CONDA_ENV_FILEPATH="$2"
-      shift
-      shift
-      ;;
-    -*|--*)
-      echo "[ERROR]: Unknown option $1"
-      exit 1
-      ;;
-    *)
-      POSITIONAL_ARGS+=("$1")
-      shift
-      ;;
-  esac
-done
 
 task 'Assert that a jugglebot Conda env config file was specified'
 

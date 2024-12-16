@@ -153,8 +153,9 @@ WORKDIR "/home/$USERNAME"
 
 # TASK [Run base_setup.sh and then the Ansible playbook]
 
-RUN "/home/$USERNAME/Jugglebot/environments/ubuntu-common/base_setup.sh" \
-      --jugglebot-conda-env-filepath "$ENVIRONMENTS_DIR/ubuntu-common/jugglebot_conda_env.yml" \
+RUN JUGGLEBOT_CONDA_ENV_FILEPATH="$ENVIRONMENTS_DIR/ubuntu-common/jugglebot_conda_env.yml" \ 
+    source "/home/$USERNAME/Jugglebot/environments/ubuntu-common/base_setup.sh" \
+    \
     && ANSIBLE_LOCALHOST_WARNING=False \
     ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
     ANSIBLE_BECOME_PASS="$USERNAME" \
