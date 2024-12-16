@@ -57,7 +57,7 @@ noremap <silent> <C-S>   :update<CR>
 vnoremap <silent> <C-S>  <C-C>:update<CR>
 inoremap <silent> <C-S>  <C-O>:update<CR>
 
-" TASK [Apply indentation rules and plugins according by filetype]
+" TASK [Apply indentation rules and plugins by filetype]
 
 filetype plugin indent on
 
