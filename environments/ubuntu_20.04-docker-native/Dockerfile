@@ -1,15 +1,5 @@
 FROM ubuntu:focal
 
-# TASK [Initialize variables]
-
-ARG USER_UID="1000"
-ARG USER_GID="1000"
-ARG DOCKER_GID="989"
-ARG USERNAME="devops"
-ARG JUGGLEBOT_REPO_SSH_URL="git@github.com:joewalp/Jugglebot.git"
-ARG JUGGLEBOT_REPO_BRANCH="main"
-ARG REPO_CACHE_ID="0"
-ARG ENVIRONMENTS_DIR="/home/$USERNAME/Jugglebot/environments"
 
 # TASK [Upgrade the packages and restore the man command]
 
@@ -121,6 +111,13 @@ VOLUME [ "/home", "/tmp" ]
 
 RUN mkdir --mode 777 '/entrypoint' && chmod 777 '/home'
 
+# TASK [Initialize the user and group variables]
+
+ARG USER_UID="1000"
+ARG USER_GID="1000"
+ARG DOCKER_GID="989"
+ARG USERNAME="devops"
+
 # TASK [Create the default user]
 
 RUN groupadd --system --gid "$DOCKER_GID" docker \
@@ -138,20 +135,35 @@ ENV USER="$USERNAME" SHELL="/bin/bash" HOME="/home/$USERNAME"
 
 WORKDIR "/home/$USERNAME"
 
+# TASK [Initialize the repo clone variables]
+
+ARG JUGGLEBOT_REPO_SSH_URL="git@github.com:joewalp/Jugglebot.git"
+ARG REPO_CACHE_ID="0"
+
 # TASK [Clone the Jugglebot git repo]
 
-RUN --mount=type=ssh,mode=0666 mkdir --mode 700 "/home/$USERNAME/.ssh" \
+RUN --mount=type=ssh,mode=0666 echo "$REPO_CACHE_ID" \
+    && mkdir --mode 700 "/home/$USERNAME/.ssh" \
     && ssh-keyscan -t rsa github.com > /home/$USERNAME/.ssh/known_hosts \
-    && echo "$REPO_CACHE_ID" \
     && git clone "$JUGGLEBOT_REPO_SSH_URL" "/home/$USERNAME/Jugglebot"
+
+# TASK [Initialize the repo branch variable]
+
+ARG JUGGLEBOT_REPO_BRANCH="main"
 
 # TASK [Ensure that the specified branch is checked out]
 
 WORKDIR "/home/$USERNAME/Jugglebot"
 
-RUN --mount=type=ssh,mode=0666 git checkout "${JUGGLEBOT_REPO_BRANCH}"
+RUN --mount=type=ssh,mode=0666 echo "$REPO_CACHE_ID" \
+    && git checkout "${JUGGLEBOT_REPO_BRANCH}" \
+    && git pull
 
 WORKDIR "/home/$USERNAME"
+
+# TASK [Initialize the base setup and playbook variable]
+
+ARG ENVIRONMENTS_DIR="/home/$USERNAME/Jugglebot/environments"
 
 # TASK [Run the ubuntu-common base setup and then the playbook]
 
