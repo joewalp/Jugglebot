@@ -160,10 +160,13 @@ docker container start "${CONTAINER_NAME}"
 
 task 'Wait for the home directory to be initialized by entrypoint.sh'
 
+echo -n "Initializing container ${CONTAINER_NAME} ..."
+
 while ! is_home_dir_initialized "${CONTAINER_NAME}"; do
-  echo "Waiting for the container ${CONTAINER_NAME} to be initialized..."
   sleep 2
 done
+
+echo ' DONE'
 
 task 'Stop the container'
 
