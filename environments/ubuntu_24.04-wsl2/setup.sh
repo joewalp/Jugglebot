@@ -92,7 +92,7 @@ EndOfText
 
 task 'Invoke ubuntu-common/base_setup.sh'
 
-"${ENVIRONMENTS_DIR}/ubuntu-common/base_setup.sh" \
+eval "${ENVIRONMENTS_DIR}/ubuntu-common/base_setup.sh" \
   --jugglebot-conda-env-filepath "${JUGGLEBOT_CONDA_ENV_FILEPATH}"
 
 task 'Run the Ansible playbook'
