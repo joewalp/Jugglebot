@@ -142,8 +142,7 @@ ARG REPO_CACHE_ID="0"
 
 # TASK [Clone the Jugglebot git repo]
 
-RUN --mount=type=ssh,mode=0666 echo "$REPO_CACHE_ID" \
-    && mkdir --mode 700 "/home/$USERNAME/.ssh" \
+RUN --mount=type=ssh,mode=0666 mkdir --mode 700 "/home/$USERNAME/.ssh" \
     && ssh-keyscan -t rsa github.com > /home/$USERNAME/.ssh/known_hosts \
     && git clone "$JUGGLEBOT_REPO_SSH_URL" "/home/$USERNAME/Jugglebot"
 
@@ -155,8 +154,7 @@ ARG JUGGLEBOT_REPO_BRANCH="main"
 
 WORKDIR "/home/$USERNAME/Jugglebot"
 
-RUN --mount=type=ssh,mode=0666 echo "$REPO_CACHE_ID" \
-    && git checkout "${JUGGLEBOT_REPO_BRANCH}" \
+RUN --mount=type=ssh,mode=0666 git checkout "${JUGGLEBOT_REPO_BRANCH}" \
     && git pull
 
 WORKDIR "/home/$USERNAME"
