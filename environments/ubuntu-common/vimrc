@@ -26,10 +26,6 @@ hi CursorLine term=bold cterm=none ctermbg=233 guibg=Grey40
 
 " TASK [Save and restore buffer state and cursor location]
 "
-" ref: https://vim.fandom.com/wiki/Restore_cursor_to_file_position_in_previous_editing_session
-
-set viminfo='10,\"100,:20,%,n~/.vim/viminfo
-
 " Tell vim to remember certain things when we exit
 "   '10  :  marks will be remembered for up to 10 previously edited files
 "   "100 :  will save up to 100 lines for each register
@@ -37,16 +33,20 @@ set viminfo='10,\"100,:20,%,n~/.vim/viminfo
 "   %    :  saves and restores the buffer list
 "   n... :  where to save the viminfo files
 
-function! ResCur()
-  if line("'\"") <= line("$")
-    normal! g`"
-    return 1
-  endif
-endfunction
+set viminfo='10,\"100,:20,%,n~/.vim/viminfo
 
-augroup resCur
+" TASK [Restore the cursor position except in git buffers]
+" 
+" ref: https://vimhelp.org/usr_05.txt.html#last-position-jump
+
+augroup RestoreCursor
   autocmd!
-  autocmd BufWinEnter * call ResCur()
+  autocmd BufReadPost *
+    \ let line = line("'\"")
+    \ | if line >= 1 && line <= line("$") && &filetype !~# 'commit'
+    \      && index(['xxd', 'gitrebase'], &filetype) == -1
+    \ |   execute "normal! g`\""
+    \ | endif
 augroup END
 
 " TASK [Enable Ctrl+s to write the buffer]
@@ -76,10 +76,6 @@ set hidden       " Don't prompt to save upon changing the active buffer
 " TASK [Enable wrap for markdown files]
 
 autocmd FileType markdown setlocal wrap linebreak nolist textwidth=80 formatoptions+=t
-
-" TASK [Disable saving cursor position for the git commit message buffer]
-
-autocmd FileType gitcommit setlocal nobuflisted
 
 " TASK [Signify the editor mode using the cursor shape]
 
