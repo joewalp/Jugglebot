@@ -87,7 +87,7 @@ fi
 
 if [[ -z "${GIT_BRANCH:-}" ]]; then
   GIT_BRANCH='main'
-else
+elif [[ "${GIT_BRANCH}" != 'main' ]]; then
   echo -e "\n[WARNING]: Using git branch ${GIT_BRANCH} instead of main\n"
 fi
 
