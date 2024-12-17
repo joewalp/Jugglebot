@@ -93,3 +93,25 @@ if &term =~? 'rxvt' || &term =~? 'xterm' || &term =~? 'st-'
     let &t_EI .= "\<Esc>[2 q"
 endif
 
+" TASK [Enable the vim-plug plugins]
+
+call plug#begin('~/.vim/plugged')
+
+" TASK [Enable the vim-commentary plugin to provide the 'gc' command]
+
+Plug 'tpope/vim-commentary'
+
+" TASK [Retain some popular example plugins]
+"
+" The vim-sensible plugin aims to provide sensible vim defaults similar to
+" this file. However, we don't use it because a collaborator may not want vim
+" to automatically reload a buffer when its file changes on disk.
+"
+" The Fuzzy Finder plugin is super popular, but it isn't necessary for typical
+" system administration tasks.
+"
+" Plug 'tpope/vim-sensible'
+" Plug 'junegunn/fzf', { 'do': { -> fzf#setup() } }
+
+call plug#end()
+
