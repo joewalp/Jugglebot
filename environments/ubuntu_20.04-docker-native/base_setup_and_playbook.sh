@@ -43,21 +43,21 @@ done
 task 'Assert that the environments directory was specified'
 
 if [[ -z "${ENVIRONMENTS_DIR:-}" ]]; then
-  echo '[ERROR]: The environments directory is required. Invoke this command with the `--environments-dir "[directory path]"`'
+  echo '[ERROR]: The environments directory is required. Invoke this command with the `--environments-dir "[directory path]"` option.'
   exit 2
 fi
 
 task 'Assert that a conda environment config file was specified'
 
 if [[ -z "${JUGGLEBOT_CONDA_ENV_FILEPATH:-}" ]]; then
-  echo '[ERROR]: The jugglebot conda env config file is required. Invoke this command with the `--jugglebot-conda-env-filepath "[conda environment config file]"`'
+  echo '[ERROR]: The jugglebot conda env config file is required. Invoke this command with the `--jugglebot-conda-env-filepath "[conda environment config file]"` option.'
   exit 2
 fi
 
 task 'Assert that the Ansible become password was specified'
 
 if [[ -z "${ANSIBLE_BECOME_PASS:-}" ]]; then
-  echo '[ERROR]: Ansible become password is required. Invoke this command with the `--ansible-become-pass "[cleartext password]"`'
+  echo '[ERROR]: Ansible become password is required. Invoke this command with the `--ansible-become-pass "[cleartext password]"` option.'
   exit 2
 fi
 
