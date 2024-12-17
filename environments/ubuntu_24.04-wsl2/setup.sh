@@ -85,11 +85,6 @@ task 'Add the ssh private key'
 
 ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 
-task 'Build the ansible-playbook command'
-
-read -r -d '' ANSIBLE_PLAYBOOK_COMMAND << EndOfText || true
-EndOfText
-
 task 'Source ubuntu-common/base_setup.sh'
 
 source "${ENVIRONMENTS_DIR}/ubuntu-common/base_setup.sh"
