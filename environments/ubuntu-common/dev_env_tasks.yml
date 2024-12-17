@@ -173,7 +173,7 @@
     src: "{{ environments_dir }}/ubuntu-common/conda_env.sh"
     dest: "{{ jugglebot_config_dir }}/conda_env.sh"
     readable_dest: ~/.jugglebot/conda_env.sh
-    mode: '0755'
+    mode: '0644'
 
 - name: Install the conda env activate script
   copy:
