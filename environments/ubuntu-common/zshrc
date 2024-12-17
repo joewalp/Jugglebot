@@ -2,8 +2,8 @@
 #
 # This default ~/.zshrc was adapted from the default zshrc provided by Oh My 
 # Zsh. It was provisioned by an Ansible task that was run by the host setup
-# script. If you re-run that host setup script, it will not overwrite this file.
-# If you had made changes, it will produce a diff in 
+# script. If you re-run that host setup script, it will not overwrite the 
+# changes that you've made to this file. Instead, it will produce a diff in 
 # `~/.jugglebot/host_setup/diffs`.
 
 
