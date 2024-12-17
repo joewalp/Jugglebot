@@ -1,6 +1,5 @@
 FROM ubuntu:focal
 
-
 # TASK [Upgrade the packages and restore the man command]
 
 RUN export DEBIAN_FRONTEND=noninteractive \
