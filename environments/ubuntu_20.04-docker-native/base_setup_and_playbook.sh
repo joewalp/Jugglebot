@@ -50,14 +50,14 @@ fi
 task 'Assert that a conda environment config file was specified'
 
 if [[ -z "${JUGGLEBOT_CONDA_ENV_FILEPATH:-}" ]]; then
-  echo '[ERROR]: The jugglebot conda env config file is required. invoke this command with the `--jugglebot-conda-env-filepath "[conda environment config file]"`'
+  echo '[ERROR]: The jugglebot conda env config file is required. Invoke this command with the `--jugglebot-conda-env-filepath "[conda environment config file]"`'
   exit 2
 fi
 
 task 'Assert that the Ansible become password was specified'
 
 if [[ -z "${ANSIBLE_BECOME_PASS:-}" ]]; then
-  echo '[ERROR]: Ansible become password is required. invoke this command with the `--ansible-become-pass "[cleartext password]"`'
+  echo '[ERROR]: Ansible become password is required. Invoke this command with the `--ansible-become-pass "[cleartext password]"`'
   exit 2
 fi
 
