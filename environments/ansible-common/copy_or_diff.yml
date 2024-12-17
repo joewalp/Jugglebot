@@ -29,7 +29,7 @@
 # (a) the previously installed vanilla version and (b) the dest. If they're
 # the same, then the dest is vanilla and can be upgraded.
 
-- name: "Define filepath variables"
+- name: "Define filepath variables for {{ readable_dest }}"
   set_fact:
     installed_version_filepath: "{{ host_setup_defaults_dir }}/{{ src|basename }}~installed"
     latest_version_filepath: "{{ host_setup_defaults_dir }}/{{ src|basename }}~latest"
@@ -52,12 +52,12 @@
   register: dest_stat_result
   when: dest_existed and dest_previously_installed
 
-- name: "Compare the checksums to determine whether the dest is upgradable"
+- name: "Check whether {{ readable_dest }} is upgradable"
   set_fact:
     dest_vanilla: installed_stat_result.stat.checksum == dest_stat_result.stat.checksum
   when: dest_existed and dest_previously_installed
 
-- name: "If dest is vanilla, upgrade it"
+- name: "If {{ readable_dest }} is vanilla, upgrade it"
   copy:
     src: "{{ src }}"
     dest: "{{ dest }}"
@@ -113,4 +113,3 @@
     state: absent
   when: diff_needed and diff_command_result.rc == 0
   changed_when: False
-
