@@ -7,6 +7,10 @@
 # - host_setup_defaults_dir
 # - host_setup_diffs_dir
 
+# PSEUDOCODE
+#
+# Copy src to dest without clobbering
+
 - name: "Create {{ readable_dest }} only if it doesn't exist"
   copy:
     src: "{{ src }}"
@@ -19,10 +23,69 @@
   set_fact:
     dest_existed: not copy_result is changed
 
-- name: "Create {{ src|basename }}~ in ~/.jugglebot/host_setup/defaults"
+# PSEUDOCODE
+#
+# If dest_existed and dest had been installed before, compare the checksums of
+# (a) the previously installed vanilla version and (b) the dest. If they're
+# the same, then the dest is vanilla and can be upgraded.
+
+- name: "Check whether {{ readable_dest }} was previously installed"
+  set_fact:
+    installed_version_filepath: "{{ host_setup_defaults_dir }}/{{ src|basename }}~installed"
+    latest_version_filepath: "{{ host_setup_defaults_dir }}/{{ src|basename }}~latest"
+    dest_previously_installed: "'{{ installed_version_filepath }}' is file"
+
+- name: "Generate the installed version checksum"
+  stat:
+    path: "{{ installed_version_filepath }}"
+    checksum_algorithm: sha256
+  register: installed_stat_result
+  when: dest_existed and dest_previously_installed
+
+- name: "Generate the dest version checksum"
+  stat:
+    path: "{{ dest }}"
+    checksum_algorithm: sha256
+  register: dest_stat_result
+  when: dest_existed and dest_previously_installed
+
+- name: "Compare the checksums to determine whether the dest is upgradable"
+  set_fact:
+    dest_vanilla: installed_stat_result.stat.checksum == dest_stat_result.stat.checksum
+  when: dest_existed and dest_previously_installed
+
+- name: "If dest is vanilla, upgrade it"
   copy:
     src: "{{ src }}"
-    dest: "{{ host_setup_defaults_dir }}/{{ src|basename }}~"
+    dest: "{{ dest }}"
+    mode: "{{ mode }}"
+    force: yes
+  when: dest_existed and dest_previously_installed and dest_vanilla
+
+# PSEUDOCODE
+#
+# If either the copy without clobber occurred or the copy with clobber
+# occurred, save a copy of the installed vanilla version in the host_setup
+# defaults dir.
+
+- name: "Retain a copy of the installed vanilla version in ~/.jugglebot/host_setup/defaults"
+  copy:
+    src: "{{ src }}"
+    dest: "{{ installed_version_filepath }}"
+  when: (copy_result is changed) or (dest_existed and dest_previously_installed and dest_vanilla)
+
+# PSEUDOCODE
+#
+# If dest_existed and it couldn't be upgraded, generate a diff
+
+- name: "Retain a copy of the latest version in  ~/.jugglebot/host_setup/defaults"
+  copy:
+    src: "{{ src }}"
+    dest: "{{ latest_version_filepath }}"
+
+- name: "Determine whether we need to generate a diff"
+  set_fact:
+    diff_needed: dest_existed and not (dest_previously_installed and dest_vanilla)
 
 - name: "Create a file for the {{ readable_dest }} diff if necessary"
   tempfile:
@@ -30,14 +93,14 @@
     prefix: "{{ src|basename }}.{{ now( fmt='%Y-%m-%dT%H-%M-%S%z' ) }}_"
     suffix: ".diff"
   register: diff_tempfile_result
-  when: dest_existed
+  when: diff_needed
   changed_when: False
 
 - name: "Generate a diff for {{ readable_dest }} if necessary"
   shell:
-    cmd: "diff --unified=3 '{{ host_setup_defaults_dir }}/{{ src|basename }}~' '{{ dest }}' > '{{ diff_tempfile_result.path }}'"
+    cmd: "diff --unified=3 '{{ latest_version_filepath }}' '{{ dest }}' > '{{ diff_tempfile_result.path }}'"
   register: diff_command_result
-  when: dest_existed
+  when: diff_needed
   failed_when: diff_command_result.rc != 0 and diff_command_result.rc != 1
   changed_when: diff_command_result.rc == 1
 
@@ -45,6 +108,6 @@
   file:
     path: "{{ diff_tempfile_result.path }}"
     state: absent
-  when: dest_existed and diff_command_result.rc == 0
+  when: diff_needed and diff_command_result.rc == 0
   changed_when: False
 
