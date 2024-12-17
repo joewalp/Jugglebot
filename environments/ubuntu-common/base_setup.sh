@@ -1,3 +1,10 @@
+# TASK [Educate about why a Bash shebang line isn't here]
+#
+# This file is intended to be sourced by another bash script. Sourcing enables the
+# sourcing setup script to immediately use the conda environment that this script
+# provisions and enables. More specifically, it enables the sourcing script to run
+# ansible-playbook immediately.
+
 set -o nounset -o pipefail -o errexit
 IFS=$'\t\n' # Stricter IFS settings
 rc=0
