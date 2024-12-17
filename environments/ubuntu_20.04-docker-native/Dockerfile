@@ -124,7 +124,7 @@ RUN groupadd --system --gid "${DOCKER_GID}" docker \
     && useradd --create-home --shell '/bin/bash' --uid "${USER_UID}" --gid "${USERNAME}" --groups 'sudo,docker' "${USERNAME}" \
     && echo -n "${USERNAME}:${USERNAME}" | chpasswd
 
-COPY --chown="${USERNAME}:${USERNAME}" --chmod=644 [ 'build/gitconfig', "/home/${USERNAME}/.gitconfig" ]
+COPY --chown="${USERNAME}:${USERNAME}" --chmod=644 [ "build/gitconfig", "/home/${USERNAME}/.gitconfig" ]
 
 # TASK [Become the default user]
 
