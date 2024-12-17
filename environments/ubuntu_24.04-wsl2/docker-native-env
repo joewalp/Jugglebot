@@ -5,7 +5,6 @@ rc=0
 
 # TASK [Initialize variables]
 
-SERVICE_NAME='jugglebot-native-dev.service'
 CONTAINER_NAME='jugglebot-native-dev'
 EX_UNAVAILABLE=69
 
