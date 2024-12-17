@@ -3,6 +3,8 @@ set -o nounset -o pipefail -o errexit
 IFS=$'\t\n' # Stricter IFS settings
 rc=0
 
+# TASK [Define functions]
+
 task() {
   local task_desc="$1"
   echo -e "\nTASK [${task_desc}] ********"
