@@ -29,11 +29,14 @@
 # (a) the previously installed vanilla version and (b) the dest. If they're
 # the same, then the dest is vanilla and can be upgraded.
 
-- name: "Check whether {{ readable_dest }} was previously installed"
+- name: "Define filepath variables"
   set_fact:
     installed_version_filepath: "{{ host_setup_defaults_dir }}/{{ src|basename }}~installed"
     latest_version_filepath: "{{ host_setup_defaults_dir }}/{{ src|basename }}~latest"
-    dest_previously_installed: "'{{ installed_version_filepath }}' is file"
+
+- name: "Check whether {{ readable_dest }} was previously installed"
+  set_fact:
+    dest_previously_installed: "{{ installed_version_filepath is file }}"
 
 - name: "Generate the installed version checksum"
   stat:
