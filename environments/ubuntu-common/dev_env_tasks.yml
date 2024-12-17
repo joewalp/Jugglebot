@@ -165,7 +165,7 @@
 
 - name: Execute :PlugInstall to install the configured vim-plug plugins
   shell:
-    cmd: vim -c PlugInstall
+    cmd: vim -c PlugInstall -c qall
 
 - name: Create or diff ~/.oh-my-zsh/custom/aliases.zsh
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
