@@ -104,7 +104,7 @@ RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then 
 
 # TASK [Specify /home and /tmp as volumes]
 
-VOLUME [ '/home', '/tmp' ]
+VOLUME [ "/home", "/tmp" ]
 
 # TASK [Create /entrypoint to hold entrypoint resources, and make /home writeable]
 
