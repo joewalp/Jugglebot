@@ -186,11 +186,11 @@ ENV SHELL='/usr/bin/zsh' GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 # Note: If "${HOME}" doesn't exist in the /home VOLUME, entrypoint.sh
 # populates it from "/entrypoint/${USER}".
 
-ENTRYPOINT [ 'tini', '--', '/entrypoint/entrypoint.sh' ]
+ENTRYPOINT [ "tini", "--", "/entrypoint/entrypoint.sh" ]
 
 # TASK [Sleep to keep the container alive as a service]
 
-CMD [ 'sleep', 'infinity' ]
+CMD [ "sleep", "infinity" ]
 
 # TASK [Retain a couple alternative CMDs for reference]
 #
