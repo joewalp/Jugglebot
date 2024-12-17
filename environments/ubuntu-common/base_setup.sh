@@ -5,9 +5,13 @@
 # provisions and enables. More specifically, it enables the sourcing script to run
 # ansible-playbook immediately.
 
+# TASK [Include the strict Bash header]
+
 set -o nounset -o pipefail -o errexit
 IFS=$'\t\n' # Stricter IFS settings
 rc=0
+
+# TASK [Define functions]
 
 task() {
   local task_desc="$1"
