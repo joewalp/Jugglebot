@@ -7,7 +7,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get upgrade -y \
     && yes | unminimize 2>&1
 
-ENV LANG="C.UTF-8"
+ENV LANG='C.UTF-8'
 
 # TASK [Enable the universe respository]
 
@@ -104,7 +104,7 @@ RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then 
 
 # TASK [Specify /home and /tmp as volumes]
 
-VOLUME [ "/home", "/tmp" ]
+VOLUME [ '/home', '/tmp' ]
 
 # TASK [Create /entrypoint to hold entrypoint resources, and make /home writeable]
 
@@ -112,62 +112,62 @@ RUN mkdir --mode 777 '/entrypoint' && chmod 777 '/home'
 
 # TASK [Initialize the user and group variables]
 
-ARG USER_UID="1000"
-ARG USER_GID="1000"
-ARG DOCKER_GID="989"
-ARG USERNAME="devops"
+ARG USER_UID=1000
+ARG USER_GID=1000
+ARG DOCKER_GID=989
+ARG USERNAME='devops'
 
 # TASK [Create the default user]
 
-RUN groupadd --system --gid "$DOCKER_GID" docker \
-    && groupadd --gid "$USER_GID" "$USERNAME" \
-    && useradd --create-home --shell '/bin/bash' --uid "$USER_UID" --gid "$USERNAME" --groups 'sudo,docker' "$USERNAME" \
-    && echo -n "$USERNAME:$USERNAME" | chpasswd
+RUN groupadd --system --gid "${DOCKER_GID}" docker \
+    && groupadd --gid "${USER_GID}" "${USERNAME}" \
+    && useradd --create-home --shell '/bin/bash' --uid "${USER_UID}" --gid "${USERNAME}" --groups 'sudo,docker' "${USERNAME}" \
+    && echo -n "${USERNAME}:${USERNAME}" | chpasswd
 
-COPY --chown=$USERNAME:$USERNAME --chmod=644 [ "build/gitconfig", "/home/$USERNAME/.gitconfig" ]
+COPY --chown="${USERNAME}:${USERNAME}" --chmod=644 [ 'build/gitconfig', "/home/${USERNAME}/.gitconfig" ]
 
 # TASK [Become the default user]
 
-USER "$USERNAME"
+USER "${USERNAME}"
 
-ENV USER="$USERNAME" SHELL="/bin/bash" HOME="/home/$USERNAME"
+ENV USER="${USERNAME}" SHELL='/bin/bash' HOME="/home/${USERNAME}"
 
-WORKDIR "/home/$USERNAME"
+WORKDIR "/home/${USERNAME}"
 
 # TASK [Initialize the repo clone variables]
 
-ARG JUGGLEBOT_REPO_SSH_URL="git@github.com:joewalp/Jugglebot.git"
-ARG REPO_CACHE_ID="0"
+ARG JUGGLEBOT_REPO_SSH_URL='git@github.com:joewalp/Jugglebot.git'
+ARG REPO_CACHE_ID='0'
 
 # TASK [Clone the Jugglebot git repo]
 
-RUN --mount=type=ssh,mode=0666 mkdir --mode 700 "/home/$USERNAME/.ssh" \
+RUN --mount=type=ssh,mode=0666 mkdir --mode 700 "/home/${USERNAME}/.ssh" \
     && ssh-keyscan -t rsa github.com > /home/$USERNAME/.ssh/known_hosts \
-    && git clone "$JUGGLEBOT_REPO_SSH_URL" "/home/$USERNAME/Jugglebot"
+    && git clone "${JUGGLEBOT_REPO_SSH_URL}" "/home/${USERNAME}/Jugglebot"
 
 # TASK [Initialize the repo branch variable]
 
-ARG JUGGLEBOT_REPO_BRANCH="main"
+ARG JUGGLEBOT_REPO_BRANCH='main'
 
 # TASK [Ensure that the specified branch is checked out]
 
-WORKDIR "/home/$USERNAME/Jugglebot"
+WORKDIR "/home/${USERNAME}/Jugglebot"
 
 RUN --mount=type=ssh,mode=0666 git checkout "${JUGGLEBOT_REPO_BRANCH}" \
     && git pull
 
-WORKDIR "/home/$USERNAME"
+WORKDIR "/home/${USERNAME}"
 
 # TASK [Initialize the base setup and playbook variable]
 
-ARG ENVIRONMENTS_DIR="/home/$USERNAME/Jugglebot/environments"
+ARG ENVIRONMENTS_DIR="/home/${USERNAME}/Jugglebot/environments"
 
 # TASK [Run the ubuntu-common base setup and then the playbook]
 
-RUN "$ENVIRONMENTS_DIR/ubuntu_20.04-docker-native/base_setup_and_playbook.sh" \
-      --environments-dir "$ENVIRONMENTS_DIR" \
-      --jugglebot-conda-env-filepath "$ENVIRONMENTS_DIR/ubuntu-common/jugglebot_conda_env.yml" \
-      --ansible-become-pass "$USERNAME"
+RUN "${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native/base_setup_and_playbook.sh" \
+      --environments-dir "${ENVIRONMENTS_DIR}" \
+      --jugglebot-conda-env-filepath "${ENVIRONMENTS_DIR}/ubuntu-common/jugglebot_conda_env.yml" \
+      --ansible-become-pass "${USERNAME}"
 
 # TASK [Install entrypoint.sh]
 
@@ -175,22 +175,22 @@ COPY entrypoint.sh /entrypoint/
 
 # TASK [Move the default user home directory into the /entrypoint directory]
 
-RUN mv "/home/$USERNAME" "/entrypoint/$USERNAME"
+RUN mv "/home/${USERNAME}" "/entrypoint/${USERNAME}"
 
 # TASK [Specify additional environment variables for interactive sessions]
 
-ENV SHELL=/usr/bin/zsh GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+ENV SHELL='/usr/bin/zsh' GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
 # TASK [Use tini to corral processes, and run entrypoint.sh upon container start]
 #
 # Note: If "${HOME}" doesn't exist in the /home VOLUME, entrypoint.sh
 # populates it from "/entrypoint/${USER}".
 
-ENTRYPOINT [ "tini", "--", "/entrypoint/entrypoint.sh" ]
+ENTRYPOINT [ 'tini', '--', '/entrypoint/entrypoint.sh' ]
 
 # TASK [Sleep to keep the container alive as a service]
 
-CMD [ "sleep", "infinity" ]
+CMD [ 'sleep', 'infinity' ]
 
 # TASK [Retain a couple alternative CMDs for reference]
 #
@@ -205,4 +205,3 @@ CMD [ "sleep", "infinity" ]
 # run -it [...]` or `docker container start --attach [...]`.
 #
 # CMD [ "/usr/bin/zsh" ]
-
