@@ -120,3 +120,14 @@
       readable_dest: ~/bin/docker-native-env
       mode: '0755'
 
+  - name: Install ROS2
+    package:
+      name: ros-jazzy-desktop
+      state: present
+
+  - name: Enable ROS2 in zsh
+    file:
+      path: "{{ home_dir }}/.oh-my-zsh/custom/ros2_setup.zsh"
+      state: link
+      src: '/opt/ros/jazzy/setup.zsh'
+
