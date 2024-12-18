@@ -18,7 +18,7 @@
 
 - name: "Download the key for the {{ readable_name }} package repository"
   get_url:
-    url: "{{ repo_key_url }}"
+    url: "{{ key_url }}"
     dest: "/usr/share/keyrings/{{ key_filename }}"
   become: yes
 
