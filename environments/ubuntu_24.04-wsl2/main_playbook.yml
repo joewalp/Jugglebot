@@ -79,14 +79,14 @@
       add_keys_to_agent: yes
       strict_host_key_checking: accept-new
 
-  - name: Set git name in ~/.gitconfig
+  - name: Set user name in ~/.gitconfig
     community.general.ini_file:
       path: "{{ gitconfig_filepath }}"
       section: 'user'
       option: 'name'
       value: "{{ git_name }}"
 
-  - name: Set git name in ~/.gitconfig
+  - name: Set user email in ~/.gitconfig
     community.general.ini_file:
       path: "{{ gitconfig_filepath }}"
       section: 'user'
