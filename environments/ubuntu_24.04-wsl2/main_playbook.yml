@@ -124,13 +124,13 @@
     # Note: We install the Jazzy version of ROS2 because the Foxy version does
     # not have tier 1 support on Ubuntu 24.04.
     package:
-      name:
-      - ros-jazzy-desktop
-      - yq
+      name: ros-jazzy-desktop
       state: present
     become: yes
 
   - name: Set the ROS2 version codename in the Jugglebot runtime config
     command:
-      cmd: yq -i -y --arg codename jazzy '.ros.version_codename = $codename' "{{ home_dir }}/.jugglebot/jugglebot_rc.yml"
+      cmd: >
+        yq -i -y --arg codename jazzy '.ros.version_codename = $codename' 
+        "{{ home_dir }}/.jugglebot/jugglebot_rc.yml"
 
