@@ -9,21 +9,67 @@
 # Each of those scripts sets the relevant EVENT_TYPE and then sources this
 # script.
 
+# TASK [Define functions]
+
+get_ros_codename() {
+  local jugglebot_rc_filepath="$1"
+  
+  # TASK [Retrieve the ROS2 codename from the Jugglebot runtime config]
+
+  if which -s yq; then
+    ros_codename="$(yq -r .ros.version_codename "${jugglebot_rc_filepath}")"
+  else
+    echo '[WARNING]: Using the sed fallback because yq is not available'
+
+    ros_codename="$(sed -n 's/^\s*version_codename:\s*\([^\s]*\)\s*$/\1/p' \
+      "${jugglebot_rc_filepath}")"
+  fi
+
+  echo -n "${ros_codename}"
+}
+
+enable_ros2() {
+  local jugglebot_rc_filepath="$1"
+  local ros_codename="$(get_ros_codename "${jugglebot_rc_filepath}")"
+  local ros_setup_filepath="/opt/ros/${ros_codename}/setup.zsh"
+
+  # TASK [Enable ROS2]
+
+  if [[ -f "${ros_setup_filepath}" ]]; then
+    source "${ros_setup_filepath}"
+  else
+    echo '[WARNING]: The ROS2 setup script was not found.'
+  fi
+}
+
+# TASK [Handle the specified event]
+
 case "${EVENT_TYPE}" in
   activate)
     
-    # TASK [Activate]
-    
+    # TASK [Initialize environment variables]
+
     export JUGGLEBOT_REPO_DIR="${HOME}/Jugglebot"
     export JUGGLEBOT_CONFIG_DIR="${HOME}/.jugglebot"
+  
+    enable_ros2 "${JUGGLEBOT_CONFIG_DIR}/jugglebot_rc.yml"
     ;;
   
   deactivate)
   
-    # TASK [Deactivate]
+    # TASK [Cleanup environment variables]
 
     unset JUGGLEBOT_REPO_DIR
     unset JUGGLEBOT_CONFIG_DIR
+
+    # TASK [Disable ROS2]
+    #
+    # TODO Stop ROS2 and remove its environment variables
+    #
+    # A comprehensive treatment of this nice-to-have environment cleanup
+    # feature may end up introducing dependencies on the ROS2 internals. Let's
+    # defer implementation until we have some need to clean up the environment
+    # upon deactivating.
     ;;
 
   *)

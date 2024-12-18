@@ -69,13 +69,28 @@
     dest: "{{ packages_upgraded_filepath }}"
   when: upgrade_software|bool and upgrade_packages_result is succeeded
 
-- name: Ensure that keychain, zsh and git are installed
+- name: Ensure that git, jq, keychain and zsh are installed
   package:
     name:
+    - git
+    - jq
     - keychain
     - zsh
-    - git
     state: present
+  become: yes
+
+- name: On Ubuntu 24.04+, install the yq apt package
+  package:
+    name: yq
+    state: present
+  when: "{{ ansible_facts['distribution_version') is version('24.04', '>=') }}"
+  become: yes
+
+- name: On older versions of Ubuntu, install the yq snap package
+  community.general.snap:
+    name: yq
+    state: present
+  when: "{{ ansible_facts['distribution_version') is version('24.04', '<') }}"
   become: yes
 
 - name: Read the zsh path
@@ -197,6 +212,14 @@
   copy:
     src: 'conda_env_deactivate.sh'
     dest: '{{ home_dir }}/miniforge3/envs/jugglebot/etc/conda/deactivate.d/'
+
+- name: Install the Jugglebot runtime config file
+  import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
+  vars:
+    src: "{{ environments_dir }}/ubuntu-common/jugglebot_rc.yml"
+    dest: "{{ jugglebot_config_dir }}/jugglebot_rc.yml"
+    readable_dest: ~/.jugglebot/jugglebot_rc.yml
+    mode: '0644'
 
 - name: Add the Docker package repository
   import_tasks: "{{ environments_dir }}/ansible-common/add_apt_repository.yml"

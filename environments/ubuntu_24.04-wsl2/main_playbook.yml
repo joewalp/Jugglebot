@@ -120,15 +120,17 @@
       readable_dest: ~/bin/docker-native-env
       mode: '0755'
 
-  - name: Install ROS2
+  - name: Install ROS2 Jazzy Desktop (and its many dependencies)
+    # Note: We install the Jazzy version of ROS2 because the Foxy version does
+    # not have tier 1 support on Ubuntu 24.04.
     package:
-      name: ros-jazzy-desktop
+      name:
+      - ros-jazzy-desktop
+      - yq
       state: present
     become: yes
 
-  - name: Enable ROS2 in zsh
-    file:
-      path: "{{ home_dir }}/.oh-my-zsh/custom/ros2_setup.zsh"
-      state: link
-      src: '/opt/ros/jazzy/setup.zsh'
+  - name: Set the ROS2 version codename in the Jugglebot runtime config
+    command:
+      cmd: yq -i -y --arg codename jazzy '.ros.version_codename = $codename' "{{ home_dir }}/.jugglebot/jugglebot_rc.yml"
 

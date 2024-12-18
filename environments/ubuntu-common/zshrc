@@ -177,6 +177,13 @@ fi
 stty -ixon
 
 
+# TASK [Add /snap/bin to the end of the PATH]
+
+if [[ -d /snap/bin ]]; then
+  export PATH="$PATH:/snap/bin"
+fi
+
+
 # TASK [Include the conda initialize block]
 # ...
 # >>> conda initialize >>>
