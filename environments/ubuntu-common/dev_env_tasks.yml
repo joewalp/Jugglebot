@@ -69,13 +69,12 @@
     dest: "{{ packages_upgraded_filepath }}"
   when: upgrade_software|bool and upgrade_packages_result is succeeded
 
-- name: Ensure that keychain, zsh, git and python-apt are installed
+- name: Ensure that keychain, zsh and git are installed
   package:
     name:
     - keychain
     - zsh
     - git
-    - python-apt
     state: present
   become: yes
 
