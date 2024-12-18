@@ -204,7 +204,7 @@
     url: "{{ docker_package_repo_url }}"
     suite: "{{ docker_package_repo_suite }}"
     key_url: "{{ docker_package_repo_key_url }}"
-    key_filename: "{{ docker_package_repo_key_filename }}"
+    key_filepath: "{{ docker_package_repo_key_filepath }}"
     readable_name: Docker
     update_cache: no
 
@@ -214,7 +214,7 @@
     url: "{{ ros2_package_repo_url }}"
     suite: "{{ ros2_package_repo_suite }}"
     key_url: "{{ ros2_package_repo_key_url }}"
-    key_filename: "{{ ros2_package_repo_key_filename }}"
+    key_filepath: "{{ ros2_package_repo_key_filepath }}"
     readable_name: ROS2
     update_cache: yes
 
