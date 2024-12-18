@@ -218,3 +218,12 @@
     readable_name: ROS2
     update_cache: yes
 
+- name: Install ROS2
+  package:
+    name:
+    - ros-foxy-desktop
+    - python3-argcomplete
+    - ros-dev-tools
+    state: present
+  become: yes
+
