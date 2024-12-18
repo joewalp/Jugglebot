@@ -15,7 +15,14 @@ gitconfig_filepath: "{{ home_dir }}/.gitconfig"
 jugglebot_conda_env_filepath: "{{ host_setup_dir }}/jugglebot_conda_env.yml }}"
 ohmyzsh_git_repo: 'https://github.com/ohmyzsh/ohmyzsh.git'
 ohmyzsh_dir: "{{ home_dir }}/.oh-my-zsh"
-zsh_aliases_filepath: "{{ ohmyzsh_dir }}/custom/aliases.zsh"
+zsh_aliases_filepath: "{{ home_dir }}/.oh-my-zsh/custom/aliases.zsh"
 packages_upgraded_filepath: "{{ host_setup_dir }}/packages_upgraded_timestamp"
 ohmyzsh_upgraded_filepath: "{{ host_setup_dir }}/ohmyzsh_upgraded_timestamp"
-
+docker_package_repo_url: 'https://download.docker.com/linux/ubuntu'
+docker_package_repo_suite: 'stable'
+docker_package_repo_key_url: 'https://download.docker.com/linux/ubuntu/gpg'
+docker_package_repo_key_filename: 'docker.asc'
+ros2_package_repo_url: 'http://packages.ros.org/ros2/ubuntu'
+ros2_package_repo_suite: 'main'
+ros2_package_repo_key_url: 'https://raw.githubusercontent.com/ros/rosdistro/master/ros.key'
+ros2_package_repo_key_filename: 'ros-archive-keyring.gpg'

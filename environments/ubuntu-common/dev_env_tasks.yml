@@ -198,3 +198,23 @@
     src: 'conda_env_deactivate.sh'
     dest: '{{ home_dir }}/miniforge3/envs/jugglebot/etc/conda/deactivate.d/'
 
+- name: Add the Docker package repository
+  import_tasks: "{{ environments_dir }}/ansible-common/add_apt_repository.yml"
+  vars:
+    url: "{{ docker_package_repo_url }}"
+    suite: "{{ docker_package_repo_suite }}"
+    key_url: "{{ docker_package_repo_key_url }}"
+    key_filename: "{{ docker_package_repo_key_filename }}"
+    readable_name: Docker
+    update_cache: no
+
+- name: Add the ROS2 package repository
+  import_tasks: "{{ environments_dir }}/ansible-common/add_apt_repository.yml"
+  vars:
+    url: "{{ ros2_package_repo_url }}"
+    suite: "{{ ros2_package_repo_suite }}"
+    key_url: "{{ ros2_package_repo_key_url }}"
+    key_filename: "{{ ros2_package_repo_key_filename }}"
+    readable_name: ROS2
+    update_cache: yes
+

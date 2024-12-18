@@ -14,19 +14,14 @@
       dest: "{{ ansible_facts['env']['HOME'] }}"
       force: no
 
-  - name: Provision the Ubuntu environment
-    import_tasks: "{{ environments_dir }}/ubuntu-common/dev_env_tasks.yml"
-    vars:
-      environments_dir: "{{ playbook_dir }}/.."
-
   - name: Require that the jugglebot Conda environment is activated
     assert:
       that: ansible_facts['env']['CONDA_DEFAULT_ENV'] == 'jugglebot'
       fail_msg: '[ERROR]: This playbook expects for the jugglebot conda environment to be activated. Activate that environment using the following command: `conda activate jugglebot`'
       quiet: yes
 
-  - name: Add the docker package repository
-    import_tasks: "{{ environments_dir }}/ubuntu-common/docker_repository_tasks.yml"
+  - name: Provision the Ubuntu environment
+    import_tasks: "{{ environments_dir }}/ubuntu-common/dev_env_tasks.yml"
     vars:
       environments_dir: "{{ playbook_dir }}/.."
 
@@ -35,3 +30,4 @@
       name: docker-ce-cli
       state: present
     become: yes
+

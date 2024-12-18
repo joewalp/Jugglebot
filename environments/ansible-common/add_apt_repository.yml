@@ -1,0 +1,37 @@
+---
+# These tasks compensate for the deprecation of the apt_key Ansible module due
+# to the deprecation of the apt-key tool.
+#
+# parameters:
+# - url
+# - suite
+# - key_url
+# - key_filename
+# - readable_name
+# - update_cache
+
+- name: Ensure that the keyrings directory exists
+  file:
+    path: '/usr/share/keyrings'
+    state: directory
+  become: yes
+
+- name: "Download the key for the {{ readable_name }} package repository"
+  get_url:
+    url: "{{ repo_key_url }}"
+    dest: "/usr/share/keyrings/{{ key_filename }}"
+  become: yes
+
+- name: Read the dpkg architecture
+  command:
+    cmd: 'dpkg --print-architecture'
+  register: dpkg_architecture_result
+  changed_when: False
+
+- name: "Add the {{ readable_name }} package respository to the apt sources"
+  apt_repository:
+    repo: "deb [arch={{ dpkg_architecture_result.stdout|trim }} signed-by=/usr/share/keyrings/{{ key_filename }}] {{ repo_url }} {{ ansible_facts['lsb']['codename'] }} {{ suite }}"
+    install_python_apt: no
+    update_cache: "{{ update_cache }}"
+  become: yes
+

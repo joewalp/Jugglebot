@@ -5,6 +5,8 @@ dependencies:
   - ansible
   - paramiko
     # required_by: community.general.ssh_config Ansible module
+  - python-apt
+    # required_by: ansible.builtin.apt_repository Ansible module
   - pip:
     - docker
       # required_by: community.docker Ansible modules
