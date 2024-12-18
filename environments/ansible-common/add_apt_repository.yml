@@ -30,7 +30,7 @@
 
 - name: "Add the {{ readable_name }} package respository to the apt sources"
   apt_repository:
-    repo: "deb [arch={{ dpkg_architecture_result.stdout|trim }} signed-by=/usr/share/keyrings/{{ key_filename }}] {{ repo_url }} {{ ansible_facts['lsb']['codename'] }} {{ suite }}"
+    repo: "deb [arch={{ dpkg_architecture_result.stdout|trim }} signed-by=/usr/share/keyrings/{{ key_filename }}] {{ url }} {{ ansible_facts['lsb']['codename'] }} {{ suite }}"
     update_cache: "{{ update_cache }}"
   become: yes
 
