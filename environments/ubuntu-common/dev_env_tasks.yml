@@ -83,14 +83,14 @@
   package:
     name: yq
     state: present
-  when: "{{ ansible_facts['distribution_version') is version('24.04', '>=') }}"
+  when: "{{ ansible_facts['distribution_version'] is version('24.04', '>=') }}"
   become: yes
 
 - name: On older versions of Ubuntu, install the yq snap package
   community.general.snap:
     name: yq
     state: present
-  when: "{{ ansible_facts['distribution_version') is version('24.04', '<') }}"
+  when: "{{ ansible_facts['distribution_version'] is version('24.04', '<') }}"
   become: yes
 
 - name: Read the zsh path
