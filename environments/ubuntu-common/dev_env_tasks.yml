@@ -81,7 +81,7 @@
 
 - name: Determine the jq binary
   set_fact:
-    jq_download_binary_name: "{{ 'yq_linux_amd64' if ansible_facts['architecture'] in [ 'x86_64', 'amd64' ] else 'yq_linux_arm64' }}"
+    yq_download_binary_name: "{{ 'yq_linux_amd64' if ansible_facts['architecture'] in [ 'x86_64', 'amd64' ] else 'yq_linux_arm64' }}"
 
 - name: Install yq
   # Note: We install this without using a package manager because we need the
