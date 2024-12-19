@@ -11,26 +11,9 @@
 
 # TASK [Define functions]
 
-get_ros_codename() {
-  local jugglebot_rc_filepath="$1"
-  
-  # TASK [Retrieve the ROS2 codename from the Jugglebot runtime config]
-
-  if which -s yq; then
-    ros_codename="$(yq -r .ros.version_codename "${jugglebot_rc_filepath}")"
-  else
-    echo '[WARNING]: Using the sed fallback because yq is not available'
-
-    ros_codename="$(sed -n 's/^\s*version_codename:\s*\([^\s]*\)\s*$/\1/p' \
-      "${jugglebot_rc_filepath}")"
-  fi
-
-  echo -n "${ros_codename}"
-}
-
 enable_ros2() {
   local jugglebot_rc_filepath="$1"
-  local ros_codename="$(get_ros_codename "${jugglebot_rc_filepath}")"
+  local ros_codename="$(yq -r .ros.version_codename "${jugglebot_rc_filepath}")"
   local ros_setup_filepath="/opt/ros/${ros_codename}/setup.zsh"
 
   # TASK [Enable ROS2]
