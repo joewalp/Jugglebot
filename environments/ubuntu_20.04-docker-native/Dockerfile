@@ -32,6 +32,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       ca-certificates \
       clang \
       cmake \
+      code \
       coreutils \
       cppcheck \
       curl \
@@ -70,6 +71,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       net-tools \
       netcat \
       openssh-client \
+      openssh-server \
       procps \
       psmisc \
       python-pip-whl \
@@ -101,6 +103,10 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then \
       echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen; \
     fi
+
+# TASK [Configure sshd]
+
+RUN mkdir /var/run/sshd
 
 # TASK [Install ROS2 Desktop and its many dependencies]
 #
@@ -141,6 +147,10 @@ RUN groupadd --system --gid "${DOCKER_GID}" docker \
     && echo -n "${USERNAME}:${USERNAME}" | chpasswd
 
 COPY --chown="${USERNAME}:${USERNAME}" --chmod=644 [ "build/gitconfig", "/home/${USERNAME}/.gitconfig" ]
+
+# TASK [Enable the default user to start sshd]
+
+RUN echo "${USERNAME} ALL=(ALL:ALL) NOPASSWD: /usr/sbin/sshd -D" > /etc/sudoers.d/sshd_sudoers
 
 # TASK [Become the default user]
 

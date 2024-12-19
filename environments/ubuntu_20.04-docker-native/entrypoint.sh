@@ -7,6 +7,12 @@ rc=0
 
 INIT_FLAG_FILEPATH="${HOME}/.user-dir-initialized"
 
+# TASK [Start sshd]
+
+sudo /usr/sbin/sshd -D
+
+# TASK [Determine whether the user's nome directory needs to be initialized]
+
 if [[ ! -f "${INIT_FLAG_FILEPATH}" ]]; then
 
   # TASK [Initializes the user's home directory in the /home volume`]
