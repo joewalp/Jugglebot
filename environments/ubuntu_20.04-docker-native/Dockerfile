@@ -108,7 +108,7 @@ RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then 
 # dockerfile caching.
 
 RUN export DEBIAN_FRONTEND=noninteractive \
-    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+    && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
       -o /usr/share/keyrings/ros-archive-keyring.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -c -s) main" \
       | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
