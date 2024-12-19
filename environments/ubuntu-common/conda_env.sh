@@ -16,7 +16,7 @@ enable_ros2() {
   local ros_codename="$(yq -r .ros.version_codename "${jugglebot_rc_filepath}")"
   local ros_setup_filepath="/opt/ros/${ros_codename}/setup.zsh"
 
-  # TASK [Enable ROS2]
+  # TASK [Source the ROS2 setup script into the shell environment]
 
   if [[ -f "${ros_setup_filepath}" ]]; then
     source "${ros_setup_filepath}"
@@ -35,6 +35,8 @@ case "${EVENT_TYPE}" in
     export JUGGLEBOT_REPO_DIR="${HOME}/Jugglebot"
     export JUGGLEBOT_CONFIG_DIR="${HOME}/.jugglebot"
   
+    # TASK [Enable ROS2]
+
     enable_ros2 "${JUGGLEBOT_CONFIG_DIR}/jugglebot_rc.yml"
     ;;
   
