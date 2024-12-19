@@ -133,6 +133,6 @@
   - name: Set the ROS2 version codename in the Jugglebot runtime config
     command:
       cmd: >
-        /snap/bin/yq -i eval '.ros.version_codename = "jazzy"'
+        /usr/bin/yq -i eval '.ros.version_codename = "jazzy"'
         "{{ home_dir }}/.jugglebot/jugglebot_rc.yml"
 
