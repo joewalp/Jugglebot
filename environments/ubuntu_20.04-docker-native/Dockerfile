@@ -77,6 +77,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       python3-pip \
       rsync \
       sed \
+      snap \
       strace \
       sudo \
       swig3.0 \
