@@ -103,7 +103,9 @@ RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then 
     fi
 
 # TASK [Install ROS2 Desktop and its many dependencies]
-# Note: We install this here rather than in the playbook to take advantage 
+#
+# Note: We install this here rather than in the playbook to take advantage of
+# dockerfile caching.
 
 RUN export DEBIAN_FRONTEND=noninteractive \
     curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
