@@ -79,9 +79,20 @@
     state: present
   become: yes
 
-- name: Install the yq snap package
-  command:
-    cmd: /usr/bin/snap install yq
+- name: Determine the jq binary
+  set_fact:
+    jq_download_binary_name: "{{ 'yq_linux_amd64' if ansible_facts['architecture'] in [ 'x86_64', 'amd64' ] else 'yq_linux_arm64' }}"
+
+- name: Install yq
+  # Note: We install this without using a package manager because we need the
+  # a 4.11+ version and because the snap package manager doesn't play well with
+  # docker. We need version 4.11+ because earlier versions would strip the 
+  # three-hyphen header upon editing a yaml file. Note that the command line
+  # interface of yq changed substantially between v3 and v4.
+  get_url:
+    url: "{{ yq_download_url }}{{ yq_download_binary_name }}"
+    dest: /usr/bin/yq
+    mode: 0755
   become: yes
 
 - name: Read the zsh path
