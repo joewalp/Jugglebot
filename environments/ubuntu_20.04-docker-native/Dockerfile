@@ -108,6 +108,8 @@ RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then 
 
 RUN mkdir /var/run/sshd
 
+EXPOSE 22
+
 # TASK [Install the VSCode Server]
 
 RUN export DEBIAN_FRONTEND=noninteractive \
