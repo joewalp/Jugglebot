@@ -79,18 +79,14 @@
     state: present
   become: yes
 
-- name: On Ubuntu 24.04+, install the yq apt package
-  package:
-    name: yq
-    state: present
-  when: "{{ ansible_facts['distribution_version'] is version('24.04', '>=') }}"
-  become: yes
-
-- name: On older versions of Ubuntu, install the yq snap package
+- name: Install the yq snap package
+  # Note: We install the snap package instead of the Ubuntu package both (a)
+  # because an apt package is not available in Ubuntu versions prior to 24.04
+  # and (b) because version in the apt package in Ubuntu 24.04 has a bug that
+  # causes it to strip the three-dash header when editing a yaml file.
   community.general.snap:
     name: yq
     state: present
-  when: "{{ ansible_facts['distribution_version'] is version('24.04', '<') }}"
   become: yes
 
 - name: Read the zsh path
@@ -240,5 +236,4 @@
     key_filepath: "{{ ros2_package_repo_key_filepath }}"
     readable_name: ROS2
     update_cache: yes
-
 
