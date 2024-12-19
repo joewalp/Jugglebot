@@ -223,16 +223,6 @@
     readable_dest: ~/.jugglebot/jugglebot_rc.yml
     mode: '0644'
 
-- name: Add the Docker package repository
-  import_tasks: "{{ environments_dir }}/ansible-common/add_apt_repository.yml"
-  vars:
-    url: "{{ docker_package_repo_url }}"
-    suite: "{{ docker_package_repo_suite }}"
-    key_url: "{{ docker_package_repo_key_url }}"
-    key_filepath: "{{ docker_package_repo_key_filepath }}"
-    readable_name: Docker
-    update_cache: no
-
 - name: Add the ROS2 package repository
   import_tasks: "{{ environments_dir }}/ansible-common/add_apt_repository.yml"
   vars:
@@ -241,5 +231,15 @@
     key_url: "{{ ros2_package_repo_key_url }}"
     key_filepath: "{{ ros2_package_repo_key_filepath }}"
     readable_name: ROS2
+    update_cache: no
+
+- name: Add the Docker package repository
+  import_tasks: "{{ environments_dir }}/ansible-common/add_apt_repository.yml"
+  vars:
+    url: "{{ docker_package_repo_url }}"
+    suite: "{{ docker_package_repo_suite }}"
+    key_url: "{{ docker_package_repo_key_url }}"
+    key_filepath: "{{ docker_package_repo_key_filepath }}"
+    readable_name: Docker
     update_cache: yes
 
