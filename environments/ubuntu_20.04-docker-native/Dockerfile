@@ -111,6 +111,7 @@ RUN mkdir /var/run/sshd
 # TASK [Install the VSCode Server]
 
 RUN export DEBIAN_FRONTEND=noninteractive \
+    && mkdir /etc/apt/keyrings \
     && wget -qO- https://packages.microsoft.com/keys/microsoft.asc \
       | gpg --dearmor > /etc/apt/keyrings/packages.microsoft.gpg \
     && echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" \
