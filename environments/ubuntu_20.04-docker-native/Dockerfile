@@ -32,7 +32,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       ca-certificates \
       clang \
       cmake \
-      code \
       coreutils \
       cppcheck \
       curl \
@@ -42,6 +41,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       gdb \
       git \
       gnupg2 \
+      gpg \
       grep \
       htop \
       info \
@@ -107,6 +107,16 @@ RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then 
 # TASK [Configure sshd]
 
 RUN mkdir /var/run/sshd
+
+# TASK [Install the VSCode Server]
+
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && wget -qO- https://packages.microsoft.com/keys/microsoft.asc \
+      | gpg --dearmor > /etc/apt/keyrings/packages.microsoft.gpg \
+    && echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" \
+      | tee /etc/apt/sources.list.d/vscode.list > /dev/null \
+    && apt-get update \
+    && apt-get install -yq --no-install-recommends code
 
 # TASK [Install ROS2 Desktop and its many dependencies]
 #
