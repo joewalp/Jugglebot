@@ -162,6 +162,7 @@ docker container create --name "${CONTAINER_NAME}" \
   -v '/var/run/docker.sock:/var/run/docker.sock' \
   -v "${HOME_VOLUME_NAME}:/home" \
   -v "${HOME}/.oh-my-zsh/custom:/entrypoint/oh-my-zsh-custom" \
+  -p '2222:22' \
   --dns '8.8.8.8' \
   "${IMAGE_NAME}"
 
