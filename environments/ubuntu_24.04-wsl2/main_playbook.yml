@@ -124,7 +124,9 @@
     # Note: We install the Jazzy version of ROS2 because the Foxy version does
     # not have tier 1 support on Ubuntu 24.04.
     package:
-      name: ros-jazzy-desktop
+      name: 
+        - ros-jazzy-desktop
+        - ros-dev-tools
       state: present
     become: yes
 
