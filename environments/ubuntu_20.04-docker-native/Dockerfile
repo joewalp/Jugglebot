@@ -105,12 +105,13 @@ RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then 
 # TASK [Install ROS2 Desktop and its many dependencies]
 # Note: We install this here rather than in the playbook to take advantage 
 
-RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+RUN export DEBIAN_FRONTEND=noninteractive \
+    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
       -o /usr/share/keyrings/ros-archive-keyring.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -c -s) main" \
       | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
-    && apt update \
-    && apt install \
+    && apt-get update \
+    && apt-get install -yq --no-install-recommends \
       python3-argcomplete \
       ros-dev-tools \
       ros-foxy-desktop
