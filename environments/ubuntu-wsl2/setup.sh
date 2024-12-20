@@ -96,7 +96,7 @@ task 'Run the Ansible playbook'
 echo -e "\nEnter your password to enable the ansible playbook to perform privileged operations"
 
 ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
-  "${ENVIRONMENTS_DIR}/ubuntu_24.04-wsl2/main_playbook.yml" \
+  "${ENVIRONMENTS_DIR}/ubuntu-wsl2/main_playbook.yml" \
   --ask-become-pass \
   -e upgrade_software=yes \
   -e "ssh_keypair_name='${SSH_KEYPAIR_NAME}'" \
