@@ -156,10 +156,20 @@ ARG USERNAME='devops'
 
 RUN groupadd --system --gid "${DOCKER_GID}" docker \
     && groupadd --gid "${USER_GID}" "${USERNAME}" \
-    && useradd --create-home --shell '/bin/bash' --uid "${USER_UID}" --gid "${USERNAME}" --groups 'sudo,docker' "${USERNAME}" \
-    && echo -n "${USERNAME}:${USERNAME}" | chpasswd
+    && useradd --create-home --shell '/bin/bash' --uid "${USER_UID}" \
+      --gid "${USERNAME}" --groups 'sudo,docker' "${USERNAME}" \
+    && echo -n "${USERNAME}:${USERNAME}" | chpasswd \
+    && install -o "${USERNAME}" -g "${USERNAME}" -m 700 -d "/home/${USERNAME}/.ssh"
 
-COPY --chown="${USERNAME}:${USERNAME}" --chmod=644 [ "build/gitconfig", "/home/${USERNAME}/.gitconfig" ]
+# TASK [Provision the host environment gitconfig that was provided by setup.sh]
+
+COPY --chown="${USERNAME}:${USERNAME}" --chmod=644 [ "build/gitconfig", \
+    "/home/${USERNAME}/.gitconfig" ]
+
+# TASK [Provision the ssh authorized_keys that was provided by setup.sh]
+
+copy --chown="${USERNAME}:${USERNAME}" --chmod=600 [ "build/ssh_authorized_keys", \
+    "/home/${USERNAME}/.ssh/authorized_keys" ]
 
 # TASK [Enable the default user to start sshd]
 
