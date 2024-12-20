@@ -139,6 +139,7 @@
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
     src: "{{ environments_dir }}/ubuntu-common/zshrc"
+    remote_src: no
     dest: "{{ zshrc_filepath }}"
     readable_dest: ~/.zshrc
     mode: '0644'
@@ -147,6 +148,7 @@
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
     src: "{{ environments_dir }}/ubuntu-common/gitconfig"
+    remote_src: no
     dest: "{{ gitconfig_filepath }}"
     readable_dest: ~/.gitconfig
     mode: '0644'
@@ -182,6 +184,7 @@
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
     src: "{{ environments_dir }}/ubuntu-common/vimrc"
+    remote_src: no
     dest: "{{ vimrc_filepath }}"
     readable_dest: ~/.vimrc
     mode: '0644'
@@ -194,6 +197,7 @@
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
     src: "{{ environments_dir }}/ubuntu-common/aliases.zsh"
+    remote_src: no
     dest: "{{ zsh_aliases_filepath }}"
     readable_dest: ~/.oh-my-zsh/custom/aliases.zsh
     mode: '0644'
@@ -207,6 +211,7 @@
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
     src: "{{ environments_dir }}/ubuntu-common/conda_env.sh"
+    remote_src: no
     dest: "{{ jugglebot_config_dir }}/conda_env.sh"
     readable_dest: ~/.jugglebot/conda_env.sh
     mode: '0644'
@@ -221,10 +226,16 @@
     src: 'conda_env_deactivate.sh'
     dest: '{{ home_dir }}/miniforge3/envs/jugglebot/etc/conda/deactivate.d/'
 
+- name: Render the Jugglebot runtime config file with the ROS2 codename
+  template:
+    src: "{{ environments_dir }}/ubuntu-common/jugglebot_rc.yml.j2"
+    dest: "{{ host_setup_dir }}/jugglebot_rc.yml~rendered"
+
 - name: Install the Jugglebot runtime config file
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
-    src: "{{ environments_dir }}/ubuntu-common/jugglebot_rc.yml"
+    src: "{{ host_setup_dir }}/jugglebot_rc.yml~rendered"
+    remote_src: yes
     dest: "{{ jugglebot_config_dir }}/jugglebot_rc.yml"
     readable_dest: ~/.jugglebot/jugglebot_rc.yml
     mode: '0644'

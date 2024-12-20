@@ -3,7 +3,7 @@
 
 This is a preview of the environment provisioning project. Currently, the
 instructions and scripts encompass provisioning two shell environments: (1) an
-Ubuntu-24.04 for WSL2 host that runs the Docker Engine for Linux that has Qemu
+Ubuntu LTS WSL2 host that runs the Docker Engine for Linux that has Qemu
 integration installed and that has the Qemu arm64 emulator registered and (2) an
 Ubuntu-20.04 docker container that uses a native platform base image. Ansible
 tasks and a Dockerfile perform the bulk of the provisioning.
@@ -35,7 +35,7 @@ pieces of the setup is still in progress.
 wsl --install --no-distribution
 ```
 
-### Step 2. Verify that an Ubuntu-24.04 distribution is not registered.
+### Step 2. Verify that an Ubuntu-20.04 distribution is not registered.
 
 ```
 wsl --list
@@ -48,17 +48,22 @@ command to determine its version:
 wsl -d Ubuntu -e lsb_release --description
 ```
 
-If neither of the commands above indicates that some version of Ubuntu 24.04 (such
-as `Ubuntu-24.04` or `Ubuntu 24.04.1 LTS`) is registered, then you can proceed
+If neither of the commands above indicates that some version of Ubuntu 20.04 (such
+as `Ubuntu-20.04` or `Ubuntu 20.04.1 LTS`) is registered, then you can proceed
 to step 2. 
 
 If either of the commands above indicates that you have a prexisting Ubuntu
-24.04 distribution, then you have to somehow provision a vanilla Ubuntu 24.04
-instance. As of this writing, it seems that Microsoft and Canonical have not
-made it easy to acquire a tarball of a vanilla rootfs for Ubuntu 24.04 for WSL.
-Below are three options.
+20.04 distribution, then you have a few options for how to proceed. If you just
+want to take a peek at the environment, you can specify Ubuntu-22.04 or
+Ubuntu-24.04 in step 3. However, these will install a different version of ROS2
+than is currently used in Prod.
 
-#### Fixup Option 1 [RECOMMENDED]. Move your Ubuntu 24.04 instance
+If you want to match Prod more closely, you have three fixup options to
+provision a vanilla Ubuntu 20.04. As of this writing, it seems that Microsoft
+and Canonical have not made it easy to acquire a tarball of a vanilla rootfs for
+Ubuntu 24.04 for WSL.
+
+#### Fixup Option 1 [RECOMMENDED]. Move your Ubuntu 20.04 instance
 
 This option only relies on the wsl tool. The process looks like this:
 
@@ -95,14 +100,14 @@ download a manifest that includes a download URL for a vanilla WSL tarball. Note
 that the aformentioned `download-rootfs` GitHub Action uses this `release-info`
 tool under the hood. The source code for that Action is in the same repo.
 
-### Step 3. Install Ubuntu-24.04
+### Step 3. Install Ubuntu-20.04
 
-Assuming that you didn't have a preexisting Ubuntu 24.04 instance or that you
-used Fixup Option 1, you can now create a fresh Ubuntu 24.04 instance. Run the
+Assuming that you didn't have a preexisting Ubuntu 20.04 instance or that you
+used Fixup Option 1, you can now create a fresh Ubuntu 20.04 instance. Run the
 following command:
 
 ```
-wsl --install Ubuntu-24.04
+wsl --install Ubuntu-20.04
 ```
 
 Eventually, it will prompt you to supply a username and a password. This
@@ -123,7 +128,7 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generati
 
 #### Option 1. Create a new keypair on the WSL2 host
 
-Run the following command on the new Ubuntu-24.04 host. Substitute your email
+Run the following command on the new Ubuntu-20.04 host. Substitute your email
 address, omitting the brackets.
 
 ```bash
@@ -200,7 +205,7 @@ environment while specifying your name and email address that will be configured
 in ~/.gitconfig. This will take some time.
 
 ```bash
-~/Jugglebot/environments/ubuntu_24.04-wsl2/setup.sh --ssh-keypair-name id_ed25519 --git-name '[Your full name]' --git-email '[Your email address]'
+~/Jugglebot/environments/ubuntu-wsl2/setup.sh --ssh-keypair-name id_ed25519 --git-name '[Your full name]' --git-email '[Your email address]'
 ```
 
 ### Step 8. Exit and then start a new terminal session to enable all changes
@@ -219,7 +224,7 @@ the newly created distribution.
 #### Option 2. Use the wsl tool
 
 ```
-wsl -d Ubuntu-24.04
+wsl -d Ubuntu-20.04
 ```
 
 ### Step 9. Run the docker native platform environment setup script
