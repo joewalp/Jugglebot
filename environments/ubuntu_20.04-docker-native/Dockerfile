@@ -168,7 +168,7 @@ COPY --chown="${USERNAME}:${USERNAME}" --chmod=644 [ "build/gitconfig", \
 
 # TASK [Provision the ssh authorized_keys that was provided by setup.sh]
 
-copy --chown="${USERNAME}:${USERNAME}" --chmod=600 [ "build/ssh_authorized_keys", \
+COPY --chown="${USERNAME}:${USERNAME}" --chmod=600 [ "build/ssh_authorized_keys", \
     "/home/${USERNAME}/.ssh/authorized_keys" ]
 
 # TASK [Enable the default user to start sshd]
