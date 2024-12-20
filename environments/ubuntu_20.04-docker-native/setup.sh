@@ -95,6 +95,7 @@ BUILD_NO_CACHE_OPTION="${BUILD_NO_CACHE_OPTION:-}"
 REPO_CACHE_ID="${REPO_CACHE_ID:-0}"
 DEV_ENV_USERNAME='devops' # This is also the default password for the user.
 SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
+SSH_PUBLIC_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}.pub"
 BUILD_CONTEXT_DIR="${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native"
 IMAGE_NAME='jugglebot-native-dev:focal'
 CONTAINER_NAME='jugglebot-native-dev'
@@ -114,6 +115,10 @@ task 'Copy ~/.gitconfig into the build context'
 
 install -D -T "${HOME}/.gitconfig" "${BUILD_CONTEXT_DIR}/build/gitconfig"
 
+task "Copy ~/.ssh/${SSH_KEYPAIR_NAME}.pub into the build context"
+
+install -D -T "${SSH_PUBLIC_KEY_FILEPATH}" "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
+
 task "Build the docker image named ${IMAGE_NAME}"
 
 docker buildx build ${BUILD_NO_CACHE_OPTION} \
@@ -130,7 +135,8 @@ docker buildx build ${BUILD_NO_CACHE_OPTION} \
 
 task 'Cleanup the build context'
 
-rm "${BUILD_CONTEXT_DIR}/build/gitconfig"
+rm -f "${BUILD_CONTEXT_DIR}/build/gitconfig"
+rm -f "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
 
 task "Ensure that the docker volume named ${HOME_VOLUME_NAME} exists"
 
@@ -162,7 +168,7 @@ docker container create --name "${CONTAINER_NAME}" \
   -v '/var/run/docker.sock:/var/run/docker.sock' \
   -v "${HOME_VOLUME_NAME}:/home" \
   -v "${HOME}/.oh-my-zsh/custom:/entrypoint/oh-my-zsh-custom" \
-  -p '2222:22' \
+  -p '4422:22' \
   --dns '8.8.8.8' \
   "${IMAGE_NAME}"
 
