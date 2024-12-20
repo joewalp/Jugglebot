@@ -9,7 +9,7 @@ INIT_FLAG_FILEPATH="${HOME}/.user-dir-initialized"
 
 # TASK [Start sshd]
 
-sudo /usr/sbin/sshd -D
+sudo /usr/sbin/sshd -D &
 
 # TASK [Determine whether the user's nome directory needs to be initialized]
 
