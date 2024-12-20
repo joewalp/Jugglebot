@@ -133,18 +133,29 @@
       readable_dest: ~/bin/docker-native-env
       mode: '0755'
 
-  - name: Determine the ROS2 codename
+  - name: Read the ROS2 codename
     command:
       cmd: "/usr/bin/yq -r .ros.version_codename '{{ jugglebot_rc_rendered_filepath }}'"
     register: yq_command_result
 
-  - name: "Install ROS2 {{ yq_command_result.stdout }} Desktop .. please be patient"
+  - name: Set the ROS2 codename
+    set_fact:
+      ros_version_codename: "{{ yq_command_result.stdout }}"
+
+  - name: Install python3-argcomplete if necessary
+    package:
+      name: python3-argcomplete
+      state: present
+    become: yes
+    when: ros_version_codename == 'foxy'
+
+  - name: "Install ROS2 {{ ros_version_codename|capitalize }} Desktop .. please be patient"
     # Note: We install version of ROS2 that has tier 1 support for this LTS
     # version. See the ~/ubuntu-common/jugglebot_rc.yml.j2 for the mapping of
     # LTS version to ROS2 codename.
     package:
       name: 
-        - "ros-{{ yq_command_result.stdout }}-desktop"
+        - "ros-{{ ros_version_codename }}-desktop"
         - ros-dev-tools
       state: present
     become: yes
