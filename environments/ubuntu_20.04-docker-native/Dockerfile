@@ -190,8 +190,7 @@ ARG REPO_CACHE_ID='0'
 
 # TASK [Clone the Jugglebot git repo]
 
-RUN --mount=type=ssh,mode=0666 mkdir --mode 700 "/home/${USERNAME}/.ssh" \
-    && ssh-keyscan -t rsa github.com > /home/$USERNAME/.ssh/known_hosts \
+RUN --mount=type=ssh,mode=0666 ssh-keyscan -t rsa github.com > /home/$USERNAME/.ssh/known_hosts \
     && git clone "${JUGGLEBOT_REPO_SSH_URL}" "/home/${USERNAME}/Jugglebot"
 
 # TASK [Initialize the repo branch variable]
