@@ -26,7 +26,7 @@
       fail_msg: 'This playbook requires that the git name be specified using `-e "git_email=''[your email address]''"`'
   
   - name: Load variables
-    include_vars: "{{ environments_dir }}/ubuntu_24.04-wsl2/main_vars.yml"
+    include_vars: "{{ environments_dir }}/ubuntu-wsl2/main_vars.yml"
 
   - name: Ensure that wsl uses systemd
     # Note: Systemd is enabled by default, but this will change whitespace
@@ -128,23 +128,24 @@
     import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
     vars:
       src: "{{ environments_dir }}/ubuntu_24.04-wsl2/docker-native-env"
+      remote_src: no
       dest: "{{ home_dir }}/bin/docker-native-env"
       readable_dest: ~/bin/docker-native-env
       mode: '0755'
 
-  - name: Install ROS2 Jazzy Desktop and its many dependencies
-    # Note: We install the Jazzy version of ROS2 because the Foxy version does
-    # not have tier 1 support on Ubuntu 24.04.
+  - name: Determine the ROS2 codename
+    command:
+      cmd: "/usr/bin/yq -r .ros.version_codename '{{ jugglebot_rc_rendered_filepath }}'"
+    register: yq_command_result
+
+  - name: "Install ROS2 {{ yq_command_result.stdout }} Desktop .. please be patient"
+    # Note: We install version of ROS2 that has tier 1 support for this LTS
+    # version. See the ~/ubuntu-common/jugglebot_rc.yml.j2 for the mapping of
+    # LTS version to ROS2 codename.
     package:
       name: 
-        - ros-jazzy-desktop
+        - "ros-{{ yq_command_result.stdout }}-desktop"
         - ros-dev-tools
       state: present
     become: yes
-
-  - name: Set the ROS2 version codename in the Jugglebot runtime config
-    command:
-      cmd: >
-        /usr/bin/yq -i eval '.ros.version_codename = "jazzy"'
-        "{{ home_dir }}/.jugglebot/jugglebot_rc.yml"
 
