@@ -71,13 +71,25 @@
   - name: Add an ssh config for GitHub
     community.general.ssh_config:
       user: "{{ username }}"
-      host: 'github.com'
-      hostname: 'github.com'
-      remote_user: 'git'
+      host: github.com
+      hostname: github.com
+      remote_user: git
       identity_file: "~/.ssh/{{ ssh_keypair_name }}"
       identities_only: yes
       add_keys_to_agent: yes
       strict_host_key_checking: accept-new
+
+  - name: Add an ssh config for docker-native-env
+    community.general.ssh_config:
+      user: "{{ username }}"
+      host: docker-native-env
+      hostname: localhost
+      remote_user: devops
+      port: 4422
+      identity_file: "~/.ssh/{{ ssh_keypair_name }}"
+      identities_only: yes
+      add_keys_to_agent: yes
+      strict_host_key_checking: no
 
   - name: Set user name in ~/.gitconfig
     community.general.ini_file:
