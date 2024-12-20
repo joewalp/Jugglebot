@@ -1,14 +1,13 @@
 {%
 
-set ubuntu_version_to_ros_codename = {
-  '20.04': 'foxy',
-  '22.04': 'humble',
-  '24.04': 'jazzy',
+set ubuntu_codename_to_ros_codename = {
+  'focal': 'foxy',
+  'jammy': 'humble',
+  'noble': 'jazzy',
 }
 
-%}
----
+%}---
 ros:
-  version_codename: {% ubuntu_version_to_ros_codename[ansible_facts['distribution_version']] %}
+  version_codename: {{ ubuntu_codename_to_ros_codename[ansible_facts['distribution_release']] }}
   domain_id: 0
 
