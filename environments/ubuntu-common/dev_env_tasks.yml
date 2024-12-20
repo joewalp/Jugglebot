@@ -80,8 +80,10 @@
   become: yes
 
 - name: Determine the yq architecture
+  # Note: We only attempt to suport Linux and OS X
   set_fact:
     yq_architecture: "{{ 'amd64' if ansible_facts['architecture'] == 'x86_64' else ansible_facts['architecture'] }}"
+    yq_binary: "{{ 'darwin' if ansible_facts['os_family']|lower == 'darwin' else 'linux' }}"
 
 - name: Determine the yq download binary name
   set_fact:
