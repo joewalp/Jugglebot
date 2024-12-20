@@ -83,11 +83,11 @@
   # Note: We only attempt to suport Linux and OS X
   set_fact:
     yq_architecture: "{{ 'amd64' if ansible_facts['architecture'] == 'x86_64' else ansible_facts['architecture'] }}"
-    yq_binary: "{{ 'darwin' if ansible_facts['os_family']|lower == 'darwin' else 'linux' }}"
+    yq_family: "{{ 'darwin' if ansible_facts['os_family']|lower == 'darwin' else 'linux' }}"
 
 - name: Determine the yq download binary name
   set_fact:
-    yq_download_binary_name: "yq_{{ ansible_facts['os_family']|lower }}_{{ yq_architecture }}"
+    yq_download_binary_name: "yq_{{ yq_family }}_{{ yq_architecture }}"
 
 - name: Install yq
   # Note: We install this without using a package manager because we need the
