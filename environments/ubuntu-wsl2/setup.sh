@@ -101,7 +101,8 @@ ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible
   -e upgrade_software=yes \
   -e "ssh_keypair_name='${SSH_KEYPAIR_NAME}'" \
   -e "git_name='${GIT_NAME}'" \
-  -e "git_email='${GIT_EMAIL}'" || rc="$?"
+  -e "git_email='${GIT_EMAIL}'" \
+  -e "DISPLAY='${DISPLAY}'" || rc="$?"
 
 # failed_when: the return code is nonzero
 
