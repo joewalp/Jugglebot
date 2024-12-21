@@ -9,8 +9,10 @@ Ubuntu-20.04 docker container that uses a native platform base image. Ansible
 tasks and a Dockerfile perform the bulk of the provisioning.
 
 Both environments have the ROS2 Desktop and the ROS development tools installed. 
-The Ubuntu 20.04 Docker environment runs ROS2 foxy, and the Ubuntu 24.04 WSL2 
-environment runs ROS2 jazzy.
+The Ubuntu 20.04 Docker environment runs ROS2 foxy, and the Ubuntu WSL2 
+environment runs the version of ROS2 that has tier 1 support for that Ubuntu 
+release. If you want to run the same version of ROS2 as Prod runs, you should 
+install Ubuntu-20.04 for WSL despite that Ubuntu release being relatively old.
 
 You can attach VSCode for Windows to the WSL2 environment by running
 the following command from within the WSL2 environment:
@@ -22,7 +24,7 @@ cd ~/Jugglebot && code .
 Then, you can save that workspace locally in Windows to launch it conveniently.
 
 The next step is to enable attaching VSCode for Windows to the Ubuntu 20.04 
-Docker environment. I have this working, but providing instructions for the Windows
+Docker environment. This works; however, providing instructions for the Windows
 pieces of the setup is still in progress.
 
 
