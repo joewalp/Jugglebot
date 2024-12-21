@@ -229,12 +229,12 @@
 - name: Render the Jugglebot runtime config file with the ROS2 codename
   template:
     src: "{{ environments_dir }}/ubuntu-common/jugglebot_rc.yml.j2"
-    dest: "{{ host_setup_defaults_dir }}/jugglebot_rc.yml~rendered"
+    dest: "{{ host_setup_defaults_dir }}/jugglebot_rc.yml"
 
 - name: Install the Jugglebot runtime config file
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
-    src: "{{ host_setup_defaults_dir }}/jugglebot_rc.yml~rendered"
+    src: "{{ host_setup_defaults_dir }}/jugglebot_rc.yml"
     remote_src: yes
     dest: "{{ jugglebot_config_dir }}/jugglebot_rc.yml"
     readable_dest: ~/.jugglebot/jugglebot_rc.yml
