@@ -35,6 +35,7 @@ case "${EVENT_TYPE}" in
     export JUGGLEBOT_REPO_DIR="${HOME}/Jugglebot"
     export JUGGLEBOT_CONFIG_DIR="${HOME}/.jugglebot"
     export ROS_DOMAIN_ID="$(yq -r .ros.domain_id "${JUGGLEBOT_CONFIG_DIR}/jugglebot_rc.yml")"
+    export DISPLAY=':0'
   
     # TASK [Enable ROS2]
 
