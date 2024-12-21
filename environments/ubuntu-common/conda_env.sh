@@ -29,10 +29,7 @@ case "${EVENT_TYPE}" in
     
     # TASK [Enable ROS2 by sourcing its setup script into the shell environment]
 
-    if [[ -f "${ROS_SETUP_FILEPATH}" ]]; then
-
-      # Note: This source statement cannot occur within a zsh function.
-
+    if [[ -f "${ROS_SETUP_FILEPATH}" && "${ROS_WORKAROUND_ENABLED:-no}" == 'yes' ]]; then
       source "${ROS_SETUP_FILEPATH}"
     else
       echo '[WARNING]: The ROS2 setup script was not found.'
