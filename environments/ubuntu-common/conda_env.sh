@@ -9,21 +9,6 @@
 # Each of those scripts sets the relevant EVENT_TYPE and then sources this
 # script.
 
-# TASK [Define functions]
-
-enable_ros2() {
-  local jugglebot_rc_filepath="$1"
-  local ros_codename="$(yq -r .ros.version_codename "${jugglebot_rc_filepath}")"
-  local ros_setup_filepath="/opt/ros/${ros_codename}/setup.zsh"
-
-  # TASK [Source the ROS2 setup script into the shell environment]
-
-  if [[ -f "${ros_setup_filepath}" ]]; then
-    source "${ros_setup_filepath}"
-  else
-    echo '[WARNING]: The ROS2 setup script was not found.'
-  fi
-}
 
 # TASK [Handle the specified event]
 
@@ -36,10 +21,22 @@ case "${EVENT_TYPE}" in
     export JUGGLEBOT_CONFIG_DIR="${HOME}/.jugglebot"
     export ROS_DOMAIN_ID="$(yq -r .ros.domain_id "${JUGGLEBOT_CONFIG_DIR}/jugglebot_rc.yml")"
     export DISPLAY=':0'
-  
-    # TASK [Enable ROS2]
 
-    enable_ros2 "${JUGGLEBOT_CONFIG_DIR}/jugglebot_rc.yml"
+    # TASK [Determine the ROS2 setup script filepath]
+
+    ROS_CODENAME="$(yq -r .ros.version_codename "${JUGGLEBOT_CONFIG_DIR}/jugglebot_rc.yml")"
+    ROS_SETUP_FILEPATH="/opt/ros/${ROS_CODENAME}/setup.zsh"
+    
+    # TASK [Enable ROS2 by sourcing its setup script into the shell environment]
+
+    if [[ -f "${ROS_SETUP_FILEPATH}" ]]; then
+
+      # Note: This source statement cannot occur within a zsh function.
+
+      source "${ROS_SETUP_FILEPATH}"
+    else
+      echo '[WARNING]: The ROS2 setup script was not found.'
+    fi
     ;;
   
   deactivate)
