@@ -169,7 +169,7 @@ docker container create --name "${CONTAINER_NAME}" \
   -v "${HOME_VOLUME_NAME}:/home" \
   -v "${HOME}/.oh-my-zsh/custom:/entrypoint/oh-my-zsh-custom" \
   -p '4422:22' \
-  -e "DISPLAY='${DISPLAY}'" \
+  -e "DISPLAY=${DISPLAY}" \
   --dns '8.8.8.8' \
   "${IMAGE_NAME}"
 
