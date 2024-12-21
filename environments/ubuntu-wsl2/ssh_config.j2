@@ -1,6 +1,6 @@
 Host github.com
     Hostname github.com
-    IdentityFile {{ home_dir }}/.ssh/{{ ssh_keypair_filename }}
+    IdentityFile {{ home_dir }}/.ssh/{{ ssh_keypair_name }}
     IdentitiesOnly yes
     User git
     StrictHostKeyChecking accept-new
@@ -9,7 +9,7 @@ Host github.com
 Host docker-native-env
     Hostname localhost
     Port 4422
-    IdentityFile {{ home_dir }}/.ssh/{{ ssh_keypair_filepath }}
+    IdentityFile {{ home_dir }}/.ssh/{{ ssh_keypair_name }}
     IdentitiesOnly yes
     User devops
     StrictHostKeyChecking no
