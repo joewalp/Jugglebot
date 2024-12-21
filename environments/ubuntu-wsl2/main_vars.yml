@@ -1,7 +1,8 @@
 ---
 
 home_dir: "{{ ansible_facts['env']['HOME'] }}"
-jugglebot_rc_rendered_filepath: "{{ home_dir }}/.jugglebot/host_setup/jugglebot_rc.yml~rendered"
+ssh_config_rendered_filepath: "{{ home_dir }}/.jugglebot/host_setup/defaults/ssh_config~rendered"
+jugglebot_rc_rendered_filepath: "{{ home_dir }}/.jugglebot/host_setup/defaults/jugglebot_rc.yml~rendered"
 ssh_private_key_filepath: "{{ home_dir }}/.ssh/{{ ssh_keypair_name }}"
 gitconfig_filepath: "{{ home_dir }}/.gitconfig"
 jugglebot_repo_ssh_url: 'git@github.com:joewalp/Jugglebot.git'

@@ -68,28 +68,19 @@
       quiet: yes
       fail_msg: "The specified ssh keypair ('{{ ssh_private_key_filepath }}', '{{ ssh_private_key_filepath }}.pub') was not found."
 
-  - name: Add an ssh config for GitHub
-    community.general.ssh_config:
-      user: "{{ username }}"
-      host: github.com
-      hostname: github.com
-      remote_user: git
-      identity_file: "~/.ssh/{{ ssh_keypair_name }}"
-      identities_only: yes
-      add_keys_to_agent: yes
-      strict_host_key_checking: accept-new
+- name: Render the ssh config file
+  template:
+    src: "{{ environments_dir }}/ubuntu-wsl2/ssh_config.j2"
+    dest: "{{ ssh_config_rendered_filepath }}"
 
-  - name: Add an ssh config for docker-native-env
-    community.general.ssh_config:
-      user: "{{ username }}"
-      host: docker-native-env
-      hostname: localhost
-      remote_user: devops
-      port: 4422
-      identity_file: "~/.ssh/{{ ssh_keypair_name }}"
-      identities_only: yes
-      add_keys_to_agent: yes
-      strict_host_key_checking: no
+- name: Install the ssh config file
+  import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
+  vars:
+    src: "{{ ssh_config_rendered_filepath }}"
+    remote_src: yes
+    dest: "{{ home_dir }}/.ssh/config"
+    readable_dest: ~/.ssh/config
+    mode: '0600'
 
   - name: Set user name in ~/.gitconfig
     community.general.ini_file:

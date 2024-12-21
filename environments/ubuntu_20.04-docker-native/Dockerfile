@@ -107,7 +107,7 @@ RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then 
 # TASK [Configure sshd]
 
 RUN mkdir /var/run/sshd \
-    && sed -i 's/^#AllowTcpForwarding yes/AllowTcpForwarding yes/' /etc/ssh/sshd_config
+    && sed -i 's/^#AllowTcpForwarding yes$/AllowTcpForwarding yes/' /etc/ssh/sshd_config
 
 EXPOSE 22
 
