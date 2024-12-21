@@ -29,7 +29,9 @@ case "${EVENT_TYPE}" in
     
     # TASK [Enable ROS2 by sourcing its setup script into the shell environment]
 
-    if [[ -f "${ROS_SETUP_FILEPATH}" && "${ROS_WORKAROUND_ENABLED:-no}" == 'yes' ]]; then
+    if [[ "${ROS_WORKAROUND_ENABLED:-no}" == 'yes' ]]; then
+      echo '[INFO]: The ROS2 environment init is skipped during the host setup'
+    elif [[ -f "${ROS_SETUP_FILEPATH}" ]]; then
       source "${ROS_SETUP_FILEPATH}"
     else
       echo '[WARNING]: The ROS2 setup script was not found.'
