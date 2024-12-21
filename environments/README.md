@@ -24,8 +24,8 @@ cd ~/Jugglebot && code .
 Then, you can save that workspace locally in Windows to launch it conveniently.
 
 The next step is to enable attaching VSCode for Windows to the Ubuntu 20.04 
-Docker environment. This works; however, providing instructions for the Windows
-pieces of the setup is still in progress.
+Docker environment. That already works; however, providing instructions for the 
+Windows pieces of the setup is still in progress.
 
 
 ## Instructions
