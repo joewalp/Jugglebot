@@ -104,7 +104,11 @@ fi
 
 task 'Activate the jugglebot conda environment'
 
+export ROS_WORKAROUND_ENABLED=yes
+
 conda activate jugglebot
+
+unset ROS_WORKAROUND_ENABLED
 
 task 'Disable shell prompt modification by conda'
 
