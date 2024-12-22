@@ -83,6 +83,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       sudo \
       swig3.0 \
       tini \
+      tmux \
       tree \
       unzip \
       vim \
