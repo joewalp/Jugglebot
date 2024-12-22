@@ -63,7 +63,7 @@ than is currently used in Prod.
 If you want to match Prod more closely, you have three fixup options to
 provision a vanilla Ubuntu 20.04. As of this writing, it seems that Microsoft
 and Canonical have not made it easy to acquire a tarball of a vanilla rootfs for
-Ubuntu 24.04 for WSL.
+Ubuntu for WSL.
 
 #### Fixup Option 1 [RECOMMENDED]. Move your Ubuntu 20.04 instance
 
