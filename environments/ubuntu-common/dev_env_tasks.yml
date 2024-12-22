@@ -208,6 +208,15 @@
     path: "{{ home_dir }}/.sudo_as_admin_successful"
     state: touch
   
+- name: Create or diff ~/.tmux.conf
+  import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
+  vars:
+    src: "{{ environments_dir }}/ubuntu-common/tmux.conf"
+    remote_src: no
+    dest: "{{ home_dir }}/.tmux.conf"
+    readable_dest: ~/.tmux.conf
+    mode: '0644'
+
 - name: Create or diff ~/.jugglebot/conda_env.sh
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
