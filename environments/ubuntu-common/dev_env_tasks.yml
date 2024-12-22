@@ -75,6 +75,7 @@
     - git
     - jq
     - keychain
+    - tmux
     - zsh
     state: present
   become: yes
