@@ -69,7 +69,7 @@
     dest: "{{ packages_upgraded_filepath }}"
   when: upgrade_software|bool and upgrade_packages_result is succeeded
 
-- name: Ensure that git, jq, keychain and zsh are installed
+- name: Ensure that git, jq, keychain, tmux and zsh are installed
   package:
     name:
     - git
