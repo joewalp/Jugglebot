@@ -17,14 +17,14 @@
     state: present
   become: yes
 
-- name: Ensure that the docker daemon is enabled and started
+- name: Ensure that the Docker Engine daemon is enabled and started
   systemd_service:
     name: docker
     enabled: yes
     state: started
   become: yes
 
-- name: Create the docker group to manage access to the docker engine
+- name: Create the docker group to manage access to the Docker Engine
   group:
     name: docker
     state: present
