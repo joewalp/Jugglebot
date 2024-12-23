@@ -27,15 +27,10 @@ fi
 
 task 'Initialize variables'
 
-HOST_SETUP_DIR="${HOME}/.jugglebot/host_setup"
-HOST_SETUP_BACKUPS_DIR="${HOME}/.jugglebot/host_setup/backups"
 CONDA_SETUP_SCRIPT_URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$( uname )-$( uname -m ).sh"
-CONDA_SETUP_SCRIPT_FILEPATH="${HOST_SETUP_DIR}/miniforge_setup.sh"
+CONDA_SETUP_SCRIPT_FILEPATH="${HOME}/.jugglebot/host_setup/miniforge_setup.sh"
 CONDA_FILEPATH="${HOME}/miniforge3/bin/conda"
-
-task 'Ensure that the ~/.jugglebot/host_setup/backups directory exists'
-
-install -d "${HOST_SETUP_BACKUPS_DIR}"
+REPO_DIR="${REPO_DIR:-${HOME}/Jugglebot}"
 
 task 'Download the conda setup script'
 
@@ -78,29 +73,7 @@ task 'Update conda base'
 
 conda update -y -n base -c conda-forge conda
 
-task 'Determine whether the jugglebot conda environment exists'
-
-JUGGLEBOT_CONDA_ENV_STATE="$( if conda info --envs | grep -q '^jugglebot\s'; then echo 'present'; else echo 'absent'; fi )"
-
-if [[ "${JUGGLEBOT_CONDA_ENV_STATE}" == 'absent' ]]; then
-
-  task 'Create the jugglebot conda environment'
-
-  conda env create -f "${JUGGLEBOT_CONDA_ENV_FILEPATH}"
-
-else
-
-  JUGGLEBOT_CONDA_ENV_BACKUP_FILEPATH="$( mktemp -p "${HOST_SETUP_BACKUPS_DIR}" "jugglebot_conda_env.$( date +'%Y-%m-%dT%H-%M-%S%z' )_XXXXXXXX.yml" )"
- 
-  task 'Backup the jugglebot conda environment config to ~/.jugglebot/host_setup/backups'
-
-  conda env export --from-history > "${JUGGLEBOT_CONDA_ENV_BACKUP_FILEPATH}"
-
-  task 'Update the jugglebot conda environment'
-
-  conda env update -f "${JUGGLEBOT_CONDA_ENV_FILEPATH}" --prune
-
-fi
+"${REPO_DIR}/environments/ubuntu-common/refresh-conda-env"
 
 task 'Activate the jugglebot conda environment'
 

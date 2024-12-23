@@ -28,6 +28,15 @@
     path: "{{ home_dir }}/bin"
     state: directory
 
+- name: Create or diff ~/bin/refresh-conda-env
+  import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
+  vars:
+    src: "{{ environments_dir }}/ubuntu-common/refresh-conda-env"
+    remote_src: no
+    dest: "{{ home_dir }}/bin/refresh-conda-env"
+    readable_dest: ~/bin/refresh-conda-env
+    mode: '0755'
+
 - name: Read the packages upgraded timestamp
   slurp:
     src: "{{ packages_upgraded_filepath }}"
@@ -70,6 +79,8 @@
   when: upgrade_software|bool and upgrade_packages_result is succeeded
 
 - name: Ensure that git, jq, keychain, tmux and zsh are installed
+  # Note: This tmux binary will be hidden by the tmux binary in the tmux conda
+  # package that is installed as a dependency of the tmuxp conda package.
   package:
     name:
     - git

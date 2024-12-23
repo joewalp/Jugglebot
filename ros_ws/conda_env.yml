@@ -1,12 +1,14 @@
 name: jugglebot
 dependencies:
+  - python=3.12
   - ansible
   - paramiko
     # required_by: community.general.ssh_config Ansible module
   - pip
-  - python=3.12
   - tmuxp
   - pip:
     - docker
       # required_by: community.docker Ansible modules
+    - -r file:requirements.txt
+    - -r file:src/yasmin/requirements.txt
 
