@@ -19,6 +19,11 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    -w|--ros-workspace-dir)
+      ROS_WORKSPACE_DIR="$2"
+      shift
+      shift
+      ;;
     -c|--jugglebot-conda-env-filepath)
       JUGGLEBOT_CONDA_ENV_FILEPATH="$2"
       shift
@@ -47,6 +52,13 @@ if [[ -z "${ENVIRONMENTS_DIR:-}" ]]; then
   exit 2
 fi
 
+task 'Assert that the ROS workspace directory was specified'
+
+if [[ -z "${ROS_WORKSPACE_DIR:-}" ]]; then
+  echo '[ERROR]: The ROS workspace directory is required. Invoke this command with the `--ros-workspace-dir "[directory path]"` option.'
+  exit 2
+fi
+
 task 'Assert that a conda environment config file was specified'
 
 if [[ -z "${JUGGLEBOT_CONDA_ENV_FILEPATH:-}" ]]; then
@@ -72,6 +84,7 @@ task 'Run the playbook'
 ANSIBLE_LOCALHOST_WARNING=False \
   ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
   ANSIBLE_BECOME_PASS="${ANSIBLE_BECOME_PASS}" \
-  ansible-playbook "$ENVIRONMENTS_DIR/ubuntu_20.04-docker-native/main_playbook.yml" \
-    -e upgrade_software=yes
+  ansible-playbook "${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native/main_playbook.yml" \
+    -e upgrade_software=yes \
+    -e "ros_workspace_dir=${ROS_WORKSPACE_DIR}"
 

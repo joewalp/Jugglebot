@@ -137,7 +137,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -yq --no-install-recommends \
       python3-argcomplete \
       ros-dev-tools \
-      ros-foxy-desktop
+      ros-foxy-desktop \
+      ros-foxy-webots-ros2 \
+    && /usr/bin/rosdep init
 
 # TASK [Specify /home and /tmp as volumes]
 
@@ -211,12 +213,14 @@ WORKDIR "/home/${USERNAME}"
 # TASK [Initialize the base setup and playbook variable]
 
 ARG ENVIRONMENTS_DIR="/home/${USERNAME}/Jugglebot/environments"
+ARG JUGGLEBOT_ROS_WORKSPACE_DIR="/home/${USERNAME}/Jugglebot/ros_ws"
 
 # TASK [Run the ubuntu-common base setup and then the playbook]
 
 RUN "${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native/base_setup_and_playbook.sh" \
       --environments-dir "${ENVIRONMENTS_DIR}" \
       --jugglebot-conda-env-filepath "${ENVIRONMENTS_DIR}/ubuntu-common/jugglebot_conda_env.yml" \
+      --jugglebot-ros-workspace-dir "${JUGGLEBOT_ROS_WORKSPACE_DIR}" \
       --ansible-become-pass "${USERNAME}"
 
 # TASK [Install entrypoint.sh]
