@@ -14,7 +14,7 @@ task 'Initialize variables'
 
 HOST_SETUP_BACKUPS_DIR="${HOME}/.jugglebot/host_setup/backups"
 REPO_DIR="${REPO_DIR:-${HOME}/Jugglebot}"
-JUGGLEBOT_CONDA_ENV_FILEPATH="${JUGGLEBOT_CONDA_ENV_FILEPATH:-${REPO_DIR}/ros_ws/conda_env.yml"
+JUGGLEBOT_CONDA_ENV_FILEPATH="${JUGGLEBOT_CONDA_ENV_FILEPATH:-${REPO_DIR}/ros_ws/conda_env.yml}"
 
 task 'Ensure that the ~/.jugglebot/host_setup/backups directory exists'
 
