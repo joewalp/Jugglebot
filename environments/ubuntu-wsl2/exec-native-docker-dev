@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -o nounset -o pipefail -o errexit
+IFS=$'\t\n' # Stricter IFS settings
+rc=0
+
+~/bin/start-native-docker-dev
+
+# TASK [Run an interactive shell in the container]
+#
+# Note: The SSH_AUTH_SOCK is typically located beneath /tmp, and the container
+# already has /tmp mounted.
+
+docker exec -it \
+  -e "SSH_AUTH_SOCK='${SSH_AUTH_SOCK:-}'" \
+  "${CONTAINER_NAME}" \
+  '/usr/bin/zsh'
+
+
