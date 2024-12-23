@@ -167,8 +167,12 @@
     command:
       cmd: /usr/bin/rosdep update
 
+  - name: Determine the current shell
+    set_fact:
+      shell: "{{ ansible_facts['env']['SHELL']|basename }}"
+
   - name: Install the Jugglebot ROS dependencies
-    command:
-      cmd: "/usr/bin/rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}"
+    shell:
+      cmd: "source /opt/ros/{{ ros_version_codename }}/setup.{{ shell }} && rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}"
       chdir: "{{ home_dir }}/Jugglebot/ros_ws"
 
