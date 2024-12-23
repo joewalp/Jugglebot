@@ -17,4 +17,3 @@ docker exec -it \
   "${CONTAINER_NAME}" \
   '/usr/bin/zsh'
 
-
