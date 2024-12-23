@@ -4,7 +4,9 @@
   connection: local
   vars:
     environments_dir: "{{ playbook_dir }}/.."
-    ros_workspace_dir: "{{ ansible_facts['env']['HOME'] }}/Jugglebot/ros_ws"
+    home_dir: "{{ ansible_facts['env']['HOME'] }}"
+    ros_workspace_dir: "{{ home_dir }}/Jugglebot/ros_ws"
+    jugglebot_rc_rendered_filepath: "{{ home_dir }}/.jugglebot/host_setup/defaults/jugglebot_rc.yml"
 
   tasks:
 
@@ -12,7 +14,7 @@
     copy:
       remote_src: yes
       src: /etc/skel/
-      dest: "{{ ansible_facts['env']['HOME'] }}"
+      dest: "{{ home_dir }}"
       force: no
 
   - name: Require that the jugglebot Conda environment is activated
@@ -31,6 +33,15 @@
       name: docker-ce-cli
       state: present
     become: yes
+
+  - name: Read the ROS codename
+    command:
+      cmd: "/usr/bin/yq -r .ros.version_codename '{{ jugglebot_rc_rendered_filepath }}'"
+    register: yq_command_result
+
+  - name: Set the ROS codename variable
+    set_fact:
+      ros_version_codename: "{{ yq_command_result.stdout }}"
 
   - name: Install the Jugglebot ROS dependencies
     command:
