@@ -185,7 +185,7 @@ while ! is_home_dir_initialized "${CONTAINER_NAME}"; do
   sleep 2
 done
 
-echo ' DONE'
+echo ' done'
 
 task 'Stop the container'
 
