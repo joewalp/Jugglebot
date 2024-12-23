@@ -3,7 +3,9 @@ set -o nounset -o pipefail -o errexit
 IFS=$'\t\n' # Stricter IFS settings
 rc=0
 
-~/bin/start-native-docker-dev
+CONTAINER_NAME='jugglebot-native-dev'
+
+~/bin/start-native-docker-dev --container-name "${CONTAINER_NAME}"
 
 # TASK [Run an interactive shell in the container]
 #
