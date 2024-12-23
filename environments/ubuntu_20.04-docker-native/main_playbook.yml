@@ -42,6 +42,7 @@
     command:
       cmd: "/usr/bin/yq -r .ros.version_codename '{{ jugglebot_rc_rendered_filepath }}'"
     register: yq_command_result
+    changed_when: False
 
   - name: Set the ROS codename variable
     set_fact:
