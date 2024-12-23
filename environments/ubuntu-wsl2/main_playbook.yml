@@ -163,6 +163,10 @@
     when: not '/etc/ros/rosdep/sources.list.d/20-default.list' is file
     become: yes
 
+  - name: Update the rosdep package manager
+    command:
+      cmd: /usr/bin/rosdep update
+
   - name: Install the Jugglebot ROS dependencies
     command:
       cmd: "/usr/bin/rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}"
