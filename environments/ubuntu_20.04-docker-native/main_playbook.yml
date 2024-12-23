@@ -48,7 +48,8 @@
       ros_version_codename: "{{ yq_command_result.stdout }}"
 
   - name: Install the Jugglebot ROS dependencies
-    command:
-      cmd: "/usr/bin/rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}"
+    shell:
+      cmd: "source /opt/ros/{{ ros_version_codename }}/setup.bash && rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}"
+      executable: /usr/bin/bash
       chdir: "{{ ros_workspace_dir }}"
  
