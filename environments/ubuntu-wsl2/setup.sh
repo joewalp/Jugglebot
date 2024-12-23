@@ -29,8 +29,8 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
-    -e|--debug-environments-dir)
-      ENVIRONMENTS_DIR="$2"
+    -r|--debug-repo-dir)
+      REPO_DIR="$2"
       shift
       shift
       ;;
@@ -68,13 +68,13 @@ fi
 
 task 'Initialize variables'
 
-if [[ -z "${ENVIRONMENTS_DIR:-}" ]]; then
-  ENVIRONMENTS_DIR="${HOME}/Jugglebot/environments"
+if [[ -z "${REPO_DIR:-}" ]]; then
+  REPO_DIR="${HOME}/Jugglebot"
 else
-  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-environments-dir' flag should only be used when testing this script.\n"
+  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n"
 fi
 
-JUGGLEBOT_CONDA_ENV_FILEPATH="${ENVIRONMENTS_DIR}/ubuntu-common/jugglebot_conda_env.yml"
+JUGGLEBOT_CONDA_ENV_FILEPATH="${REPO_DIR}/ros_ws/conda_env.yml"
 SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
 
 task 'Enable ssh-agent'
@@ -89,14 +89,14 @@ ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 
 task 'Source ubuntu-common/base_setup.sh'
 
-source "${ENVIRONMENTS_DIR}/ubuntu-common/base_setup.sh"
+source "${REPO_DIR}/environments/ubuntu-common/base_setup.sh"
 
 task 'Run the Ansible playbook'
 
 echo -e "\nEnter your password to enable the ansible playbook to perform privileged operations"
 
 ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
-  "${ENVIRONMENTS_DIR}/ubuntu-wsl2/main_playbook.yml" \
+  "${REPO_DIR}/environments/ubuntu-wsl2/main_playbook.yml" \
   --ask-become-pass \
   -e upgrade_software=yes \
   -e "ssh_keypair_name='${SSH_KEYPAIR_NAME}'" \
