@@ -197,7 +197,7 @@ echo -e "
 Run the following command to open a shell in the jugglebot-native-dev
 container:
 
-docker-native-env
+exec-native-docker-dev
 
 ---
 
