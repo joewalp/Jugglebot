@@ -34,6 +34,10 @@
       state: present
     become: yes
 
+  - name: Update the rosdep package manager
+    command:
+      cmd: /usr/bin/rosdep update
+
   - name: Read the ROS codename
     command:
       cmd: "/usr/bin/yq -r .ros.version_codename '{{ jugglebot_rc_rendered_filepath }}'"
