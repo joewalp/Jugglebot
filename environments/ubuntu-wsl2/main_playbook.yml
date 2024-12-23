@@ -123,12 +123,12 @@
       readable_dest: ~/bin/docker-native-env
       mode: '0755'
 
-  - name: Read the ROS2 codename
+  - name: Read the ROS codename
     command:
       cmd: "/usr/bin/yq -r .ros.version_codename '{{ jugglebot_rc_rendered_filepath }}'"
     register: yq_command_result
 
-  - name: Set the ROS2 codename
+  - name: Set the ROS codename variable
     set_fact:
       ros_version_codename: "{{ yq_command_result.stdout }}"
 
@@ -140,13 +140,31 @@
     when: ros_version_codename == 'foxy'
 
   - name: "Install ROS2 {{ ros_version_codename|capitalize }} Desktop .. please be patient"
-    # Note: We install version of ROS2 that has tier 1 support for this LTS
-    # version. See the ~/ubuntu-common/jugglebot_rc.yml.j2 for the mapping of
-    # LTS version to ROS2 codename.
+    #
+    # Note 1: We install version of ROS2 that has tier 1 support for this
+    # Ubuntu LTS release. See the ~/ubuntu-common/jugglebot_rc.yml.j2 for the
+    # mapping of LTS release to ROS2 codename.
+    #
+    # Note 2: We also install the webots package because it supplies the
+    # webots_ros2_driver that is required by the following package:
+    # Jugglebot/ros_ws/src/jugglebot_simulator/package.xml
+    #
     package:
       name: 
         - "ros-{{ ros_version_codename }}-desktop"
+        - "ros-{{ ros_version_codename }}-webots-ros2"
         - ros-dev-tools
       state: present
     become: yes
+
+  - name: Initialize the rosdep package manager
+    command:
+      cmd: /usr/bin/rosdep init
+    when: not '/etc/ros/rosdep/sources.list.d/20-default.list' is file
+    become: yes
+
+  - name: Install the Jugglebot ROS dependencies
+    command:
+      cmd: "/usr/bin/rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}"
+      chdir: "{{ home_dir }}/Jugglebot/ros_ws"
 
