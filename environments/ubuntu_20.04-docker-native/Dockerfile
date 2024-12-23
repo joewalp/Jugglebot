@@ -206,7 +206,8 @@ ARG JUGGLEBOT_REPO_BRANCH='main'
 WORKDIR "/home/${USERNAME}/Jugglebot"
 
 RUN --mount=type=ssh,mode=0666 git pull \
-    && git checkout "${JUGGLEBOT_REPO_BRANCH}"
+    && git checkout "${JUGGLEBOT_REPO_BRANCH}" \
+    && git pull
 
 WORKDIR "/home/${USERNAME}"
 
