@@ -3,9 +3,29 @@ set -o nounset -o pipefail -o errexit
 IFS=$'\t\n' # Stricter IFS settings
 rc=0
 
+# TASK [Parse the arguments]
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -c|--container-name)
+      CONTAINER_NAME="$2"
+      shift
+      shift
+      ;;
+    -*|--*)
+      echo "[ERROR]: Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
 # TASK [Initialize variables]
 
-CONTAINER_NAME='jugglebot-native-dev'
+CONTAINER_NAME="${CONTAINER_NAME:-jugglebot-native-dev}"
 EX_UNAVAILABLE=69
 
 # TASK [Define functions]
