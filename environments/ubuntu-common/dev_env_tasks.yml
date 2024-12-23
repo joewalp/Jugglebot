@@ -205,8 +205,9 @@
 
 - name: Disable the sudo welcome message
   file:
-    path: "{{ home_dir }}/.sudo_as_admin_successful"
+    path: "{{ sudo_welcome_flag_filepath }}"
     state: touch
+  when: not sudo_welcome_flag_filepath is file
   
 - name: Create or diff ~/.tmux.conf
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"

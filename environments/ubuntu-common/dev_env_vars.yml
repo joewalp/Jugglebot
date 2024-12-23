@@ -3,6 +3,7 @@ upgrade_software: "{{ upgrade_software if upgrade_software else no }}"
 ssh_keypair_name: ''
 home_dir: "{{ ansible_facts['env']['HOME'] }}"
 username: "{{ ansible_facts['env']['USER'] }}"
+sudo_welcome_flag_filepath: "{{ home_dir }}.sudo_as_admin_successful"
 jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
 host_setup_dir: "{{ home_dir }}/.jugglebot/host_setup"
 host_setup_backups_dir: "{{ home_dir }}/.jugglebot/host_setup/backups"
