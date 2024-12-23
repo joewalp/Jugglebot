@@ -1,6 +1,7 @@
 ---
 
 home_dir: "{{ ansible_facts['env']['HOME'] }}"
+wsl_welcome_flag_filepath: "{{ home_dir }}/.hushlogin"
 ssh_config_rendered_filepath: "{{ home_dir }}/.jugglebot/host_setup/defaults/ssh_config"
 jugglebot_rc_rendered_filepath: "{{ home_dir }}/.jugglebot/host_setup/defaults/jugglebot_rc.yml"
 ssh_private_key_filepath: "{{ home_dir }}/.ssh/{{ ssh_keypair_name }}"
