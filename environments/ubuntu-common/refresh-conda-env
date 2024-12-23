@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -o nounset -o pipefail -o errexit
+IFS=$'\t\n' # Stricter IFS settings
+rc=0
+
+# TASK [Define functions]
+
+task() {
+  local task_desc="$1"
+  echo -e "\nTASK [${task_desc}] ********"
+}
+
+task 'Initialize variables'
+
+HOST_SETUP_BACKUPS_DIR="${HOME}/.jugglebot/host_setup/backups"
+REPO_DIR="${REPO_DIR:-${HOME}/Jugglebot}"
+JUGGLEBOT_CONDA_ENV_FILEPATH="${JUGGLEBOT_CONDA_ENV_FILEPATH:-${REPO_DIR}/ros_ws/conda_env.yml"
+
+task 'Ensure that the ~/.jugglebot/host_setup/backups directory exists'
+
+install -d "${HOST_SETUP_BACKUPS_DIR}"
+
+task 'Determine whether the jugglebot conda environment exists'
+
+JUGGLEBOT_CONDA_ENV_STATE="$( if conda info --envs | grep -q '^jugglebot\s'; then echo 'present'; else echo 'absent'; fi )"
+
+if [[ "${JUGGLEBOT_CONDA_ENV_STATE}" == 'absent' ]]; then
+
+  task 'Create the jugglebot conda environment'
+
+  conda env create -f "${JUGGLEBOT_CONDA_ENV_FILEPATH}"
+
+else
+
+  JUGGLEBOT_CONDA_ENV_BACKUP_FILEPATH="$( mktemp -p "${HOST_SETUP_BACKUPS_DIR}" "jugglebot_conda_env.$( date +'%Y-%m-%dT%H-%M-%S%z' )_XXXXXXXX.yml" )"
+ 
+  task 'Backup the jugglebot conda environment config to ~/.jugglebot/host_setup/backups'
+
+  conda env export --from-history > "${JUGGLEBOT_CONDA_ENV_BACKUP_FILEPATH}"
+
+  task 'Update the jugglebot conda environment'
+
+  conda env update -f "${JUGGLEBOT_CONDA_ENV_FILEPATH}" --prune
+
+fi
+
