@@ -10,14 +10,14 @@ EX_UNAVAILABLE=69
 
 # TASK [Define functions]
 
-is_docker_container_running() {
-  local container_name="$1"
-  [[ "$(docker container ls --quiet --filter "name=${container_name}")" != '' ]]
-}
-
 does_docker_container_exist() {
   local container_name="$1"
   [[ "$(docker container ls --quiet --all --filter "name=${container_name}")" != '' ]]
+}
+
+is_docker_container_running() {
+  local container_name="$1"
+  [[ "$(docker container ls --quiet --filter "name=${container_name}")" != '' ]]
 }
 
 is_home_dir_initialized() {
@@ -48,14 +48,4 @@ while ! is_home_dir_initialized "${CONTAINER_NAME}"; do
   echo "Waiting for the home directory in container ${CONTAINER_NAME} to be initialized..."
   sleep 2
 done
-
-# TASK [Run an interactive shell in the container]
-#
-# Note: The SSH_AUTH_SOCK is typically located beneath /tmp, and the container
-# already has /tmp mounted.
-
-docker exec -it \
-  -e "SSH_AUTH_SOCK='${SSH_AUTH_SOCK:-}'" \
-  "${CONTAINER_NAME}" \
-  '/usr/bin/zsh'
 

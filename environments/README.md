@@ -14,8 +14,9 @@ environment runs the version of ROS2 that has tier 1 support for that Ubuntu
 release. If you want to run the same version of ROS2 as Prod runs, you should 
 install Ubuntu-20.04 for WSL despite that Ubuntu release being relatively old.
 
-You can attach VSCode for Windows to the WSL2 environment by running
-the following command from within the WSL2 environment:
+After following Steps 1 through 8 of the Instructions below, you can attach
+VSCode for Windows to the WSL2 environment by running the following command from
+within the WSL2 environment:
 
 ```zsh
 cd ~/Jugglebot && code .
@@ -234,7 +235,7 @@ wsl -d Ubuntu-20.04
 Within the WSL2 environment, run the setup script for the docker native platform
 environment. This will take some time.
 
-```bash
+```zsh
 ~/Jugglebot/environments/ubuntu_20.04-docker-native/setup.sh --ssh-keypair-name id_ed25519 --debug-git-branch dev-env-provisioning
 ```
 
@@ -244,8 +245,8 @@ The script in Step 9 will print some information about the container that it
 builds. After reading that info, run the following command to enter the docker
 native platform environment.
 
-```bash
-docker-native-env
+```zsh
+exec-native-docker-dev
 ```
 
 ## Notes
