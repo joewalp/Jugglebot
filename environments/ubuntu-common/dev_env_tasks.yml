@@ -69,13 +69,21 @@
     dest: "{{ packages_upgraded_filepath }}"
   when: upgrade_software|bool and upgrade_packages_result is succeeded
 
-- name: Ensure that git, jq, keychain, tmux and zsh are installed
+- name: Ensure that essential applications are installed
   package:
     name:
     - git
+    - gnome-terminal
     - jq
+      # required_by: yq
     - keychain
+    - terminator
     - tmux
+      # required_by: tmuxp
+      #
+      # Note: H. Low may not use tmux and tmuxp. J. Walp is including them
+      # because tmux will be highly useful if we enable remote access to Prod
+      # over ssh.
     - zsh
     state: present
   become: yes
