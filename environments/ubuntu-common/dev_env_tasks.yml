@@ -28,15 +28,6 @@
     path: "{{ home_dir }}/bin"
     state: directory
 
-- name: Create or diff ~/bin/refresh-conda-env
-  import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
-  vars:
-    src: "{{ environments_dir }}/ubuntu-common/refresh-conda-env"
-    remote_src: no
-    dest: "{{ home_dir }}/bin/refresh-conda-env"
-    readable_dest: ~/bin/refresh-conda-env
-    mode: '0755'
-
 - name: Read the packages upgraded timestamp
   slurp:
     src: "{{ packages_upgraded_filepath }}"
@@ -209,25 +200,6 @@
     dest: "{{ home_dir }}/.tmux.conf"
     readable_dest: ~/.tmux.conf
     mode: '0644'
-
-- name: Create or diff ~/.jugglebot/conda_env.sh
-  import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
-  vars:
-    src: "{{ environments_dir }}/ubuntu-common/conda_env.sh"
-    remote_src: no
-    dest: "{{ jugglebot_config_dir }}/conda_env.sh"
-    readable_dest: ~/.jugglebot/conda_env.sh
-    mode: '0644'
-
-- name: Install the conda env activate script
-  copy:
-    src: 'conda_env_activate.sh'
-    dest: '{{ home_dir }}/miniforge3/envs/jugglebot/etc/conda/activate.d/'
-
-- name: Install the conda env deactivate script
-  copy:
-    src: 'conda_env_deactivate.sh'
-    dest: '{{ home_dir }}/miniforge3/envs/jugglebot/etc/conda/deactivate.d/'
 
 - name: Add the ROS2 package repository
   import_tasks: "{{ environments_dir }}/ansible-common/add_apt_repository.yml"
