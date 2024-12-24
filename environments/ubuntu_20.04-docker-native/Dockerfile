@@ -93,8 +93,7 @@ RUN export debian_frontend=noninteractive \
       zip \
       zlib1g \
     # Clean up
-    && apt-get autoremove -y && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get autoremove -y
 
 # TASK [Install the same packages as in dev_env_tasks.yml to benefit from caching]
 #
