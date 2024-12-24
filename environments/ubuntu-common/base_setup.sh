@@ -71,9 +71,5 @@ fi
 
 eval "$("${CONDA_FILEPATH}" 'shell.bash' 'hook' 2> /dev/null)"
 
-export ROS_WORKAROUND_ENABLED=yes
-
-conda activate jugglebot
-
-unset ROS_WORKAROUND_ENABLED
+conda activate host-provisioning
 

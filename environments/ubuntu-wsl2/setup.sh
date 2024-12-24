@@ -93,7 +93,7 @@ source "${REPO_DIR}/environments/ubuntu-common/base_setup.sh"
 
 task 'Run the Ansible playbook'
 
-echo -e "\nEnter your password to enable the ansible playbook to perform privileged operations"
+echo -e "\nEnter your password to enable the Ansible playbook to perform privileged operations"
 
 ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
   "${REPO_DIR}/environments/ubuntu-wsl2/main_playbook.yml" \
@@ -107,7 +107,7 @@ ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible
 # failed_when: the return code is nonzero
 
 if [[ $rc -ne 0 ]]; then
-  echo -e "[ERROR]: The ansible playbook failed with return code ${rc}."
+  echo -e "[ERROR]: The Ansible playbook failed with return code ${rc}."
   exit $rc
 fi
 

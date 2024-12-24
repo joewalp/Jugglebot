@@ -1,0 +1,30 @@
+name: host-provisioning
+dependencies:
+  - python=3.12
+    # Note: Ansible requires a Python version that is 3.9 or higher. The
+    # community.docker.docker_container Ansible module requires a Python
+    # version greater than 3.9. We install Python 3.12 because it is the latest
+    # at this time. There is little reason to bump this version, but you should
+    # feel free to bump it if you need a feature that's only available for a
+    # newer version.
+
+  # TASK [Specify the host provisioning requirements]
+  
+  - ansible
+
+  - pip
+  
+  - pip:
+
+    # TASK [Specify the pip requirements]
+    # 
+    # Note: We prefer to specify the Conda package unless (a) no Conda package
+    # exists or (b) the Conda package would install a binary that we prefer to
+    # manage via apt an repository package.
+    
+    - docker
+      # required_by: community.docker Ansible modules
+      #
+      # Note: We choose the pip package because we prefer to use the Docker
+      # CLI tool binaries that are provided by the Docker apt repository.
+
