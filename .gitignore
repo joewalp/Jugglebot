@@ -71,3 +71,10 @@ log/
 # Ignore the temporary Docker build context directory
 /environments/ubuntu_20.04-docker-native/build/
 
+# Ignore the generated conda_env.yml
+#
+# Note: The process to update the conda environment is to edit
+# `ros_ws/conda_env.yml.j2` and then to run the `~/bin/refresh-conda-env`
+# utility.
+/ros_ws/conda_env.yml
+

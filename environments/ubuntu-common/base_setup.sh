@@ -29,6 +29,7 @@ task 'Initialize variables'
 
 CONDA_SETUP_SCRIPT_URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$( uname )-$( uname -m ).sh"
 CONDA_SETUP_SCRIPT_FILEPATH="${HOME}/.jugglebot/host_setup/miniforge_setup.sh"
+CONDA_BASE_UPDATED_FILEPATH="${HOME}/.jugglebot/host_setup/conda_base_updated_timestamp"
 CONDA_FILEPATH="${HOME}/miniforge3/bin/conda"
 REPO_DIR="${REPO_DIR:-${HOME}/Jugglebot}"
 
@@ -47,7 +48,7 @@ if [[ $rc -ne 0 ]]; then
   exit $rc
 fi
 
-task 'Run the conda setup script'
+task 'Run the Conda setup script'
 
 if [[ ! -f "${CONDA_FILEPATH}" ]]; then
   # The `-b` flag signifies batch mode, which applies the default config.
@@ -61,29 +62,27 @@ if [[ ! -f "${CONDA_FILEPATH}" ]]; then
   exit 3
 fi
 
-task 'Install conda in the bashrc'
+task 'Install Conda in the bashrc'
 
 "${CONDA_FILEPATH}" init bash || true
 
-task 'Enable conda'
+task 'Enable Conda'
 
 eval "$("${CONDA_FILEPATH}" 'shell.bash' 'hook' 2> /dev/null)"
 
-task 'Update conda base'
+task 'Update Conda base if necessary'
 
-conda update -y -n base -c conda-forge conda
+if [[ ! -f "${CONDA_BASE_UPDATED_FILEPATH}" ]]; then
+
+  conda update -y -n base -c conda-forge conda
+
+  date +%s > "${CONDA_BASE_UPDATED_FILEPATH}"
+
+fi
 
 "${REPO_DIR}/environments/ubuntu-common/refresh-conda-env"
 
-task 'Activate the jugglebot conda environment'
-
-export ROS_WORKAROUND_ENABLED=yes
-
-conda activate jugglebot
-
-unset ROS_WORKAROUND_ENABLED
-
-task 'Disable shell prompt modification by conda'
+task 'Disable shell prompt modification by Conda'
 
 conda config --set changeps1 False
 
