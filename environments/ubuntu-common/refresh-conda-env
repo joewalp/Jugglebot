@@ -29,11 +29,15 @@ eval "$("${CONDA_FILEPATH}" 'shell.bash' 'hook' 2> /dev/null)"
 
 if ! which ansible-playbook; then
 
-  task 'Create the boostrap Conda environment'
+  if ! conda info --envs | grep -q '^bootstrap\s'; then
+    
+    task 'Create the boostrap Conda environment'
+    
+    conda env create -f "${BOOTSTRAP_CONDA_ENV_FILEPATH}"
   
-  conda env create -f "${BOOTSTRAP_CONDA_ENV_FILEPATH}"
+  fi
 
-  task 'Activate the bootstrap Conda environment'
+  task 'Activate the boostrap Conda environment'  
 
   conda activate bootstrap
 
