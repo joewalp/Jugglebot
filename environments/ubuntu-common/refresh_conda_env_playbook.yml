@@ -51,7 +51,7 @@
   - name: Set the conda base updated timestamp
     copy:
       content: "{{ now(utc=True, fmt='%s') }}"
-      dest: "{{ packages_upgraded_filepath }}"
+      dest: "{{ conda_base_updated_filepath }}"
     when: conda_base_update_needed and not update_conda_base_result is failed
 
   - name: Disable shell prompt modification by Conda
