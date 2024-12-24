@@ -52,7 +52,7 @@
       cmd: conda config --set changeps1 False
 
   - name: Import package version lookup variables
-    import_vars: "{{ environments_dir }}/ubuntu-common/package_version_lookup_vars.yml"
+    include_vars: "{{ environments_dir }}/ubuntu-common/package_version_lookup_vars.yml"
 
   - name: Set the ros_codename variable and the python_version variable
     set_fact:
