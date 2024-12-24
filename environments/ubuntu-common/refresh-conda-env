@@ -14,33 +14,41 @@ task 'Initialize variables'
 
 HOST_SETUP_BACKUPS_DIR="${HOME}/.jugglebot/host_setup/backups"
 REPO_DIR="${REPO_DIR:-${HOME}/Jugglebot}"
+BOOTSTRAP_CONDA_ENV_FILEPATH="${BOOTSTRAP_CONDA_ENV_FILEPATH:-${REPO_DIR}/environments/ubuntu-common/bootstrap_conda_env.yml}"
 JUGGLEBOT_CONDA_ENV_FILEPATH="${JUGGLEBOT_CONDA_ENV_FILEPATH:-${REPO_DIR}/ros_ws/conda_env.yml}"
+REFRESH_PLAYBOOK_FILEPATH="${REFRESH_PLAYBOOK_FILEPATH:-${REPO_DIR}/environments/ubuntu-common/refresh_conda_env_playbook.yml}"
 
 task 'Ensure that the ~/.jugglebot/host_setup/backups directory exists'
 
 install -d "${HOST_SETUP_BACKUPS_DIR}"
 
-task 'Determine whether the jugglebot conda environment exists'
+task 'Test whether Ansible has been installed'
 
-JUGGLEBOT_CONDA_ENV_STATE="$( if conda info --envs | grep -q '^jugglebot\s'; then echo 'present'; else echo 'absent'; fi )"
+if ! which ansible-playbook; then
 
-if [[ "${JUGGLEBOT_CONDA_ENV_STATE}" == 'absent' ]]; then
+  task 'Create the boostrap Conda environment'
+  
+  conda env create -f "${BOOTSTRAP_CONDA_ENV_FILEPATH}"
 
-  task 'Create the jugglebot conda environment'
+  task 'Activate the bootstrap Conda environment'
 
-  conda env create -f "${JUGGLEBOT_CONDA_ENV_FILEPATH}"
+  conda activate bootstrap
 
-else
+fi 
 
-  JUGGLEBOT_CONDA_ENV_BACKUP_FILEPATH="$( mktemp -p "${HOST_SETUP_BACKUPS_DIR}" "jugglebot_conda_env.$( date +'%Y-%m-%dT%H-%M-%S%z' )_XXXXXXXX.yml" )"
- 
-  task 'Backup the jugglebot conda environment config to ~/.jugglebot/host_setup/backups'
+task 'Run the refresh jugglebot Conda environment playbook'
 
-  conda env export --from-history > "${JUGGLEBOT_CONDA_ENV_BACKUP_FILEPATH}"
+ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
+  "${REFRESH_PLAYBOOK_FILEPATH}" || rc="$?"
 
-  task 'Update the jugglebot conda environment'
+task 'Ensure that the jugglebot Conda environment is active'
 
-  conda env update -f "${JUGGLEBOT_CONDA_ENV_FILEPATH}" --prune
+# Note: The ROS workaround prevents ~/.jugglebot/conda_env.sh from sourcing the
+# ROS shell setup script upon activating the environment.
 
-fi
+export ROS_WORKAROUND_ENABLED=yes
+
+conda activate jugglebot
+
+unset ROS_WORKAROUND_ENABLED
 
