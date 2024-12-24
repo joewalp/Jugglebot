@@ -41,8 +41,8 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
-    -e|--debug-environments-dir)
-      ENVIRONMENTS_DIR="$2"
+    -e|--debug-repo-dir)
+      REPO_DIR="$2"
       shift
       shift
       ;;
@@ -79,10 +79,10 @@ fi
 
 task 'Initialize variables'
 
-if [[ -z "${ENVIRONMENTS_DIR:-}" ]]; then
-  ENVIRONMENTS_DIR="${HOME}/Jugglebot/environments"
+if [[ -z "${REPO_DIR:-}" ]]; then
+  REPO_DIR="${HOME}/Jugglebot"
 else
-  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-environments-dir' flag should only be used when testing this script.\n"
+  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n"
 fi
 
 if [[ -z "${GIT_BRANCH:-}" ]]; then
@@ -96,7 +96,7 @@ REPO_CACHE_ID="${REPO_CACHE_ID:-0}"
 DEV_ENV_USERNAME='devops' # This is also the default password for the user.
 SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
 SSH_PUBLIC_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}.pub"
-BUILD_CONTEXT_DIR="${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native"
+BUILD_CONTEXT_DIR="${REPO_DIR}/environments/ubuntu_20.04-docker-native"
 IMAGE_NAME='jugglebot-native-dev:focal'
 CONTAINER_NAME='jugglebot-native-dev'
 HOME_VOLUME_NAME='jugglebot-native-dev-home'
@@ -113,12 +113,12 @@ ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 
 task 'Copy the host-provisioning Conda environment file into the build context'
 
-install -D -T "${ENVIRONMENTS_DIR}/ubuntu-common/host_provisioning_conda_env.yml" \
+install -D -T "${REPO_DIR}/environments/ubuntu-common/host_provisioning_conda_env.yml" \
   "${BUILD_CONTEXT_DIR}/build/host_provisioning_conda_env.yml"
 
 task 'Copy the jugglebot Conda environment template file into the build context'
 
-install -D -T "${ENVIRONMENTS_DIR}/ros_ws/conda_env.yml.j2" \
+install -D -T "${REPO_DIR}/ros_ws/conda_env.yml.j2" \
   "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
 
 task 'Set the Python version in the jugglebot Conda environnment file'
