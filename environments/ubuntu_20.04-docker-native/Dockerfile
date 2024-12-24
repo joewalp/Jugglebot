@@ -194,7 +194,7 @@ WORKDIR "/home/${USERNAME}"
 
 # TASK [Precreate the Conda environments to benefit from caching]
 
-COPY host_provisioning_conda_env.yml jugglebot_conda_env.yml .
+COPY build/host_provisioning_conda_env.yml build/jugglebot_conda_env.yml .
 
 RUN install -d './.jugglebot/host_setup' \
     && wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$( uname )-$( uname -m ).sh" -O - > \
