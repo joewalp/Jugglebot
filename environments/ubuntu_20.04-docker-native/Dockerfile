@@ -39,7 +39,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       dirmngr \
       expect \
       gdb \
-      git \
       gnupg2 \
       gpg \
       grep \
@@ -47,7 +46,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       info \
       init-system-helpers \
       iproute2 \
-      jq \
       less \
       libc6 \
       libgcc1 \
@@ -83,7 +81,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       sudo \
       swig3.0 \
       tini \
-      tmux \
       tree \
       unzip \
       vim \
@@ -99,13 +96,25 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get autoremove -y && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
+# TASK [Install the same apps as in dev_env_tasks.yml to benefit from caching]
+
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get install -yq --no-install-recommends \
+      git \
+      gnome-terminal \
+      jq \
+      keychain \
+      terminator \
+      tmux \
+      zsh
+
 # TASK [Ensure that at least the en_US.UTF-8 UTF-8 locale is available]
 
 RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then \
       echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen; \
     fi
 
-# TASK [Configure sshd]
+# TASK [Configure OpenSSH Server]
 
 RUN mkdir /var/run/sshd \
     && sed -i 's/^#AllowTcpForwarding yes$/AllowTcpForwarding yes/' /etc/ssh/sshd_config
@@ -125,7 +134,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 # TASK [Install ROS2 Desktop and its many dependencies]
 #
-# Note: We install this here rather than in the playbook to take advantage of
+# Note: We install this here rather than in the playbook to benefit from of
 # dockerfile caching.
 
 RUN export DEBIAN_FRONTEND=noninteractive \
