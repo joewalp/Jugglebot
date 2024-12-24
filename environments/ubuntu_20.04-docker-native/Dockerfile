@@ -201,9 +201,11 @@ RUN install -d .jugglebot/host_setup \
       .jugglebot/host_setup/miniforge_setup.sh \
     && sh .jugglebot/host_setup/miniforge_setup.sh -b \
     && /usr/bin/bash -c '\
-      eval "$(./miniforge3/bin/conda shell.bash hook 2> /dev/null)"\
+      eval "$(./miniforge3/bin/conda shell.bash hook 2> /dev/null)" \
+      && conda update -y -n base -c conda-forge conda \
       && conda env create -f host_provisioning_conda_env.yml \
       && conda env create -f jugglebot_conda_env.yml' \
+    && date +%s > .jugglebot/host_setup/conda_base_updated_timestamp \
     && rm host_provisioning_conda_env.yml \
     && rm jugglebot_conda_env.yml
 
