@@ -69,3 +69,5 @@ fi
 
 "${REPO_DIR}/environments/ubuntu-common/refresh-conda-env"
 
+eval "$("${CONDA_FILEPATH}" 'shell.bash' 'hook' 2> /dev/null)"
+
