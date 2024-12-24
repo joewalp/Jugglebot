@@ -7,20 +7,26 @@
     repo_dir: "{{ playbook_dir }}/../.."
     home_dir: "{{ ansible_facts['env']['HOME'] }}"
     jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
-    host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
     host_setup_backups_dir: "{{ home_dir }}/.jugglebot/host_setup/backups"
+    host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
+    host_setup_diffs_dir: "{{ home_dir }}/.jugglebot/host_setup/diffs"
     conda_base_updated_filepath: "{{ home_dir }}/.jugglebot/host_setup/conda_base_updated_timestamp"
 
   tasks:
+
+  - name: Ensure that the host setup backups directory exists
+    file:
+      path: "{{ host_setup_backups_dir }}"
+      state: directory
 
   - name: Ensure that the host setup defaults directory exists
     file:
       path: "{{ host_setup_defaults_dir }}"
       state: directory
 
-  - name: Ensure that the host setup backups directory exists
+  - name: Ensure that the host setup diffs directory exists
     file:
-      path: "{{ host_setup_backups_dir }}"
+      path: "{{ host_setup_diffs_dir }}"
       state: directory
 
   - name: Initialize the bash runtime config for conda
