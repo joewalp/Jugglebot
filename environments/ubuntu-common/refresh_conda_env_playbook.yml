@@ -5,7 +5,7 @@
   vars:
     environments_dir: "{{ playbook_dir }}/.."
     repo_dir: "{{ playbook_dir }}/../.."
-    home_dir: "{{ ansible_facts['env']['HOME']"
+    home_dir: "{{ ansible_facts['env']['HOME'] }}"
     jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
     host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
     host_setup_backups_dir: "{{ home_dir }}/.jugglebot/host_setup/backups"
