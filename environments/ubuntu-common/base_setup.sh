@@ -67,27 +67,5 @@ if [[ ! -f "${CONDA_FILEPATH}" ]]; then
   exit 3
 fi
 
-task 'Install Conda in the bashrc'
-
-"${CONDA_FILEPATH}" init bash || true
-
-task 'Enable Conda'
-
-eval "$("${CONDA_FILEPATH}" 'shell.bash' 'hook' 2> /dev/null)"
-
-task 'Update Conda base if necessary'
-
-if [[ ! -f "${CONDA_BASE_UPDATED_FILEPATH}" ]]; then
-
-  conda update -y -n base -c conda-forge conda
-
-  date +%s > "${CONDA_BASE_UPDATED_FILEPATH}"
-
-fi
-
 "${REPO_DIR}/environments/ubuntu-common/refresh-conda-env"
-
-task 'Disable shell prompt modification by Conda'
-
-conda config --set changeps1 False
 
