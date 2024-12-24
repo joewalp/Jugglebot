@@ -7,6 +7,10 @@ rc=0
 
 INIT_FLAG_FILEPATH="${HOME}/.user-dir-initialized"
 
+# TASK [Start dbus-daemon]
+
+sudo /usr/bin/dbus-daemon --system &
+
 # TASK [Start sshd]
 
 sudo /usr/sbin/sshd -D &
