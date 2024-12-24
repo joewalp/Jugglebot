@@ -113,23 +113,27 @@ ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 
 task 'Copy the host-provisioning Conda environment file into the build context'
 
-install -D -t "${ENVIRONMENTS_DIR}/ubuntu-common/host_provisioning_conda_env.yml" "${BUILD_CONTEXT_DIR}/build/"
+install -D -T "${ENVIRONMENTS_DIR}/ubuntu-common/host_provisioning_conda_env.yml" \
+  "${BUILD_CONTEXT_DIR}/build/host_provisioning_conda_env.yml"
 
 task 'Copy the jugglebot Conda environment template file into the build context'
 
-install -D -t "${ENVIRONMENTS_DIR}/ros_ws/conda_env.yml.j2" "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
+install -D -T "${ENVIRONMENTS_DIR}/ros_ws/conda_env.yml.j2" \
+  "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
 
 task 'Set the Python version in the jugglebot Conda environnment file'
 
-sed -i 's/[{][{]\s*python_version\s*[}][}]/3.8/' "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
+sed -i 's/[{][{]\s*python_version\s*[}][}]/3.8/' \
+  "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
 
 task 'Copy ~/.gitconfig into the build context'
 
-install -D -t "${HOME}/.gitconfig" "${BUILD_CONTEXT_DIR}/build/gitconfig"
+install -D -T "${HOME}/.gitconfig" "${BUILD_CONTEXT_DIR}/build/gitconfig"
 
 task "Copy ~/.ssh/${SSH_KEYPAIR_NAME}.pub into the build context"
 
-install -D -T "${SSH_PUBLIC_KEY_FILEPATH}" "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
+install -D -T "${SSH_PUBLIC_KEY_FILEPATH}" \
+  "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
 
 task "Build the docker image named ${IMAGE_NAME}"
 
