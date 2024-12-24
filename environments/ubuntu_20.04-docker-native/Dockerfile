@@ -196,14 +196,16 @@ WORKDIR "/home/${USERNAME}"
 
 COPY build/host_provisioning_conda_env.yml build/jugglebot_conda_env.yml .
 
-RUN install -d './.jugglebot/host_setup' \
+RUN install -d .jugglebot/host_setup \
     && wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$( uname )-$( uname -m ).sh" -O - > \
-      './.jugglebot/host_setup/miniforge_setup.sh' \
-    && sh './.jugglebot/host_setup/miniforge_setup.sh' -b \
-    && conda env create -f './host_provisioning_conda_env.yml' \
-    && rm './host_provisioning_conda_env.yml' \
-    && conda env create -f './jugglebot_conda_env.yml' \
-    && rm './jugglebot_conda_env.yml'
+      .jugglebot/host_setup/miniforge_setup.sh \
+    && sh .jugglebot/host_setup/miniforge_setup.sh -b \
+    && /usr/bin/bash -c '\
+      eval "$(./miniforge3/bin/conda shell.bash hook 2> /dev/null)"\
+      && conda env create -f host_provisioning_conda_env.yml \
+      && conda env create -f jugglebot_conda_env.yml' \
+    && rm host_provisioning_conda_env.yml \
+    && rm jugglebot_conda_env.yml
 
 # TASK [Initialize the repo clone variables]
 
