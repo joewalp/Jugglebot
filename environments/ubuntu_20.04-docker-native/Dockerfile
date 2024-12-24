@@ -92,21 +92,17 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       xz-utils \
       zip \
       zlib1g \
-    # Clean up
-    && apt-get autoremove -y && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
-
-# TASK [Install the same apps as in dev_env_tasks.yml to benefit from caching]
-
-RUN export DEBIAN_FRONTEND=noninteractive \
-    && apt-get install -yq --no-install-recommends \
+      # Preinstall the same apps as in dev_env_tasks.yml to benefit from caching
       git \
       gnome-terminal \
       jq \
       keychain \
       terminator \
       tmux \
-      zsh
+      zsh \
+    # Clean up
+    && apt-get autoremove -y && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
 
 # TASK [Ensure that at least the en_US.UTF-8 UTF-8 locale is available]
 
