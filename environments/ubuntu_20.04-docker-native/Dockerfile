@@ -192,11 +192,18 @@ ENV USER="${USERNAME}" SHELL='/bin/bash' HOME="/home/${USERNAME}"
 
 WORKDIR "/home/${USERNAME}"
 
-# TASK [Predownload the Conda setup script to benefit from caching]
+# TASK [Precreate the Conda environments to benefit from caching]
+
+COPY host_provisioning_conda_env.yml jugglebot_conda_env.yml .
 
 RUN install -d './.jugglebot/host_setup' \
     && wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$( uname )-$( uname -m ).sh" -O - > \
-      './.jugglebot/host_setup/miniforge_setup.sh'
+      './.jugglebot/host_setup/miniforge_setup.sh' \
+    && sh './.jugglebot/host_setup/miniforge_setup.sh' -b \
+    && conda env create -f './host_provisioning_conda_env.yml' \
+    && rm './host_provisioning_conda_env.yml' \
+    && conda env create -f './jugglebot_conda_env.yml' \
+    && rm './jugglebot_conda_env.yml'
 
 # TASK [Initialize the repo clone variables]
 

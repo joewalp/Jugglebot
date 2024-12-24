@@ -111,9 +111,21 @@ task 'Add the ssh private key'
 
 ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 
+task 'Copy the host-provisioning Conda environment file into the build context'
+
+install -d -t "${ENVIRONMENTS_DIR}/ubuntu-common/host_provisioning_conda_env.yml" "${build_context_dir}/build/"
+
+task 'Copy the jugglebot Conda environment template file into the build context'
+
+install -d -t "${ENVIRONMENTS_DIR}/ros_ws/conda_env.yml.j2" "${build_context_dir}/build/jugglebot_conda_env.yml"
+
+task 'Set the Python version in the jugglebot Conda environnment file'
+
+sed -i 's/[{][{]\s*python_version\s*[}][}]/3.8/' "${build_context_dir}/build/jugglebot_conda_env.yml"
+
 task 'Copy ~/.gitconfig into the build context'
 
-install -D -T "${HOME}/.gitconfig" "${BUILD_CONTEXT_DIR}/build/gitconfig"
+install -d -t "${home}/.gitconfig" "${build_context_dir}/build/gitconfig"
 
 task "Copy ~/.ssh/${SSH_KEYPAIR_NAME}.pub into the build context"
 
@@ -135,6 +147,8 @@ docker buildx build ${BUILD_NO_CACHE_OPTION} \
 
 task 'Cleanup the build context'
 
+rm -f "${BUILD_CONTEXT_DIR}/build/host_provisioning_conda_env.yml"
+rm -f "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
 rm -f "${BUILD_CONTEXT_DIR}/build/gitconfig"
 rm -f "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
 
