@@ -118,3 +118,7 @@
       cmd: "conda env update -n jugglebot -f '{{ repo_dir }}/ros_ws/conda_env.yml' --prune"
     when: jugglebot_env_exists
 
+  - name: Verify that the jugglebot Conda environment can be activated
+    shell:
+      cmd: export ROS_WORKAROUND_ENABLED=yes && conda activate jugglebot
+

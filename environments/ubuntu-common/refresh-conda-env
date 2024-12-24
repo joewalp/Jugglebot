@@ -10,12 +10,32 @@ task() {
   echo -e "\nTASK [${task_desc}] ********"
 }
 
+task 'Parse the arguments'
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -p|--refresh-host-provisioning)
+      REFRESH_HOST_PROVISIONING=yes
+      shift
+      ;;
+    -*|--*)
+      echo "[ERROR]: Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
 task 'Initialize variables'
 
+REFRESH_HOST_PROVISIONING="${REFRESH_HOST_PROVISIONING:-no}"
 CONDA_FILEPATH="${HOME}/miniforge3/bin/conda"
 HOST_SETUP_BACKUPS_DIR="${HOME}/.jugglebot/host_setup/backups"
 REPO_DIR="${REPO_DIR:-${HOME}/Jugglebot}"
-BOOTSTRAP_CONDA_ENV_FILEPATH="${BOOTSTRAP_CONDA_ENV_FILEPATH:-${REPO_DIR}/environments/ubuntu-common/bootstrap_conda_env.yml}"
+HOST_PROVISIONING_CONDA_ENV_FILEPATH="${HOST_PROVISIONING_CONDA_ENV_FILEPATH:-${REPO_DIR}/environments/ubuntu-common/host_provisioning_conda_env.yml}"
 JUGGLEBOT_CONDA_ENV_FILEPATH="${JUGGLEBOT_CONDA_ENV_FILEPATH:-${REPO_DIR}/ros_ws/conda_env.yml}"
 REFRESH_PLAYBOOK_FILEPATH="${REFRESH_PLAYBOOK_FILEPATH:-${REPO_DIR}/environments/ubuntu-common/refresh_conda_env_playbook.yml}"
 
@@ -27,35 +47,37 @@ task 'Test whether Ansible has been installed'
 
 eval "$("${CONDA_FILEPATH}" 'shell.bash' 'hook' 2> /dev/null)"
 
-if ! which ansible-playbook; then
+if conda info --envs | grep -q '^host-provisioning\s'; then
 
-  if ! conda info --envs | grep -q '^bootstrap\s'; then
-    
-    task 'Create the boostrap Conda environment'
-    
-    conda env create -f "${BOOTSTRAP_CONDA_ENV_FILEPATH}"
-  
+  if [[ "${REFRESH_HOST_PROVISIONING}" == 'yes' ]]; then
+
+    task 'Refresh the host-provisioning Conda environment'
+
+    conda env update -n host-provisioning -f "${HOST_PROVISIONING_CONDA_ENV_FILEPATH}" --prune
+
   fi
 
-  task 'Activate the boostrap Conda environment'  
+else
+  
+  task 'Create the host-provisioning Conda environment'
+  
+  conda env create -f "${HOST_PROVISIONING_CONDA_ENV_FILEPATH}"
 
-  conda activate bootstrap
+fi
 
-fi 
+task 'Activate the host-provisioning Conda environment'  
+
+conda activate host-provisioning
 
 task 'Run the refresh jugglebot Conda environment playbook'
 
 ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
   "${REFRESH_PLAYBOOK_FILEPATH}" || rc="$?"
 
-task 'Ensure that the jugglebot Conda environment is active'
+# failed_when: the return code is nonzero
 
-# Note: The ROS workaround prevents ~/.jugglebot/conda_env.sh from sourcing the
-# ROS shell setup script upon activating the environment.
-
-export ROS_WORKAROUND_ENABLED=yes
-
-conda activate jugglebot
-
-unset ROS_WORKAROUND_ENABLED
+if [[ $rc -ne 0 ]]; then
+  echo -e "[ERROR]: The Ansible playbook failed with return code ${rc}."
+  exit $rc
+fi
 
