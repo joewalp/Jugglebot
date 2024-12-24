@@ -91,9 +91,9 @@ task 'Source ubuntu-common/base_setup.sh'
 
 source "${REPO_DIR}/environments/ubuntu-common/base_setup.sh"
 
-task 'Run the Ansible playbook'
+task 'Run the ubuntu-wsl2 Ansible playbook'
 
-echo -e "\nEnter your password to enable the Ansible playbook to perform privileged operations"
+echo -e "\nEnter your password to enable the playbook to configure this Ubuntu host"
 
 ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
   "${REPO_DIR}/environments/ubuntu-wsl2/main_playbook.yml" \
