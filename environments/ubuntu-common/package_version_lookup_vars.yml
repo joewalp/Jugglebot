@@ -6,7 +6,7 @@ ubuntu_codename_to_ros_codename:
   noble: jazzy
 
 ubuntu_codename_to_python_version:
-  focal: 3.9
+  focal: 3.12
   jammy: 3.10
   noble: 3.12
 
