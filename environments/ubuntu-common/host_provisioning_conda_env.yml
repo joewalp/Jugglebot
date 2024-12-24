@@ -1,4 +1,6 @@
 name: host-provisioning
+channels:
+  - conda-forge
 dependencies:
   - python=3.12
     # Note: Ansible requires a Python version that is 3.9 or higher. The
@@ -7,13 +9,13 @@ dependencies:
     # at this time. There is little reason to bump this version, but you should
     # feel free to bump it if you need a feature that's only available for a
     # newer version.
+  - pip
+  
 
   # TASK [Specify the host provisioning requirements]
   
   - ansible
 
-  - pip
-  
   - pip:
 
     # TASK [Specify the pip requirements]
