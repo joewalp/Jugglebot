@@ -11,6 +11,7 @@
     host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
     host_setup_diffs_dir: "{{ home_dir }}/.jugglebot/host_setup/diffs"
     conda_base_updated_filepath: "{{ home_dir }}/.jugglebot/host_setup/conda_base_updated_timestamp"
+    conda_filepath: "{{ home_dir }}/miniforge3/bin/conda"
 
   tasks:
 
@@ -84,7 +85,7 @@
       src: "{{ repo_dir }}/ros_ws/conda_env.yml.j2"
       dest: "{{ repo_dir }}/ros_ws/conda_env.yml"
 
-  - name: Query whether the jugglebot Conda environment exists
+  - name: Check whether the jugglebot Conda environment exists
     shell:
       cmd: conda info --envs | grep -q '^jugglebot\s'
     register: conda_info_grep_result
@@ -95,12 +96,12 @@
     set_fact:
       jugglebot_env_exists: "{{ conda_info_grep_result.rc == 0 }}"
 
-  - name: Create the jugglebot Conda environment if necessary
+  - name: Create the jugglebot Conda environment .. please be patient
     command:
       cmd: "conda env create -f '{{ repo_dir }}/ros_ws/conda_env.yml'"
     when: not jugglebot_env_exists
   
-  - name: Create a file for the jugglebot Conda environment backup"
+  - name: Create a file for the jugglebot Conda environment backup
     tempfile:
       path: "{{ host_setup_backups_dir }}"
       prefix: "conda_env.{{ now( fmt='%Y-%m-%dT%H-%M-%S%z' ) }}_"
@@ -113,12 +114,16 @@
       cmd: "conda env export -n jugglebot --from-history > '{{ backup_tempfile_result.path }}'"
     when: jugglebot_env_exists
 
-  - name: Refresh the jugglebot Conda environment
+  - name: Refresh the jugglebot Conda environment .. please be patient
     shell:
       cmd: "conda env update -n jugglebot -f '{{ repo_dir }}/ros_ws/conda_env.yml' --prune"
     when: jugglebot_env_exists
 
   - name: Verify that the jugglebot Conda environment can be activated
     shell:
-      cmd: export ROS_WORKAROUND_ENABLED=yes && conda activate jugglebot
+      cmd: "export ROS_WORKAROUND_ENABLED=yes \
+        && eval \"$('{{ conda_filepath }}' 'shell.bash' 'hook' 2> /dev/null)\" \
+        && conda activate jugglebot"
+      executable: /usr/bin/bash
+    changed_when: False
 

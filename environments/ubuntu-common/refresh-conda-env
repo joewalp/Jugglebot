@@ -43,9 +43,11 @@ task 'Ensure that the ~/.jugglebot/host_setup/backups directory exists'
 
 install -d "${HOST_SETUP_BACKUPS_DIR}"
 
-task 'Test whether Ansible has been installed'
+task 'Enable Conda'
 
 eval "$("${CONDA_FILEPATH}" 'shell.bash' 'hook' 2> /dev/null)"
+
+task 'Check whether the host-provisioning Conda environment exists'
 
 if conda info --envs | grep -q '^host-provisioning\s'; then
 
