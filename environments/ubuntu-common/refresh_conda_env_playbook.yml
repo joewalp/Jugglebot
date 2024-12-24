@@ -88,6 +88,7 @@
     shell:
       cmd: conda info --envs | grep -q '^jugglebot\s'
     register: conda_info_grep_result
+    failed_when: conda_info_grep_result.rc not in [0, 1]
     changed_when: False
   
   - name: Set the jugglebot_env_exists variable
