@@ -31,6 +31,11 @@
       path: "{{ host_setup_diffs_dir }}"
       state: directory
 
+  - name: Ensure that the ~/bin directory exists
+    file:
+      path: "{{ home_dir }}/bin"
+      state: directory
+
   - name: Initialize the bash runtime config for conda
     # Note: We don't use Bash for development, but we still want that shell to
     # be usable for exploration by a potential contributor who may not be
