@@ -5,6 +5,7 @@
   vars:
     environments_dir: "{{ playbook_dir }}/.."
     repo_dir: "{{ playbook_dir }}/../.."
+    ubuntu_codename: "{{ ansible_facts['distribution_release'] }}"
     home_dir: "{{ ansible_facts['env']['HOME'] }}"
     jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
     host_setup_backups_dir: "{{ home_dir }}/.jugglebot/host_setup/backups"
@@ -63,7 +64,6 @@
 
   - name: Set the ros_codename variable and the python_version variable
     set_fact:
-      ubuntu_codename: "{{ ansible_facts['distribution_release'] }}"
       ros_codename: "{{ ubuntu_codename_to_ros_codename[ubuntu_codename] }}"
       python_version: "{{ ubuntu_codename_to_python_version[ubuntu_codename] }}"
 
