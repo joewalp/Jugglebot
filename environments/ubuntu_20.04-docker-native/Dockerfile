@@ -192,6 +192,12 @@ ENV USER="${USERNAME}" SHELL='/bin/bash' HOME="/home/${USERNAME}"
 
 WORKDIR "/home/${USERNAME}"
 
+# TASK [Predownload the Conda setup script to benefit from caching]
+
+RUN install -d './.jugglebot/host_setup' \
+    && wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$( uname )-$( uname -m ).sh" -O - > \
+      './.jugglebot/host_setup/miniforge_setup.sh'
+
 # TASK [Initialize the repo clone variables]
 
 ARG JUGGLEBOT_REPO_SSH_URL='git@github.com:joewalp/Jugglebot.git'
