@@ -5,9 +5,11 @@
   vars:
     environments_dir: "{{ playbook_dir }}/.."
     repo_dir: "{{ playbook_dir }}/../.."
+    home_dir: "{{ ansible_facts['env']['HOME']"
     jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
     host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
     host_setup_backups_dir: "{{ home_dir }}/.jugglebot/host_setup/backups"
+    conda_base_updated_filepath: "{{ home_dir }}/.jugglebot/host_setup/conda_base_updated_timestamp"
 
   tasks:
 
@@ -15,6 +17,39 @@
     file:
       path: "{{ host_setup_defaults_dir }}"
       state: directory
+
+  - name: Ensure that the host setup backups directory exists
+    file:
+      path: "{{ host_setup_backups_dir }}"
+      state: directory
+
+  - name: Initialize the bash runtime config for conda
+    # Note: We don't use Bash for development, but we still want that shell to
+    # be usable for exploration by a potential contributor who may not be
+    # familiar with Z Shell.
+    shell: 
+      cmd: conda init bash
+
+  - name: Set the conda_base_update_needed variable
+    set_fact:
+      conda_base_update_needed: "{{ not conda_base_updated_filepath is file }}"
+
+  - name: Update Conda base if necessary
+    shell:
+      cmd: conda update -y -n base -c conda-forge conda
+    when: conda_base_update_needed
+    register: update_conda_base_result
+    failed_when: update_conda_base_result.rc != 0
+
+  - name: Set the conda base updated timestamp
+    copy:
+      content: "{{ now(utc=True, fmt='%s') }}"
+      dest: "{{ packages_upgraded_filepath }}"
+    when: conda_base_update_needed and not update_conda_base_result is failed
+
+  - name: Disable shell prompt modification by Conda
+    shell:
+      cmd: conda config --set changeps1 False
 
   - name: Import package version lookup variables
     import_vars: "{{ environments_dir }}/ubuntu-common/package_version_lookup_vars.yml"
@@ -58,12 +93,6 @@
       cmd: "conda env create -f '{{ repo_dir }}/ros_ws/conda_env.yml'"
     when: not jugglebot_env_exists
   
-  - name: Ensure that the host setup defaults directory exists
-    file:
-      path: "{{ host_setup_backups_dir }}"
-      state: directory
-    when: jugglebot_env_exists
-
   - name: Create a file for the jugglebot Conda environment backup"
     tempfile:
       path: "{{ host_setup_backups_dir }}"

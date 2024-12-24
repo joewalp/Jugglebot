@@ -12,6 +12,7 @@ task() {
 
 task 'Initialize variables'
 
+CONDA_FILEPATH="${HOME}/miniforge3/bin/conda"
 HOST_SETUP_BACKUPS_DIR="${HOME}/.jugglebot/host_setup/backups"
 REPO_DIR="${REPO_DIR:-${HOME}/Jugglebot}"
 BOOTSTRAP_CONDA_ENV_FILEPATH="${BOOTSTRAP_CONDA_ENV_FILEPATH:-${REPO_DIR}/environments/ubuntu-common/bootstrap_conda_env.yml}"
@@ -23,6 +24,8 @@ task 'Ensure that the ~/.jugglebot/host_setup/backups directory exists'
 install -d "${HOST_SETUP_BACKUPS_DIR}"
 
 task 'Test whether Ansible has been installed'
+
+eval "$("${CONDA_FILEPATH}" 'shell.bash' 'hook' 2> /dev/null)"
 
 if ! which ansible-playbook; then
 
