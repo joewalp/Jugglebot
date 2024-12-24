@@ -58,13 +58,14 @@
     shell:
       cmd: conda config --set changeps1 False
 
-  - name: Import package version lookup variables
+  - name: Import package version lookup dicts
     include_vars: "{{ environments_dir }}/ubuntu-common/package_version_lookup_vars.yml"
 
   - name: Set the ros_codename variable and the python_version variable
     set_fact:
-      ros_codename: "{{ ubuntu_codename_to_ros_codename[ansible_facts['distribution_release']] }}"
-      python_version: "{{ ubuntu_codename_to_python_version[ansible_facts['distribution_release']] }}"
+      ubuntu_codename: "{{ ansible_facts['distribution_release'] }}"
+      ros_codename: "{{ ubuntu_codename_to_ros_codename[ubuntu_codename] }}"
+      python_version: "{{ ubuntu_codename_to_python_version[ubuntu_codename] }}"
 
   - name: Render the Jugglebot runtime config file with the ROS codename
     template:
@@ -118,6 +119,34 @@
     shell:
       cmd: "conda env update -n jugglebot -f '{{ repo_dir }}/ros_ws/conda_env.yml' --prune"
     when: jugglebot_env_exists
+
+  - name: Create or diff ~/.jugglebot/conda_env.sh
+    import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
+    vars:
+      src: "{{ environments_dir }}/ubuntu-common/conda_env.sh"
+      remote_src: no
+      dest: "{{ jugglebot_config_dir }}/conda_env.sh"
+      readable_dest: ~/.jugglebot/conda_env.sh
+      mode: '0644'
+
+  - name: Install the Conda environment activate script
+    copy:
+      src: 'conda_env_activate.sh'
+      dest: '{{ home_dir }}/miniforge3/envs/jugglebot/etc/conda/activate.d/'
+
+  - name: Install the Conda environment deactivate script
+    copy:
+      src: 'conda_env_deactivate.sh'
+      dest: '{{ home_dir }}/miniforge3/envs/jugglebot/etc/conda/deactivate.d/'
+
+  - name: Create or diff ~/bin/refresh-conda-env
+    import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
+    vars:
+      src: "{{ environments_dir }}/ubuntu-common/refresh-conda-env"
+      remote_src: no
+      dest: "{{ home_dir }}/bin/refresh-conda-env"
+      readable_dest: ~/bin/refresh-conda-env
+      mode: '0755'
 
   - name: Verify that the jugglebot Conda environment can be activated
     shell:
