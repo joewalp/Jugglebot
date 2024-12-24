@@ -6,6 +6,7 @@
   shell:
     cmd: which yq
   register: which_yq_result
+  failed_when: which_yq_result.rc not in [0, 1]
 
 - name: Set the yq_installed variable
   set_fact:
