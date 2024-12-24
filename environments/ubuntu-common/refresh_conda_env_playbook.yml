@@ -80,7 +80,7 @@
 
   - name: Query whether the jugglebot Conda environment exists
     shell:
-      cmd: "conda info --envs | grep -q '^jugglebot\s'"
+      cmd: conda info --envs | grep -q '^jugglebot\s'
     register: conda_info_grep_result
     changed_when: False
   
