@@ -1,0 +1,84 @@
+---
+- name: Refresh the jugglebot Conda environment
+  hosts: localhost
+  connection: local
+  vars:
+    environments_dir: "{{ playbook_dir }}/.."
+    repo_dir: "{{ playbook_dir }}/../.."
+    jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
+    host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
+    host_setup_backups_dir: "{{ home_dir }}/.jugglebot/host_setup/backups"
+
+  tasks:
+
+  - name: Ensure that the host setup defaults directory exists
+    file:
+      path: "{{ host_setup_defaults_dir }}"
+      state: directory
+
+  - name: Import package version lookup variables
+    import_vars: "{{ environments_dir }}/ubuntu-common/package_version_lookup_vars.yml"
+
+  - name: Set the ros_codename variable and the python_version variable
+    set_fact:
+      ros_codename: "{{ ubuntu_codename_to_ros_codename[ansible_facts['distribution_release']] }}"
+      python_version: "{{ ubuntu_codename_to_python_version[ansible_facts['distribution_release']] }}"
+
+  - name: Render the Jugglebot runtime config file with the ROS codename
+    template:
+      src: "{{ environments_dir }}/ubuntu-common/jugglebot_rc.yml.j2"
+      dest: "{{ host_setup_defaults_dir }}/jugglebot_rc.yml"
+
+  - name: Install the Jugglebot runtime config file
+    import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
+    vars:
+      src: "{{ host_setup_defaults_dir }}/jugglebot_rc.yml"
+      remote_src: yes
+      dest: "{{ jugglebot_config_dir }}/jugglebot_rc.yml"
+      readable_dest: ~/.jugglebot/jugglebot_rc.yml
+      mode: '0644'
+
+  - name: Render the jugglebot Conda env config with the Python version
+    template:
+      src: "{{ repo_dir }}/ros_ws/conda_env.yml.j2"
+      dest: "{{ repo_dir }}/ros_ws/conda_env.yml"
+
+  - name: Query whether the jugglebot Conda environment exists
+    shell:
+      cmd: "conda info --envs | grep -q '^jugglebot\s'"
+    register: conda_info_grep_result
+    changed_when: False
+  
+  - name: Set the jugglebot_env_exists variable
+    set_fact:
+      jugglebot_env_exists: "{{ conda_info_grep_result.rc == 0 }}"
+
+  - name: Create the jugglebot Conda environment if necessary
+    command:
+      cmd: "conda env create -f '{{ repo_dir }}/ros_ws/conda_env.yml'"
+    when: not jugglebot_env_exists
+  
+  - name: Ensure that the host setup defaults directory exists
+    file:
+      path: "{{ host_setup_backups_dir }}"
+      state: directory
+    when: jugglebot_env_exists
+
+  - name: Create a file for the jugglebot Conda environment backup"
+    tempfile:
+      path: "{{ host_setup_backups_dir }}"
+      prefix: "conda_env.{{ now( fmt='%Y-%m-%dT%H-%M-%S%z' ) }}_"
+      suffix: ".yml"
+    register: backup_tempfile_result
+    when: jugglebot_env_exists
+
+  - name: Export a backup of the jugglebot Conda environment
+    shell:
+      cmd: "conda env export -n jugglebot --from-history > '{{ backup_tempfile_result.path }}'"
+    when: jugglebot_env_exists
+
+  - name: Refresh the jugglebot Conda environment
+    shell:
+      cmd: "conda env update -n jugglebot -f '{{ repo_dir }}/ros_ws/conda_env.yml' --prune"
+    when: jugglebot_env_exists
+

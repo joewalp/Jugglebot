@@ -1,13 +1,4 @@
-{%
-
-set ubuntu_codename_to_ros_codename = {
-  'focal': 'foxy',
-  'jammy': 'humble',
-  'noble': 'jazzy',
-}
-
-%}---
 ros:
-  version_codename: {{ ubuntu_codename_to_ros_codename[ansible_facts['distribution_release']] }}
+  version_codename: {{ ros_codename }}
   domain_id: 0
 

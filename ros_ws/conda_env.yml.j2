@@ -1,0 +1,39 @@
+name: jugglebot
+dependencies:
+  - python={{ python_version }}
+  
+  # TASK [Specify development environment requirements]
+
+  - ansible
+  - pip
+  
+  # TASK [Specify Jugglebot project requirements]
+  
+  - cantools
+  - matplotlib
+  - numpy
+  - python-can
+  
+  # TASK [Specify Yasmin requirements]
+  
+  - expiringdict
+  - flask
+  - waitress
+  - pip:
+    
+    # TASK [Specify development environment pip requirements]
+    
+    - docker
+      # required_by: community.docker Ansible modules
+      #
+      # Note: We choose the pip package because we prefer to use the Docker
+      # CLI tools that are provided by the Docker apt repository.
+    - tmuxp
+      # Note: We choose the pip package because we prefer to use the tmux
+      # that is provided by the Ubuntu apt repository.
+    
+    # TASK [Specify Jugglebot project pip requirements]
+    
+    - numpy-quaternion==2022.4.4
+    - pyspacemouse==1.0.9
+

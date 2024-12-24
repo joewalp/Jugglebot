@@ -79,8 +79,6 @@
   when: upgrade_software|bool and upgrade_packages_result is succeeded
 
 - name: Ensure that git, jq, keychain, tmux and zsh are installed
-  # Note: This tmux binary will be hidden by the tmux binary in the tmux conda
-  # package that is installed as a dependency of the tmuxp conda package.
   package:
     name:
     - git
@@ -91,27 +89,10 @@
     state: present
   become: yes
 
-- name: Determine the yq architecture
-  # Note: We only attempt to suport Linux and OS X
-  set_fact:
-    yq_architecture: "{{ 'amd64' if ansible_facts['architecture'] == 'x86_64' else ansible_facts['architecture'] }}"
-    yq_family: "{{ 'darwin' if ansible_facts['os_family']|lower == 'darwin' else 'linux' }}"
-
-- name: Determine the yq download binary name
-  set_fact:
-    yq_download_binary_name: "yq_{{ yq_family }}_{{ yq_architecture }}"
-
-- name: Install yq
-  # Note: We install this without using a package manager because we need the
-  # a 4.11+ version and because the snap package manager doesn't play well with
-  # docker. We need version 4.11+ because earlier versions would strip the 
-  # three-hyphen header upon editing a yaml file. Note that the command line
-  # interface of yq changed substantially between v3 and v4.
-  get_url:
-    url: "{{ yq_download_url }}{{ yq_download_binary_name }}"
-    dest: /usr/bin/yq
-    mode: 0755
-  become: yes
+- name: Ensure that yq is installed
+  import_tasks: "{{ environments_dir }}/ubuntu-common/install_yq_tasks.yml"
+  vars:
+    yq_download_url: "https://github.com/mikefarah/yq/releases/download/v4.44.5/"
 
 - name: Read the zsh path
   command:
@@ -247,20 +228,6 @@
   copy:
     src: 'conda_env_deactivate.sh'
     dest: '{{ home_dir }}/miniforge3/envs/jugglebot/etc/conda/deactivate.d/'
-
-- name: Render the Jugglebot runtime config file with the ROS2 codename
-  template:
-    src: "{{ environments_dir }}/ubuntu-common/jugglebot_rc.yml.j2"
-    dest: "{{ host_setup_defaults_dir }}/jugglebot_rc.yml"
-
-- name: Install the Jugglebot runtime config file
-  import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
-  vars:
-    src: "{{ host_setup_defaults_dir }}/jugglebot_rc.yml"
-    remote_src: yes
-    dest: "{{ jugglebot_config_dir }}/jugglebot_rc.yml"
-    readable_dest: ~/.jugglebot/jugglebot_rc.yml
-    mode: '0644'
 
 - name: Add the ROS2 package repository
   import_tasks: "{{ environments_dir }}/ansible-common/add_apt_repository.yml"

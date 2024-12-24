@@ -1,0 +1,38 @@
+---
+# parameters:
+# - yq_download_url
+
+- name: Query whether yq is installed
+  shell:
+    cmd: which yq
+  register: which_yq_result
+
+- name: Set the yq_installed variable
+  set_fact:
+    yq_installed: "{{ which_yq_result.rc == 0 }}"
+
+- name: Determine the yq architecture
+  # Note: We only attempt to support Linux and OS X
+  set_fact:
+    yq_architecture: "{{ 'amd64' if ansible_facts['architecture'] == 'x86_64' else ansible_facts['architecture'] }}"
+    yq_family: "{{ 'darwin' if ansible_facts['os_family']|lower == 'darwin' else 'linux' }}"
+  when: not yq_installed
+
+- name: Determine the yq download binary name
+  set_fact:
+    yq_download_binary_name: "yq_{{ yq_family }}_{{ yq_architecture }}"
+  when: not yq_installed
+
+- name: Install yq
+  # Note: We install this without using a package manager because we need the
+  # a 4.11+ version and because the snap package manager doesn't play well with
+  # docker. We need version 4.11+ because earlier versions would strip the 
+  # three-hyphen header upon editing a yaml file. Note that the command line
+  # interface of yq changed substantially between v3 and v4.
+  get_url:
+    url: "{{ yq_download_url }}{{ yq_download_binary_name }}"
+    dest: /usr/bin/yq
+    mode: 0755
+  become: yes
+  when: not yq_installed
+
