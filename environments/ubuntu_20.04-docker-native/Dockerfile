@@ -21,7 +21,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 # Note: We do not install manpages-posix and manpages-posix-dev, which are
 # non-free packages in Debian.
 
-RUN export DEBIAN_FRONTEND=noninteractive \
+RUN export debian_frontend=noninteractive \
     && apt-get install -yq --no-install-recommends \
       apt-transport-https \
       apt-utils \
@@ -92,17 +92,24 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       xz-utils \
       zip \
       zlib1g \
-      # Preinstall the same apps as in dev_env_tasks.yml to benefit from caching
+    # Clean up
+    && apt-get autoremove -y && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# TASK [Install the same packages as in dev_env_tasks.yml to benefit from caching]
+#
+# Note: We include recommended packages because gnome-terminal and terminator
+# behave more nicely with those packages.
+
+RUN export debian_frontend=noninteractive \
+    && apt-get install -yq \
       git \
       gnome-terminal \
       jq \
       keychain \
       terminator \
       tmux \
-      zsh \
-    # Clean up
-    && apt-get autoremove -y && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
+      zsh
 
 # TASK [Ensure that at least the en_US.UTF-8 UTF-8 locale is available]
 
@@ -113,7 +120,8 @@ RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then 
 # TASK [Configure OpenSSH Server]
 
 RUN mkdir /var/run/sshd \
-    && sed -i 's/^#AllowTcpForwarding yes$/AllowTcpForwarding yes/' /etc/ssh/sshd_config
+    && sed -i 's/^#AllowTcpForwarding yes$/AllowTcpForwarding yes/' \
+      /etc/ssh/sshd_config
 
 EXPOSE 22
 
@@ -123,7 +131,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && mkdir /etc/apt/keyrings \
     && wget -qO- https://packages.microsoft.com/keys/microsoft.asc \
       | gpg --dearmor > /etc/apt/keyrings/packages.microsoft.gpg \
-    && echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" \
+    && echo "deb [arch=amd64,arm64,armhf \
+      signed-by=/etc/apt/keyrings/packages.microsoft.gpg] \
+      https://packages.microsoft.com/repos/code stable main" \
       | tee /etc/apt/sources.list.d/vscode.list > /dev/null \
     && apt-get update \
     && apt-get install -yq --no-install-recommends code
@@ -136,7 +146,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 RUN export DEBIAN_FRONTEND=noninteractive \
     && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
       -o /usr/share/keyrings/ros-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -c -s) main" \
+    && echo "deb [arch=$(dpkg --print-architecture) \
+      signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] \
+      http://packages.ros.org/ros2/ubuntu $(lsb_release -c -s) main" \
       | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
     && apt-get update \
     && apt-get install -yq --no-install-recommends \
@@ -180,9 +192,12 @@ COPY --chown="${USERNAME}:${USERNAME}" --chmod=644 [ "build/gitconfig", \
 COPY --chown="${USERNAME}:${USERNAME}" --chmod=600 [ "build/ssh_authorized_keys", \
     "/home/${USERNAME}/.ssh/authorized_keys" ]
 
-# TASK [Enable the default user to start sshd]
+# TASK [Enable the default user to start dbus-daemon and sshd]
 
-RUN echo "${USERNAME} ALL=(ALL:ALL) NOPASSWD: /usr/sbin/sshd -D" > /etc/sudoers.d/sshd_sudoers
+RUN echo "${USERNAME} ALL=(ALL:ALL) NOPASSWD: /usr/bin/dbus-daemon --system" > \
+      /etc/sudoers.d/dbus_sudoers \
+    && echo "${USERNAME} ALL=(ALL:ALL) NOPASSWD: /usr/sbin/sshd -D" > \
+      /etc/sudoers.d/sshd_sudoers
 
 # TASK [Become the default user]
 
@@ -216,7 +231,8 @@ ARG REPO_CACHE_ID='0'
 
 # TASK [Clone the Jugglebot git repo]
 
-RUN --mount=type=ssh,mode=0666 ssh-keyscan -t rsa github.com > /home/$USERNAME/.ssh/known_hosts \
+RUN --mount=type=ssh,mode=0666 ssh-keyscan -t rsa github.com > \
+      /home/$USERNAME/.ssh/known_hosts \
     && git clone "${JUGGLEBOT_REPO_SSH_URL}" "/home/${USERNAME}/Jugglebot"
 
 # TASK [Initialize the repo branch variable]
