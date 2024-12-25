@@ -56,7 +56,7 @@ do_set_key() {
   local ssh_keypair_name="$1"
   local ssh_private_key_filepath="${HOME}/.ssh/${ssh_keypair_name}"
 
-  if -f "${ssh_private_key_filepath}"; then
+  if [[ -f "${ssh_private_key_filepath}" ]]; then
     echo "${ssh_private_key_filepath}" > "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}"
   fi
 }
@@ -111,9 +111,9 @@ do_exec() {
   local identity_count="$(get_ssh_identity_count)"
 
   if [[ "${identity_count}" -eq 0 ]]; then
-    if -f "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}"; then
+    if [[ -f "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}" ]]; then
       local default_ssh_key_filepath="$(< "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}")"
-      if -f "${default_ssh_key_filepath}"; then
+      if [[ -f "${default_ssh_key_filepath}" ]]; then
         ssh-add "${default_ssh_key_filepath}"
       else
         echo '[WARNING]: The configured default GitHub ssh key does not exist.' >&2
