@@ -51,7 +51,7 @@
   register: pip_check_result
   failed_when: pip_check_result is changed
 
-- name: Run the Qemu installer image
+- name: Run the Qemu installer image .. please be patient
   # 
   # Note: As of this writing, the following page recommends using the
   # tonistiigi/binfmt executable image to install Qemu and to register Qemu
