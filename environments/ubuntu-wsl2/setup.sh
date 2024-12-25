@@ -111,3 +111,4 @@ if [[ $rc -ne 0 ]]; then
   exit $rc
 fi
 
+echo -e "\nPlease exit and create a new terminal session to enable all changes\n"
