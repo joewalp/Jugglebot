@@ -1,0 +1,11 @@
+name: depgraph
+channels:
+  - conda-forge
+  - omegacen
+dependencies:
+  - conda-depgraph
+  - pip
+
+  - pip:
+    - asciinet
+
