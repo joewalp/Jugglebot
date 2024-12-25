@@ -58,6 +58,9 @@ do_set_key() {
 
   if [[ -f "${ssh_private_key_filepath}" ]]; then
     echo "${ssh_private_key_filepath}" > "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}"
+  else
+    echo "[ERROR]: The specified private key ${ssh_private_key_filepath} does not exist" >&2
+    exit ${EX_UNAVAILABLE}
   fi
 }
 
