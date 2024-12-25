@@ -54,7 +54,7 @@
     msg: "[WARNING]: Aborting as requested"
   when: packages_stale and not upgrade_software|bool and not continue_without_upgrades_result.user_input|bool
 
-- name: Run `apt update`, `apt upgrade` and `apt autoremove` if requested
+- name: Run apt commands update, upgrade and autoremove .. please be patient
   apt:
     update-cache: yes
     upgrade: safe
@@ -69,7 +69,7 @@
     dest: "{{ packages_upgraded_filepath }}"
   when: upgrade_software|bool and upgrade_packages_result is succeeded
 
-- name: Ensure that essential applications are installed
+- name: Ensure that essential applications are installed .. please be patient
   package:
     name:
     - git
