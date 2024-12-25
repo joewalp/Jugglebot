@@ -163,7 +163,7 @@ fi
 
 case "${POSITIONAL_ARGS[0]}" in
   build)
-    do_build "${CONTAINER_NAME} ${SSH_KEYPAIR_NAME}"
+    do_build "${CONTAINER_NAME}" "${SSH_KEYPAIR_NAME}"
     ;;
   exec)
     do_exec "${CONTAINER_NAME}"
