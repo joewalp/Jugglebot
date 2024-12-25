@@ -6,7 +6,7 @@
     fail_msg: '[ERROR]: This playbook expects for the host-provisioning Conda environment to be activated. Activate that environment using the following command: `conda activate host-provisioning`'
     quiet: yes
 
-- name: Install the Docker Engine packages
+- name: Install the Docker Engine packages .. please be patient
   package:
     name:
     - docker-ce
