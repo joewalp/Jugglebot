@@ -141,7 +141,7 @@
     become: yes
     when: ros_version_codename == 'foxy'
 
-  - name: "Install ROS2 {{ ros_version_codename|capitalize }} Desktop .. please be patient"
+  - name: "Install ROS2 {{ ros_version_codename|capitalize }} Desktop .. please be very patient"
     #
     # Note 1: We install version of ROS2 that has tier 1 support for this
     # Ubuntu LTS release. See the ~/ubuntu-common/jugglebot_rc.yml.j2 for the
