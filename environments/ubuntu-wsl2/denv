@@ -22,6 +22,10 @@ is_home_dir_initialized() {
     /usr/bin/bash -c '[[ -f "${HOME}/.user-dir-initialized" ]]'
 }
 
+get_ssh_identity_count() {
+  echo "$(ssh-add -l | grep --invert-match 'The agent has no identities.' | wc -l)"
+}
+
 do_build() {
   local container_name="$1"
   local ssh_keypair_name="$2"
@@ -45,6 +49,15 @@ do_build() {
   if [[ "$rc" != 0 ]]; then
     echo "[ERROR]: The build script failed with error code $rc" >&2
     exit $rc
+  fi
+}
+
+do_set_key() {
+  local ssh_keypair_name="$1"
+  local ssh_private_key_filepath="${HOME}/.ssh/${ssh_keypair_name}"
+
+  if -f "${ssh_private_key_filepath}"; then
+    echo "${ssh_private_key_filepath}" > "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}"
   fi
 }
 
@@ -93,6 +106,27 @@ do_exec() {
 
   do_start "${container_name}"
 
+  # TASK [Check how many identities have been added to the ssh-agent]
+
+  local identity_count="$(get_ssh_identity_count)"
+
+  if [[ "${identity_count}" -eq 0 ]]; then
+    if -f "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}"; then
+      local default_ssh_key_filepath="$(< "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}")"
+      if -f "${default_ssh_key_filepath}"; then
+        ssh-add "${default_ssh_key_filepath}"
+      else
+        echo '[WARNING]: The configured default GitHub ssh key does not exist.' >&2
+      fi
+    else
+      echo '[WARNING]: No ssh key has been configured. Use the following command to set a default GitHub ssh key:
+
+denv set-key -k [ssh keypair name]
+
+' >&2
+    fi
+  fi
+
   # TASK [Run an interactive shell in the container]
   #
   # Note: The SSH_AUTH_SOCK is typically located beneath /tmp, and the container
@@ -112,12 +146,17 @@ Commands:
   build       Build the container
   exec        Open a shell in the container
   help        Print this usage message
+  set-key     Set a default ssh private key
   start       Start the container
   stop        Stop the container
 
 Build Command Options:
   -k|--ssh-keypair-name  [Required] The name of the ssh keypair for Github
                          authentication (e.g. `denv build -k id_ed25519`)
+
+Set-key Command Options:
+  -k|--ssh-keypair-name  [Required] The name of the ssh keypair for Github
+                         authentication (e.g. `denv set-key -k id_ed25519`)
 '
 }
 
@@ -153,6 +192,7 @@ done
 CONTAINER_NAME="${CONTAINER_NAME:-jugglebot-native-dev}"
 JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
 SSH_KEYPAIR_NAME="${SSH_KEYPAIR_NAME:-}"
+DEFAULT_SSH_KEY_CONFIG_FILEPATH="${HOME}/.jugglebot/default_github_ssh_key_filepath"
 EX_UNAVAILABLE=69
 
 if [[ "${#POSITIONAL_ARGS[@]}" != 1 ]]; then
@@ -170,6 +210,9 @@ case "${POSITIONAL_ARGS[0]}" in
     ;;
   help)
     print_usage
+    ;;
+  set-key)
+    do_set_key "${SSH_KEYPAIR_NAME}"
     ;;
   start)
     do_start "${CONTAINER_NAME}"
