@@ -43,20 +43,6 @@
       value: 'true'
     become: yes
 
-  - name: Prevent wsl from changing resolv.conf
-    community.general.ini_file:
-      path: '/etc/wsl.conf'
-      section: 'network'
-      option: 'generateResolvConf'
-      value: 'false'
-    become: yes
-
-  - name: Specify the Google nameserver in resolv.conf
-    copy: 
-       src: "{{ environments_dir }}/ubuntu-wsl2/resolv.conf"
-       dest: '/etc/resolv.conf'
-    become: yes
-
   - name: Disable the WSL welcome message
     file:
       path: "{{ wsl_welcome_flag_filepath }}"
