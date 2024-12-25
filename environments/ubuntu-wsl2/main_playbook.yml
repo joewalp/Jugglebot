@@ -28,6 +28,12 @@
   - name: Load variables
     include_vars: "{{ environments_dir }}/ubuntu-wsl2/main_vars.yml"
 
+  - name: Ensure that the specified ssh keypair exists
+    assert:
+      that: "ssh_private_key_filepath is file and (ssh_private_key_filepath + '.pub') is file"
+      quiet: yes
+      fail_msg: "The specified ssh keypair ('{{ ssh_private_key_filepath }}', '{{ ssh_private_key_filepath }}.pub') was not found."
+
   - name: Ensure that wsl uses systemd
     # Note: Systemd is enabled by default, but this will change whitespace
     community.general.ini_file:
@@ -61,12 +67,6 @@
     import_tasks: "{{ environments_dir }}/ubuntu-common/dev_env_tasks.yml"
     vars:
       environments_dir: "{{ playbook_dir }}/.."
-
-  - name: Ensure that the specified ssh keypair exists
-    assert:
-      that: "ssh_private_key_filepath is file and (ssh_private_key_filepath + '.pub') is file"
-      quiet: yes
-      fail_msg: "The specified ssh keypair ('{{ ssh_private_key_filepath }}', '{{ ssh_private_key_filepath }}.pub') was not found."
 
   - name: Render the ssh config file
     template:
@@ -123,6 +123,10 @@
       dest: "{{ home_dir }}/bin/denv"
       readable_dest: ~/bin/denv
       mode: '0755'
+
+  - name: Set the default GitHub ssh key
+    command:
+      cmd: "{{ home_dir }}/bin/denv set-key -k '{{ ssh_keypair_name }}'"
 
   - name: Read the ROS codename
     command:
