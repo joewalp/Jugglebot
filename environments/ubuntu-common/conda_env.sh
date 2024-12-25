@@ -22,7 +22,7 @@ case "${EVENT_TYPE}" in
     export DISPLAY=':0'
 
     if [[ "${ROS_WORKAROUND_ENABLED:-no}" == 'yes' ]]; then
-      echo '[INFO]: The ROS shell environment setup is skipped during the host setup'
+      echo '[INFO]: The ROS shell environment setup is skipped during the host setup' >&2
     else
       
       # TASK [Determine the ROS shell setup script filepath]
@@ -41,7 +41,7 @@ case "${EVENT_TYPE}" in
         export ROS_DOMAIN_ID="$(yq -r .ros.domain_id "${JUGGLEBOT_RC_FILEPATH}")"
         
       else
-        echo '[WARNING]: The ROS shell setup script was not found.'
+        echo '[WARNING]: The ROS shell setup script was not found.' >&2
       fi
     fi
     ;;
@@ -65,7 +65,7 @@ case "${EVENT_TYPE}" in
     ;;
 
   *)
-    echo -e "\n[ERROR]: Unrecognized event type (${EVENT_TYPE})."
+    echo -e "\n[ERROR]: Unrecognized event type (${EVENT_TYPE})." >&2
     exit 2
     ;;
 esac

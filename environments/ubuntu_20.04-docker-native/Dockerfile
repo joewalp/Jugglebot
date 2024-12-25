@@ -221,7 +221,8 @@ RUN install -d .jugglebot/host_setup \
       && conda env create -f jugglebot_conda_env.yml' \
     && date +%s > .jugglebot/host_setup/conda_base_updated_timestamp \
     && rm host_provisioning_conda_env.yml \
-    && rm jugglebot_conda_env.yml
+    && rm jugglebot_conda_env.yml \
+    && rm -f "/entrypoint/${USERNAME}/.user-dir-initialized"
 
 # TASK [Initialize the repo clone variables]
 
@@ -259,7 +260,8 @@ RUN "${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native/base_setup_and_playbook.sh" 
       --environments-dir "${ENVIRONMENTS_DIR}" \
       --jugglebot-conda-env-filepath "${ENVIRONMENTS_DIR}/ubuntu-common/jugglebot_conda_env.yml" \
       --ros-workspace-dir "${ROS_WORKSPACE_DIR}" \
-      --ansible-become-pass "${USERNAME}"
+      --ansible-become-pass "${USERNAME}" \
+    && rm -f "/entrypoint/${USERNAME}/.user-dir-initialized"
 
 # TASK [Install entrypoint.sh]
 

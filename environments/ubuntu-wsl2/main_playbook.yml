@@ -115,24 +115,15 @@
       groups: docker
     become: yes
 
-  - name: Create or diff the docker-native-env script
+  - name: Create or diff the denv script
     import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
     vars:
-      src: "{{ environments_dir }}/ubuntu-wsl2/start-native-docker-dev"
+      src: "{{ environments_dir }}/ubuntu-wsl2/denv"
       remote_src: no
-      dest: "{{ home_dir }}/bin/start-native-docker-dev"
-      readable_dest: ~/bin/start-native-docker-dev
+      dest: "{{ home_dir }}/bin/denv"
+      readable_dest: ~/bin/denv
       mode: '0755'
 
-  - name: Create or diff the docker-native-env script
-    import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
-    vars:
-      src: "{{ environments_dir }}/ubuntu-wsl2/exec-native-docker-dev"
-      remote_src: no
-      dest: "{{ home_dir }}/bin/exec-native-docker-dev"
-      readable_dest: ~/bin/start-native-docker-dev
-      mode: '0755'
-  
   - name: Read the ROS codename
     command:
       cmd: "/usr/bin/yq -r .ros.version_codename '{{ jugglebot_rc_rendered_filepath }}'"

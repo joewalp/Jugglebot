@@ -41,6 +41,11 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    -n|--container-name)
+      CONTAINER_NAME="$2"
+      shift
+      shift
+      ;;
     -e|--debug-repo-dir)
       REPO_DIR="$2"
       shift
@@ -60,7 +65,7 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     -*|--*)
-      echo "[ERROR]: Unknown option $1"
+      echo "[ERROR]: Unknown option $1" >&2
       exit 1
       ;;
     *)
@@ -73,7 +78,7 @@ done
 task 'Assert that an ssh keypair name was specified'
 
 if [[ -z "${SSH_KEYPAIR_NAME:-}" ]]; then
-  echo '[ERROR]: An ssh keypair name is required. Invoke this command with the `--ssh-keypair-name [keypair name]` switch (eg. `--ssh-keypair-name ed25519`)'
+  echo '[ERROR]: An ssh keypair name is required. Invoke this command with the `--ssh-keypair-name [keypair name]` switch (eg. `--ssh-keypair-name ed25519`)' >&2
   exit 2
 fi
 
@@ -82,15 +87,16 @@ task 'Initialize variables'
 if [[ -z "${REPO_DIR:-}" ]]; then
   REPO_DIR="${HOME}/Jugglebot"
 else
-  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n"
+  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
 fi
 
 if [[ -z "${GIT_BRANCH:-}" ]]; then
   GIT_BRANCH='main'
 elif [[ "${GIT_BRANCH}" != 'main' ]]; then
-  echo -e "\n[WARNING]: Using git branch ${GIT_BRANCH} instead of main\n"
+  echo -e "\n[WARNING]: Using git branch ${GIT_BRANCH} instead of main\n" >&2
 fi
 
+CONTAINER_NAME="${CONTAINER_NAME:-jugglebot-native-dev}"
 BUILD_NO_CACHE_OPTION="${BUILD_NO_CACHE_OPTION:-}"
 REPO_CACHE_ID="${REPO_CACHE_ID:-0}"
 DEV_ENV_USERNAME='devops' # This is also the default password for the user.
@@ -98,7 +104,6 @@ SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
 SSH_PUBLIC_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}.pub"
 BUILD_CONTEXT_DIR="${REPO_DIR}/environments/ubuntu_20.04-docker-native"
 IMAGE_NAME='jugglebot-native-dev:focal'
-CONTAINER_NAME='jugglebot-native-dev'
 HOME_VOLUME_NAME='jugglebot-native-dev-home'
 
 task 'Enable ssh-agent'
@@ -215,7 +220,7 @@ echo -e "
 Run the following command to open a shell in the jugglebot-native-dev
 container:
 
-exec-native-docker-dev
+  denv exec
 
 ---
 
