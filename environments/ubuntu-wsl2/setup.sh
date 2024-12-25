@@ -48,21 +48,21 @@ done
 task 'Assert that an ssh keypair name was specified'
 
 if [[ -z "${SSH_KEYPAIR_NAME:-}" ]]; then
-  echo '[ERROR]: An ssh keypair name is required. Invoke this command with the `--ssh-keypair-name [keypair name]` switch (eg. `--ssh-keypair-name ed25519`)'
+  echo '[ERROR]: An ssh keypair name is required. Invoke this command with the `--ssh-keypair-name [keypair name]` switch (eg. `--ssh-keypair-name ed25519`)' >&2
   exit 2
 fi
 
 task 'Assert that a git name was specified'
 
 if [[ -z "${GIT_NAME:-}" ]]; then
-  echo '[ERROR]: A git name is required. Invoke this command with the `--git-name "[Your full name]"` switch (eg. `--git-name "Jane Doe"`)'
+  echo '[ERROR]: A git name is required. Invoke this command with the `--git-name "[Your full name]"` switch (eg. `--git-name "Jane Doe"`)' >&2
   exit 2
 fi
 
 task 'Assert that a git email was specified'
 
 if [[ -z "${GIT_EMAIL:-}" ]]; then
-  echo '[ERROR]: A git email is required. Invoke this command with the `--git-email "[your email address]"` switch (eg. `--git-email "jane.doe@gmail.com"`)'
+  echo '[ERROR]: A git email is required. Invoke this command with the `--git-email "[your email address]"` switch (eg. `--git-email "jane.doe@gmail.com"`)' >&2
   exit 2
 fi
 
@@ -71,7 +71,7 @@ task 'Initialize variables'
 if [[ -z "${REPO_DIR:-}" ]]; then
   REPO_DIR="${HOME}/Jugglebot"
 else
-  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n"
+  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
 fi
 
 JUGGLEBOT_CONDA_ENV_FILEPATH="${REPO_DIR}/ros_ws/conda_env.yml"
@@ -107,7 +107,7 @@ ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible
 # failed_when: the return code is nonzero
 
 if [[ $rc -ne 0 ]]; then
-  echo -e "[ERROR]: The Ansible playbook failed with return code ${rc}."
+  echo -e "[ERROR]: The Ansible playbook failed with return code ${rc}." >&2
   exit $rc
 fi
 

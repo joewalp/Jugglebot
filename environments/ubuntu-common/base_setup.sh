@@ -21,7 +21,7 @@ task() {
 task 'Assert that a jugglebot Conda env config file was specified'
 
 if [[ -z "${JUGGLEBOT_CONDA_ENV_FILEPATH:-}" ]]; then
-  echo -e '[ERROR]: A jugglebot Conda env config file is required. Set\nJUGGLEBOT_CONDA_ENV_FILEPATH before sourcing this script.'
+  echo -e '[ERROR]: A jugglebot Conda env config file is required. Set\nJUGGLEBOT_CONDA_ENV_FILEPATH before sourcing this script.' >&2
   exit 2
 fi
 
@@ -49,7 +49,7 @@ fi
 # failed_when: the return code is nonzero
 
 if [[ $rc -ne 0 ]]; then
-  echo "[ERROR]: The Conda setup script could not be downloaded from `${CONDA_SETUP_SCRIPT_URL}`."
+  echo "[ERROR]: The Conda setup script could not be downloaded from `${CONDA_SETUP_SCRIPT_URL}`." >&2
   exit $rc
 fi
 
@@ -63,7 +63,7 @@ fi
 # failed_when: the setup script didn't produce the conda executable
 
 if [[ ! -f "${CONDA_FILEPATH}" ]]; then
-  echo "[ERROR]: The Conda setup script did not provision `${CONDA_FILEPATH}`."
+  echo "[ERROR]: The Conda setup script did not provision `${CONDA_FILEPATH}`." >&2
   exit 3
 fi
 

@@ -1,0 +1,188 @@
+#!/usr/bin/env bash
+set -o nounset -o pipefail -o errexit
+IFS=$'\t\n' # Stricter IFS settings
+rc=0
+
+# TASK [Define functions]
+
+does_docker_container_exist() {
+  local container_name="$1"
+  [[ "$(docker container ls --quiet --all --filter "name=${container_name}")" != '' ]]
+}
+
+is_docker_container_running() {
+  local container_name="$1"
+  [[ "$(docker container ls --quiet --filter "name=${container_name}")" != '' ]]
+}
+
+is_home_dir_initialized() {
+  local container_name="$1"
+  docker exec -it \
+    "${container_name}" \
+    /usr/bin/bash -c '[[ -f "${HOME}/.user-dir-initialized" ]]'
+}
+
+do_build() {
+  local container_name="$1"
+  local ssh_keypair_name="$2"
+  
+  if [[ -z "${ssh_keypair_name}" ]]; then
+    echo '[ERROR]: An ssh keypair name is required' >&2
+    print_usage
+    exit 2
+  fi
+
+  # Note: The following setup.sh script has several features that support
+  # development of the container. We do not expose those features in this script
+  # because this script is geared toward using the current release of the
+  # container. 
+
+  "${JUGGLEBOT_REPO_DIR}/environments/ubuntu_20.04-docker-native/setup.sh" \
+    --debug-git-branch dev-env-provisioning \
+    --container-name "${container_name}" \
+    --ssh-keypair-name "${ssh_keypair_name}" || rc=$?
+
+  if [[ "$rc" != 0 ]]; then
+    echo "[ERROR]: The build script failed with error code $rc" >&2
+    exit $rc
+  fi
+}
+
+do_start() {
+  local container_name="$1"
+
+  # TASK [Ensure that the docker container exists]
+
+  if ! does_docker_container_exist "${container_name}"; then
+    echo -e "
+[ERROR]: The ${container_name} docker container does not exist. Run the following command to build it:
+
+  denv build
+" >&2
+    exit ${EX_UNAVAILABLE}
+  fi
+
+  # TASK [Start the container if necessary]
+
+  if ! is_docker_container_running "${container_name}"; then
+    docker container start "${container_name}" >/dev/null
+  fi
+
+  # TASK [Wait for the home directory to be initialized by entrypoint.sh]
+
+  while ! is_home_dir_initialized "${container_name}"; do
+    echo "Waiting for the home directory in container ${container_name} to be initialized..."
+    sleep 2
+  done
+}
+
+do_stop() {
+  local container_name="$1"
+
+  if is_docker_container_running "${container_name}"; then
+    docker container stop "${container_name}" >/dev/null
+  else
+    echo "[WARNING]: Docker container ${container_name} was not running" >&2
+  fi
+}
+
+do_exec() {
+  local container_name="$1"
+
+  # TASK [Ensure that the container is running]
+
+  do_start "${container_name}"
+
+  # TASK [Run an interactive shell in the container]
+  #
+  # Note: The SSH_AUTH_SOCK is typically located beneath /tmp, and the container
+  # already has /tmp mounted.
+
+  docker exec -it \
+    -e "SSH_AUTH_SOCK='${SSH_AUTH_SOCK:-}'" \
+    "${container_name}" \
+    '/usr/bin/zsh'
+}
+
+print_usage() {
+  echo '
+usage: denv COMMAND [Options]
+
+Commands:
+  build       Build the container
+  exec        Open a shell in the container
+  help        Print this usage message
+  start       Start the container
+  stop        Stop the container
+
+Build Command Options:
+  -k|--ssh-keypair-name  [Required] The name of the ssh keypair for Github
+                         authentication (e.g. `denv build -k id_ed25519`)
+'
+}
+
+# TASK [Parse the arguments]
+
+POSITIONAL_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -c|--container-name)
+      CONTAINER_NAME="$2"
+      shift
+      shift
+      ;;
+    -k|--ssh-keypair-name)
+      SSH_KEYPAIR_NAME="$2"
+      shift
+      shift
+      ;;
+    -*|--*)
+      echo "[ERROR]: Unknown option $1" >&2
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+# TASK [Initialize variables]
+
+CONTAINER_NAME="${CONTAINER_NAME:-jugglebot-native-dev}"
+JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
+SSH_KEYPAIR_NAME="${SSH_KEYPAIR_NAME:-}"
+EX_UNAVAILABLE=69
+
+if [[ "${#POSITIONAL_ARGS[@]}" != 1 ]]; then
+  echo -e "\n[ERROR]: Found ${#POSITIONAL_ARGS[@]} commands when 1 is expected" >&2
+  print_usage
+  exit 2
+fi
+
+case "${POSITIONAL_ARGS[0]}" in
+  build)
+    do_build "${CONTAINER_NAME} ${SSH_KEYPAIR_NAME}"
+    ;;
+  exec)
+    do_exec "${CONTAINER_NAME}"
+    ;;
+  help)
+    print_usage
+    ;;
+  start)
+    do_start "${CONTAINER_NAME}"
+    ;;
+  stop)
+    do_stop "${CONTAINER_NAME}"
+    ;;
+  *)
+    echo '[ERROR]: Unrecognized command' >&2
+    print_usage
+    exit 2
+    ;;
+esac
+
+exit 0
+

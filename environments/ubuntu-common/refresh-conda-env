@@ -79,7 +79,7 @@ ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible
 # failed_when: the return code is nonzero
 
 if [[ $rc -ne 0 ]]; then
-  echo -e "[ERROR]: The Ansible playbook failed with return code ${rc}."
+  echo -e "[ERROR]: The Ansible playbook failed with return code ${rc}." >&2
   exit $rc
 fi
 
