@@ -284,6 +284,28 @@ how to use a dedicated conda environment to build and to run an app that has
 different dependencies from your primary Jugglebot project. Running it will
 produce ~/bin/SavvyCAN, which will launch the app.
 
+`WSL Ubuntu-20.04`
+```zsh
+install-savvycan
+SavvyCan
+```
+
+To see how this works, you can peek at those two Bash scripts.
+
+=== aside ==
+> Note that second and third lines of each file aren't essential. They make the
+> Bash interpreter more fail-fast and more predictable. The fail-fast
+> characteristic tends to make it easier to recover manually when a script fails
+> midway. The IFS initialization avoids the issue where the script behavior could
+> change based on a previously exported IFS value.
+=====
+
+`WSL Ubuntu-20.04`
+```zsh
+less ~/bin/install-savvycan
+less ~/SavvyCan
+```
+
 ---
 
 #### Task 3. Expose a USB device to WSL
