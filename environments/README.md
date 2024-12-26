@@ -127,7 +127,7 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generati
 Run the following command on the new Ubuntu-20.04 host. Substitute your email
 address, omitting the brackets.
 
-WSL Bash Shell
+WSL Ubuntu-20.04
 ```bash
 ssh-keygen -t ed25519 -C '[your email address]'
 ```
@@ -146,7 +146,7 @@ You may already have a keypair registered with GitHub that you've been using for
 local development. Here are some commands that you could use to copy it into
 place if those files are stored in the mounted filesystem:
 
-WSL Bash Shell
+WSL Ubuntu-20.04
 ```bash
 install -m 700 -d ~/.ssh
 install -m 600 /mnt/c/[path to private key] -t ~/.ssh
@@ -170,7 +170,7 @@ described here:
 
 https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 
-WSL Bash Shell
+WSL Ubuntu-20.04
 ```bash
 (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
 	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
@@ -185,14 +185,14 @@ Then use `gh` to add your public key to your GitHub account as described here:
 
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account?platform=linux&tool=cli
 
-WSL Bash Shell
+WSL Ubuntu-20.04
 ```bash
 gh ssh-key add ~/.ssh/id_ed25519.pub --type authentication --title 'Jugglebot dev env'
 ```
 
 ### Step 6. Clone the Jugglebot repo
 
-WSL Bash Shell
+WSL Ubuntu-20.04
 ```bash
 sudo apt install git
 
@@ -205,14 +205,14 @@ Within the WSL2 environment, run the setup script for the WSL2 development
 environment while specifying your name and email address that will be configured
 in ~/.gitconfig. This will take some time.
 
-WSL Bash Shell
+WSL Ubuntu-20.04
 ```bash
 ~/Jugglebot/environments/ubuntu-wsl2/setup.sh --ssh-keypair-name id_ed25519 --git-name '[Your full name]' --git-email '[Your email address]'
 ```
 
 ### Step 8. Exit and then start a new terminal session to enable all changes
 
-WSL Bash Shell
+WSL Ubuntu-20.04
 ```bash
 exit
 ```
@@ -236,6 +236,7 @@ wsl -d Ubuntu-20.04
 Within the WSL2 environment, run the setup script for the docker native platform
 environment. This will take some time.
 
+WSL Ubuntu-20.04
 ```zsh
 denv build --ssh-keypair-name id_ed25519
 ```
@@ -246,6 +247,7 @@ The script in Step 9 will print some information about the container that it
 builds. After reading that info, run the following command to enter the docker
 native platform environment.
 
+WSL Ubuntu-20.04
 ```zsh
 denv exec
 ```
@@ -258,6 +260,7 @@ The WSL extension for VSCode for Windows allows you to drive a WSL environment.
 After installing that extension, run the following command from within the WSL
 environment:
 
+WSL Ubuntu-20.04
 ```zsh
 cd ~/Jugglebot && code .
 ```
