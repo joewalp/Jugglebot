@@ -287,7 +287,7 @@ produce ~/bin/SavvyCAN, which will launch the app.
 `WSL Ubuntu-20.04`
 ```zsh
 install-savvycan
-SavvyCan
+SavvyCAN
 ```
 
 To see how this works, you can peek at those two Bash scripts.
@@ -295,8 +295,8 @@ To see how this works, you can peek at those two Bash scripts.
 
 `WSL Ubuntu-20.04`
 ```zsh
-less ~/bin/install-savvycan
-less ~/bin/SavvyCan
+pygmentize -g ~/bin/install-savvycan | less -R
+pygmentize -g ~/bin/SavvyCAN | less -R
 ```
 
 Note:
