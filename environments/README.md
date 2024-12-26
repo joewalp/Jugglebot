@@ -29,7 +29,7 @@ wsl --update
 
 ### Step 2. Verify that an Ubuntu-20.04 distribution is not registered.
 
-PowerShell
+`PowerShell`
 ```
 wsl --list
 ```
@@ -37,7 +37,7 @@ wsl --list
 If the output includes `Ubuntu` or `Ubuntu (Default)`, then run the following
 command to determine its version:
 
-PowerShell
+`PowerShell`
 ```
 wsl -d Ubuntu -e lsb_release --description
 ```
@@ -71,7 +71,7 @@ This option only relies on the wsl tool. The process looks like this:
 Below are some example commands. These assume that the preexisting distribution
 is using WSL version 2 and that its virtual disk uses the default ext4 filesystem.
 
-PowerShell
+`PowerShell`
 ```
 wsl --terminate <Distribution Name>
 wsl --export <Distribution Name> <Vhdx FileName> --vhd
@@ -101,7 +101,7 @@ Assuming that you didn't have a preexisting Ubuntu 20.04 instance or that you
 used Fixup Option 1, you can now create a fresh Ubuntu 20.04 instance. Run the
 following command:
 
-PowerShell
+`PowerShell`
 ```
 wsl --install Ubuntu-20.04
 ```
@@ -127,7 +127,7 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generati
 Run the following command on the new Ubuntu-20.04 host. Substitute your email
 address, omitting the brackets.
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```bash
 ssh-keygen -t ed25519 -C '[your email address]'
 ```
@@ -146,7 +146,7 @@ You may already have a keypair registered with GitHub that you've been using for
 local development. Here are some commands that you could use to copy it into
 place if those files are stored in the mounted filesystem:
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```bash
 install -m 700 -d ~/.ssh
 install -m 600 /mnt/c/[path to private key] -t ~/.ssh
@@ -170,7 +170,7 @@ described here:
 
 https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```bash
 (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
 	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
@@ -185,14 +185,14 @@ Then use `gh` to add your public key to your GitHub account as described here:
 
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account?platform=linux&tool=cli
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```bash
 gh ssh-key add ~/.ssh/id_ed25519.pub --type authentication --title 'Jugglebot dev env'
 ```
 
 ### Step 6. Clone the Jugglebot repo
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```bash
 sudo apt install git
 
@@ -205,14 +205,14 @@ Within the WSL2 environment, run the setup script for the WSL2 development
 environment while specifying your name and email address that will be configured
 in ~/.gitconfig. This will take some time.
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```bash
 ~/Jugglebot/environments/ubuntu-wsl2/setup.sh --ssh-keypair-name id_ed25519 --git-name '[Your full name]' --git-email '[Your email address]'
 ```
 
 ### Step 8. Exit and then start a new terminal session to enable all changes
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```bash
 exit
 ```
@@ -226,7 +226,7 @@ the newly created distribution.
 
 #### Option 2. Use the wsl tool
 
-PowerShell
+`PowerShell`
 ```
 wsl -d Ubuntu-20.04
 ```
@@ -236,7 +236,7 @@ wsl -d Ubuntu-20.04
 Within the WSL2 environment, run the setup script for the docker native platform
 environment. This will take some time.
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```zsh
 denv build --ssh-keypair-name id_ed25519
 ```
@@ -247,7 +247,7 @@ The script in Step 9 will print some information about the container that it
 builds. After reading that info, run the following command to enter the docker
 native platform environment.
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```zsh
 denv exec
 ```
@@ -262,7 +262,7 @@ The WSL extension for VSCode for Windows allows you to drive a WSL environment.
 After installing that extension, run the following command from within the WSL
 environment:
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```zsh
 cd ~/Jugglebot && code .
 ```
@@ -316,23 +316,23 @@ Briefly, the process on Windows 11 goes like this:
 
 Here are some example commands:
 
-PowerShell
+`PowerShell`
 ```
 winget install --interactive --exact dorssel.usbipd-win
 ```
 
-Administrator PowerShell
+`Administrator PowerShell`
 ```
 usbipd list
 usbipd bind --busid <BUSID>
 ```
 
-PowerShell
+`PowerShell`
 ```
 usbipd attach --wsl --busid <BUSID>
 ```
 
-WSL Ubuntu-20.04
+`WSL Ubuntu-20.04`
 ```zsh
 lsusb
 ```
@@ -376,4 +376,3 @@ and features work within an arm64 platform environment.
 - On a Windows 11 machine with an Nvidia GPU, demonstrate passthrough of Cuda
   tasks from a guest Linux development environment host where those tasks are
   driven by a Jetson SDK.
-
