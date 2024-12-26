@@ -288,8 +288,8 @@ save that VSCode workspace locally in Windows to facilitate opening it later.
 
 It's possible also for VSCode for Windows to drive a Ubuntu 20.04 Docker
 environment using the Remote SSH extension for VSCode. That already works.
-However, providing instructions for the ssh key management by Windows to make
-that workflow convenient is still in progress.
+However, providing instructions for how to set up the ssh key management by
+Windows to make that workflow convenient is still in progress.
 
 ---
 
