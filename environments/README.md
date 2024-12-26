@@ -23,6 +23,7 @@ install Ubuntu-20.04 for WSL despite that Ubuntu LTS release being relatively ol
 
 ```
 # PowerShell
+
 wsl --install --no-distribution
 wsl --update
 ```
@@ -31,6 +32,7 @@ wsl --update
 
 ```
 # PowerShell
+
 wsl --list
 ```
 
@@ -39,6 +41,7 @@ command to determine its version:
 
 ```
 # PowerShell
+
 wsl -d Ubuntu -e lsb_release --description
 ```
 
@@ -73,6 +76,7 @@ is using WSL version 2 and that its virtual disk uses the default ext4 filesyste
 
 ```
 # PowerShell
+
 wsl --terminate <Distribution Name>
 wsl --export <Distribution Name> <Vhdx FileName> --vhd
 wsl --import-in-place <Alternative Distribution Name> <Vhdx FileName>
@@ -103,6 +107,7 @@ following command:
 
 ```
 # PowerShell
+
 wsl --install Ubuntu-20.04
 ```
 
@@ -129,6 +134,7 @@ address, omitting the brackets.
 
 ```bash
 # WSL Ubuntu-20.04
+
 ssh-keygen -t ed25519 -C '[your email address]'
 ```
 
@@ -148,6 +154,7 @@ place if those files are stored in the mounted filesystem:
 
 ```bash
 # WSL Ubuntu-20.04
+
 install -m 700 -d ~/.ssh
 install -m 600 /mnt/c/[path to private key] -t ~/.ssh
 install -m 644 /mnt/c/[path to public key] -t ~/.ssh
@@ -172,6 +179,7 @@ https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 
 ```bash
 # WSL Ubuntu-20.04
+
 (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
 	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
 	&& wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
@@ -187,6 +195,7 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a
 
 ```bash
 # WSL Ubuntu-20.04
+
 gh ssh-key add ~/.ssh/id_ed25519.pub --type authentication --title 'Jugglebot dev env'
 ```
 
@@ -194,6 +203,7 @@ gh ssh-key add ~/.ssh/id_ed25519.pub --type authentication --title 'Jugglebot de
 
 ```bash
 # WSL Ubuntu-20.04
+
 sudo apt install git
 
 cd ~ && GIT_SSH_COMMAND="ssh -i ${HOME}/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" git clone git@github.com:joewalp/Jugglebot.git
@@ -207,6 +217,7 @@ in ~/.gitconfig. This will take some time.
 
 ```bash
 # WSL Ubuntu-20.04
+
 ~/Jugglebot/environments/ubuntu-wsl2/setup.sh --ssh-keypair-name id_ed25519 --git-name '[Your full name]' --git-email '[Your email address]'
 ```
 
@@ -214,6 +225,7 @@ in ~/.gitconfig. This will take some time.
 
 ```bash
 # WSL Ubuntu-20.04
+
 exit
 ```
 
@@ -228,6 +240,7 @@ the newly created distribution.
 
 ```
 # PowerShell
+
 wsl -d Ubuntu-20.04
 ```
 
@@ -238,6 +251,7 @@ environment. This will take some time.
 
 ```zsh
 # WSL Ubuntu-20.04
+
 denv build --ssh-keypair-name id_ed25519
 ```
 
@@ -249,6 +263,7 @@ native platform environment.
 
 ```zsh
 # WSL Ubuntu-20.04
+
 denv exec
 ```
 
@@ -264,6 +279,7 @@ environment:
 
 ```zsh
 # WSL Ubuntu-20.04
+
 cd ~/Jugglebot && code .
 ```
 
@@ -286,6 +302,7 @@ produce ~/bin/SavvyCAN, which will launch the app.
 
 ```zsh
 # WSL Ubuntu-20.04
+
 install-savvycan
 SavvyCAN
 ```
@@ -295,6 +312,7 @@ To see how this works, you can peek at those two Bash scripts.
 
 ```zsh
 # WSL Ubuntu-20.04
+
 pygmentize -O style=native -g ~/bin/install-savvycan | less -R
 pygmentize -O style=native -g ~/bin/SavvyCAN | less -R
 ```
@@ -341,22 +359,26 @@ Here are some example commands:
 
 ```
 # PowerShell
+
 winget install --interactive --exact dorssel.usbipd-win
 ```
 
 ```
 # Administrator PowerShell
+
 usbipd list
 usbipd bind --busid <BUSID>
 ```
 
 ```
 # PowerShell
+
 usbipd attach --wsl --busid <BUSID>
 ```
 
 ```zsh
 # WSL Ubuntu-20.04
+
 lsusb
 ```
 
