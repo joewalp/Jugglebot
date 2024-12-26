@@ -5,15 +5,32 @@ rc=0
 
 # TASK [Define functions]
 
+print_usage() {
+  echo '
+usage: refresh-conda-env [Options]
+
+Options:
+  -h|--help              Display this usage message
+  -p|--refresh-host-provisioning
+                         If the host-provisioning Conda environment already
+                         exists, update it from its configuration file
+'
+}
+
 task() {
   local task_desc="$1"
   echo -e "\nTASK [${task_desc}] ********"
 }
 
+
 task 'Parse the arguments'
 
 while [[ $# -gt 0 ]]; do
   case $1 in
+    -h|--help)
+      print_usage
+      exit 0
+      ;;
     -p|--refresh-host-provisioning)
       REFRESH_HOST_PROVISIONING=yes
       shift
@@ -33,15 +50,10 @@ task 'Initialize variables'
 
 REFRESH_HOST_PROVISIONING="${REFRESH_HOST_PROVISIONING:-no}"
 CONDA_FILEPATH="${HOME}/miniforge3/bin/conda"
-HOST_SETUP_BACKUPS_DIR="${HOME}/.jugglebot/host_setup/backups"
 REPO_DIR="${REPO_DIR:-${HOME}/Jugglebot}"
 HOST_PROVISIONING_CONDA_ENV_FILEPATH="${HOST_PROVISIONING_CONDA_ENV_FILEPATH:-${REPO_DIR}/environments/ubuntu-common/host_provisioning_conda_env.yml}"
 JUGGLEBOT_CONDA_ENV_FILEPATH="${JUGGLEBOT_CONDA_ENV_FILEPATH:-${REPO_DIR}/ros_ws/conda_env.yml}"
 REFRESH_PLAYBOOK_FILEPATH="${REFRESH_PLAYBOOK_FILEPATH:-${REPO_DIR}/environments/ubuntu-common/refresh_conda_env_playbook.yml}"
-
-task 'Ensure that the ~/.jugglebot/host_setup/backups directory exists'
-
-install -d "${HOST_SETUP_BACKUPS_DIR}"
 
 task 'Enable Conda'
 
@@ -55,7 +67,7 @@ if conda info --envs | grep -q '^host-provisioning\s'; then
 
     task 'Refresh the host-provisioning Conda environment'
 
-    conda env update -n host-provisioning -f "${HOST_PROVISIONING_CONDA_ENV_FILEPATH}" --prune
+    conda env update -f "${HOST_PROVISIONING_CONDA_ENV_FILEPATH}" --prune
 
   fi
 
