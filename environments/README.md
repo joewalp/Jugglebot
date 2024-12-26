@@ -292,20 +292,19 @@ SavvyCan
 
 To see how this works, you can peek at those two Bash scripts.
 
-=== aside ==
-> Note that second and third lines of each file aren't essential. They make the
-> Bash interpreter more fail-fast and more predictable. The fail-fast
-> characteristic tends to make it easier to recover manually when a script fails
-> midway. The IFS initialization avoids the issue where the script behavior could
-> change based on a previously exported IFS value.
-
-=====
 
 `WSL Ubuntu-20.04`
 ```zsh
 less ~/bin/install-savvycan
 less ~/SavvyCan
 ```
+
+Note:
+> The second and third lines of each file aren't essential. They make the Bash
+> interpreter more fail-fast and more predictable. The fail-fast characteristic
+> tends to make it easier to recover manually when a script fails midway. The
+> IFS initialization avoids the issue where the script behavior could change
+> based on a previously exported IFS value.
 
 ---
 
