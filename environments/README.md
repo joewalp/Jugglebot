@@ -300,11 +300,11 @@ pygmentize -g ~/bin/SavvyCAN | less -R
 ```
 
 Note:
-> The second and third lines of each file aren't essential. They make the Bash
-> interpreter more fail-fast and more predictable. The fail-fast characteristic
-> tends to make it easier to recover manually when a script fails midway. The
-> IFS initialization avoids the issue where the script behavior could change
-> based on a previously exported IFS value.
+> The second and third lines of each of those scripts aren't essential. They
+> make the Bash interpreter more fail-fast and more predictable. The fail-fast
+> characteristic tends to make it easier to recover manually when a script fails
+> midway. The IFS initialization avoids the issue where the script behavior
+> could change based on a previously exported IFS value.
 
 ---
 
