@@ -21,7 +21,7 @@ install Ubuntu-20.04 for WSL despite that Ubuntu LTS release being relatively ol
 
 ### Step 1. Ensure that WSL2 is installed and updated
 
-PowerShell
+`PowerShell`
 ```
 wsl --install --no-distribution
 wsl --update
