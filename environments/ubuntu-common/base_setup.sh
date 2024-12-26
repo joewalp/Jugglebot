@@ -8,7 +8,7 @@
 # TASK [Include the strict Bash header]
 
 set -o nounset -o pipefail -o errexit
-IFS=$'\t\n' # Stricter IFS settings
+IFS=$'\t\n' # For predictability
 rc=0
 
 # TASK [Define functions]
