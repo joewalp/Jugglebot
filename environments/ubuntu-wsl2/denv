@@ -161,7 +161,7 @@ denv set-key -k [ssh keypair name]
   # already has /tmp mounted.
 
   docker exec -it \
-    -e "SSH_AUTH_SOCK='${SSH_AUTH_SOCK:-}'" \
+    -e "SSH_AUTH_SOCK=${SSH_AUTH_SOCK:-}" \
     "${container_name}" \
     '/usr/bin/zsh'
 }
