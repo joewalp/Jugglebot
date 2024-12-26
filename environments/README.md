@@ -252,7 +252,7 @@ denv exec
 
 ### Additional things to try
 
-#### Drive WSL from VSCode for Windows
+#### Task 1. Drive WSL from VSCode for Windows
 
 The WSL extension for VSCode for Windows allows you to drive a WSL environment.
 After installing that extension, run the following command from within the WSL
@@ -270,14 +270,14 @@ environment using the Remote SSH extension for VSCode. That already works.
 However, providing instructions for the ssh key management by Windows to make
 that workflow convenient is still in progress.
 
-#### Run SavvyCAN in WSL
+#### Task 2. Run SavvyCAN in WSL
 
 You'll find the `install-savvycan` utility in `~/bin`. That script demonstrates
 how to use a dedicated conda environment to build and to run an app that has
 different dependencies from your primary Jugglebot project. Running it will
 produce ~/bin/SavvyCAN, which will launch the app.
 
-#### Expose a USB device to WSL
+#### Task 4. Expose a USB device to WSL
 
 To use your USB ports in WSL, you need to expose them using the usbipd tool as
 described here:
