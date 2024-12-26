@@ -179,6 +179,10 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    -h|--help)
+      print_usage
+      exit 0
+      ;;
     -*|--*)
       echo "[ERROR]: Unknown option $1" >&2
       exit 1
