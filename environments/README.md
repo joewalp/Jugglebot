@@ -12,34 +12,24 @@ Both environments have the ROS2 Desktop and the ROS development tools installed.
 The Ubuntu 20.04 Docker environment runs ROS2 foxy, and the Ubuntu WSL2 
 environment runs the version of ROS2 that has tier 1 support for that Ubuntu 
 release. If you want to run the same version of ROS2 as Prod runs, you should 
-install Ubuntu-20.04 for WSL despite that Ubuntu release being relatively old.
+install Ubuntu-20.04 for WSL despite that Ubuntu LTS release being relatively old.
 
-After following Steps 1 through 8 of the Instructions below, you can attach
-VSCode for Windows to the WSL2 environment by running the following command from
-within the WSL2 environment:
-
-```zsh
-cd ~/Jugglebot && code .
-```
-
-Then, you can save that workspace locally in Windows to launch it conveniently.
-
-The next step is to enable attaching VSCode for Windows to the Ubuntu 20.04 
-Docker environment. That already works. However, providing instructions for the 
-Windows pieces of the setup is still in progress.
 
 
 ## Instructions
 
 
-### Step 1. Ensure that WSL2 is installed
+### Step 1. Ensure that WSL2 is installed and updated
 
+PowerShell
 ```
 wsl --install --no-distribution
+wsl --update
 ```
 
 ### Step 2. Verify that an Ubuntu-20.04 distribution is not registered.
 
+PowerShell
 ```
 wsl --list
 ```
@@ -47,6 +37,7 @@ wsl --list
 If the output includes `Ubuntu` or `Ubuntu (Default)`, then run the following
 command to determine its version:
 
+PowerShell
 ```
 wsl -d Ubuntu -e lsb_release --description
 ```
@@ -80,6 +71,7 @@ This option only relies on the wsl tool. The process looks like this:
 Below are some example commands. These assume that the preexisting distribution
 is using WSL version 2 and that its virtual disk uses the default ext4 filesystem.
 
+PowerShell
 ```
 wsl --terminate <Distribution Name>
 wsl --export <Distribution Name> <Vhdx FileName> --vhd
@@ -109,6 +101,7 @@ Assuming that you didn't have a preexisting Ubuntu 20.04 instance or that you
 used Fixup Option 1, you can now create a fresh Ubuntu 20.04 instance. Run the
 following command:
 
+PowerShell
 ```
 wsl --install Ubuntu-20.04
 ```
@@ -134,6 +127,7 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generati
 Run the following command on the new Ubuntu-20.04 host. Substitute your email
 address, omitting the brackets.
 
+WSL Bash Shell
 ```bash
 ssh-keygen -t ed25519 -C '[your email address]'
 ```
@@ -152,6 +146,7 @@ You may already have a keypair registered with GitHub that you've been using for
 local development. Here are some commands that you could use to copy it into
 place if those files are stored in the mounted filesystem:
 
+WSL Bash Shell
 ```bash
 install -m 700 -d ~/.ssh
 install -m 600 /mnt/c/[path to private key] -t ~/.ssh
@@ -175,6 +170,7 @@ described here:
 
 https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 
+WSL Bash Shell
 ```bash
 (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
 	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
@@ -189,12 +185,14 @@ Then use `gh` to add your public key to your GitHub account as described here:
 
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account?platform=linux&tool=cli
 
+WSL Bash Shell
 ```bash
 gh ssh-key add ~/.ssh/id_ed25519.pub --type authentication --title 'Jugglebot dev env'
 ```
 
 ### Step 6. Clone the Jugglebot repo
 
+WSL Bash Shell
 ```bash
 sudo apt install git
 
@@ -207,12 +205,14 @@ Within the WSL2 environment, run the setup script for the WSL2 development
 environment while specifying your name and email address that will be configured
 in ~/.gitconfig. This will take some time.
 
+WSL Bash Shell
 ```bash
 ~/Jugglebot/environments/ubuntu-wsl2/setup.sh --ssh-keypair-name id_ed25519 --git-name '[Your full name]' --git-email '[Your email address]'
 ```
 
 ### Step 8. Exit and then start a new terminal session to enable all changes
 
+WSL Bash Shell
 ```bash
 exit
 ```
@@ -226,6 +226,7 @@ the newly created distribution.
 
 #### Option 2. Use the wsl tool
 
+PowerShell
 ```
 wsl -d Ubuntu-20.04
 ```
@@ -249,6 +250,84 @@ native platform environment.
 denv exec
 ```
 
+### Additional things to try
+
+#### Drive WSL from VSCode for Windows
+
+The WSL extension for VSCode for Windows allows you to drive a WSL environment.
+After installing that extension, run the following command from within the WSL
+environment:
+
+```zsh
+cd ~/Jugglebot && code .
+```
+
+That will open a VSCode window that's attached to the WSL environment. You can
+save that VSCode workspace locally in Windows to facilitate opening it later.
+
+It's possible also for VSCode for Windows to drive a Ubuntu 20.04 Docker
+environment using the Remote SSH extension for VSCode. That already works.
+However, providing instructions for the ssh key management by Windows to make
+that workflow convenient is still in progress.
+
+#### Run SavvyCAN in WSL
+
+You'll find the `install-savvycan` utility in `~/bin`. That script demonstrates
+how to use a dedicated conda environment to build and to run an app that has
+different dependencies from your primary Jugglebot project. Running it will
+produce ~/bin/SavvyCAN, which will launch the app.
+
+#### Expose a USB device to WSL
+
+To use your USB ports in WSL, you need to expose them using the usbipd tool as
+described here:
+
+https://github.com/dorssel/usbipd-win/blob/v4.3.0/README.md
+
+Briefly, the process on Windows 11 goes like this:
+
+1. Within PowerShell, use winget to install the usbipd tool.
+
+2. Attach the physical device that you want to use.
+
+3. Within an Administrator PowerShell, use the usbipd tool to identify and to
+   bind the device by specifying its busid. This is a one-time operation.
+
+4. Within PowerShell during each Windows session prior to using the device in
+   WSL, use the usbipd tool to attach the device to WSL. This will make the
+   device available to all of the WSL distributions that have a compatible
+   kernel.
+
+5. Within the WSL Ubuntu-20.04 environment, use the lsusb tool to verify that
+   you can see the device.
+
+6. [Optional] Install the USBIP Connect extension in VSCode. This will add an
+   `Attach` button to the status bar that will enable you to attach any device
+   that you had previously exposed via `usbipd bind`.
+
+Here are some example commands:
+
+PowerShell
+```
+winget install --interactive --exact dorssel.usbipd-win
+```
+
+Administrator PowerShell
+```
+usbipd list
+usbipd bind --busid <BUSID>
+```
+
+PowerShell
+```
+usbipd attach --wsl --busid <BUSID>
+```
+
+WSL Ubuntu-20.04
+```zsh
+lsusb
+```
+
 ## Notes
 
 Each of these environments uses Z Shell (zsh) with Oh My Zsh and the 'clean'
@@ -257,14 +336,14 @@ virtualenv and pip because the conda-forge dependency management makes life
 easier.
 
 The Jugglebot repo is checked out separately in each environment. If anyone ends
-up using the docker environment in tandem with the WSL2 environment for
-interactive coding and testing, we may end up mounting the WSL2 Jugglebot repo
-into the container. However, I currently consider the docker native platform
-environment to be a stepping stone toward building the Ubuntu for arm64 Docker
-container. The native platform environment is considerably faster than the arm64
-platform environment, so I want to use it for iterating on features before
-confirming that the same provisioning and features work within the arm64
-platform environment.
+up using the docker container environment in tandem with the WSL2 environment
+for interactive coding and testing, we may end up mounting the WSL2 Jugglebot
+repo into the container. However, I currently consider the docker native
+platform container environment to be a stepping stone toward building the Ubuntu
+for arm64 Docker container. The native platform container environment is
+considerably faster than the arm64 platform container environment, so I want to
+use it for iterating on features before confirming that the same provisioning
+and features work within an arm64 platform environment.
 
 ## Noteworthy future milestones
 
