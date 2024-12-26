@@ -296,7 +296,7 @@ To see how this works, you can peek at those two Bash scripts.
 `WSL Ubuntu-20.04`
 ```zsh
 less ~/bin/install-savvycan
-less ~/SavvyCan
+less ~/bin/SavvyCan
 ```
 
 Note:
