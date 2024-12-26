@@ -1,0 +1,6 @@
+name: savvycan
+channels:
+  - conda-forge
+dependencies:
+  - qt=5.15.8
+
