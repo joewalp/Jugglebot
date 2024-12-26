@@ -295,8 +295,8 @@ To see how this works, you can peek at those two Bash scripts.
 
 ```zsh
 # WSL Ubuntu-20.04
-pygmentize -g ~/bin/install-savvycan | less -R
-pygmentize -g ~/bin/SavvyCAN | less -R
+pygmentize -O style=native -g ~/bin/install-savvycan | less -R
+pygmentize -O style=native -g ~/bin/SavvyCAN | less -R
 ```
 
 > Note:
