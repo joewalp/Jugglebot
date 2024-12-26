@@ -125,7 +125,7 @@
       cmd: "conda env update -n jugglebot -f '{{ repo_dir }}/ros_ws/conda_env.yml' --prune"
     when: jugglebot_env_exists
 
-  - name: Create or diff ~/.jugglebot/conda_env.sh
+  - name: Install ~/.jugglebot/conda_env.sh
     import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
     vars:
       src: "{{ environments_dir }}/ubuntu-common/conda_env.sh"
@@ -144,7 +144,7 @@
       src: 'conda_env_deactivate.sh'
       dest: '{{ home_dir }}/miniforge3/envs/jugglebot/etc/conda/deactivate.d/'
 
-  - name: Create or diff ~/bin/refresh-conda-env
+  - name: Install ~/bin/refresh-conda-env
     import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
     vars:
       src: "{{ environments_dir }}/ubuntu-common/refresh-conda-env"

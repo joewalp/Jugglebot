@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+set -o nounset -o pipefail -o errexit
+IFS=$'\t\n' # Stricter IFS settings
+rc=0
+
+# TASK [Define functions]
+
+task() {
+  local task_desc="$1"
+  echo -e "\nTASK [${task_desc}] ********"
+}
+
+task 'Assert that SavvyCAN is not already installed'
+
+# if [[ -n "$( which SavvyCAN )" ]]; then
+#   echo "[ERROR]: SavvyCAN already exists in the path at $( which SavvyCAN )" >&2
+#   exit 1
+# fi
+
+task 'Initialize variables'
+
+REFRESH_CONDA_ENV="${REFRESH_CONDA_ENV:-no}"
+SAVVYCAN_GITHUB_URL='https://github.com/collin80/savvycan.git'
+SAVVYCAN_CONDA_ENV_FILEPATH="${SAVVYCAN_CONDA_ENV_FILEPATH:-${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/savvycan_conda_env.yml}"
+
+task 'Enable Conda'
+
+eval "$("${HOME}/miniforge3/bin/conda" 'shell.bash' 'hook' 2> /dev/null)"
+
+task 'Check whether the savvycan Conda environment exists'
+
+if conda info --envs | grep -q '^savvycan\s'; then
+
+  if [[ "${REFRESH_CONDA_ENV}" == 'yes' ]]; then
+
+    task 'Refresh the savvycan Conda environment'
+
+    conda env update -f "${SAVVYCAN_CONDA_ENV_FILEPATH}" --prune
+
+  fi
+
+else
+
+  task 'Create the savvycan Conda environment'
+
+  conda env create -f "${SAVVYCAN_CONDA_ENV_FILEPATH}"
+
+fi
+
+task 'Activate the savvycan Conda environment'
+
+conda activate savvycan
+
+task 'Clone the SavvyCAN repo'
+
+SAVVYCAN_DIR="${CONDA_PREFIX}/src/SavvyCAN"
+
+install -d "${CONDA_PREFIX}/src"
+
+rm -rf "${SAVVYCAN_DIR}"
+
+git clone --depth 1 "${SAVVYCAN_GITHUB_URL}" "${SAVVYCAN_DIR}" || rc="$?"
+
+if [[ $rc -ne 0 ]]; then
+  echo -e "[ERROR]: Cloning the SavvyCAN repo failed with return code ${rc}." >&2
+  exit $rc
+fi
+
+task 'Build SavvyCAN'
+
+cd "${SAVVYCAN_DIR}"
+
+qmake || rc="$rc"
+
+if [[ $rc -ne 0 ]]; then
+  echo -e "[ERROR]: Preparing using qmake failed with return code ${rc}." >&2
+  exit $rc
+fi
+
+make || rc="$?"
+
+if [[ $rc -ne 0 ]]; then
+  echo -e "[ERROR]: Building SavvyCAN failed with return code ${rc}." >&2
+  exit $rc
+fi
+
+task 'Install SavvyCAN in the savvycan Conda environment'
+
+ln -f -s -T "${CONDA_PREFIX}/src/SavvyCAN/SavvyCAN" "${CONDA_PREFIX}/bin/SavvyCAN"
+
+task 'Install ~/bin/SavvyCAN'
+
+cat <<'EOF' > "${HOME}/bin/SavvyCAN"
+#!/usr/bin/env bash
+set -o nounset -o pipefail -o errexit
+IFS=$'\t\n' # Stricter IFS settings
+rc=0
+
+# TASK [Enable Conda]
+
+eval "$("${HOME}/miniforge3/bin/conda" shell.bash hook 2> /dev/null)"
+
+# TASK [Activate the savvycan Conda environment]
+
+conda activate savvycan
+
+# TASK [Launch SavvyCAN in the background]
+
+"${CONDA_PREFIX}/bin/SavvyCAN" > /dev/null 2>&1 &
+
+EOF
+
+chmod +x "${HOME}/bin/SavvyCAN"
+
+task 'Educate about this installation'
+
+echo '
+
+The installation completed successfully. Run SavvyCAN using the following
+command:
+
+  SavvyCAN
+
+This application is installed within a dedicated Conda environment. You can
+uninstall it using the following two commands:
+
+  conda env remove -y -n savvycan
+
+  rm -f ~/bin/SavvyCAN
+'
+
