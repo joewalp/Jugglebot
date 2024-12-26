@@ -299,7 +299,8 @@ pygmentize -g ~/bin/install-savvycan | less -R
 pygmentize -g ~/bin/SavvyCAN | less -R
 ```
 
-Note:
+> Note:
+> 
 > The second and third lines of each of those scripts aren't essential. They
 > make the Bash interpreter more fail-fast and more predictable. The fail-fast
 > characteristic tends to make it easier to recover manually when a script fails
