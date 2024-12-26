@@ -185,15 +185,15 @@ Then use `gh` to add your public key to your GitHub account as described here:
 
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account?platform=linux&tool=cli
 
-`WSL Ubuntu-20.04`
 ```bash
+# WSL Ubuntu-20.04
 gh ssh-key add ~/.ssh/id_ed25519.pub --type authentication --title 'Jugglebot dev env'
 ```
 
 ### Step 6. Clone the Jugglebot repo
 
-`WSL Ubuntu-20.04`
 ```bash
+# WSL Ubuntu-20.04
 sudo apt install git
 
 cd ~ && GIT_SSH_COMMAND="ssh -i ${HOME}/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" git clone git@github.com:joewalp/Jugglebot.git
@@ -205,8 +205,8 @@ Within the WSL2 environment, run the setup script for the WSL2 development
 environment while specifying your name and email address that will be configured
 in ~/.gitconfig. This will take some time.
 
-`WSL Ubuntu-20.04`
 ```bash
+# WSL Ubuntu-20.04
 ~/Jugglebot/environments/ubuntu-wsl2/setup.sh --ssh-keypair-name id_ed25519 --git-name '[Your full name]' --git-email '[Your email address]'
 ```
 
