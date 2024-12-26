@@ -21,24 +21,24 @@ install Ubuntu-20.04 for WSL despite that Ubuntu LTS release being relatively ol
 
 ### Step 1. Ensure that WSL2 is installed and updated
 
-`PowerShell`
 ```
+# PowerShell
 wsl --install --no-distribution
 wsl --update
 ```
 
 ### Step 2. Verify that an Ubuntu-20.04 distribution is not registered.
 
-`PowerShell`
 ```
+# PowerShell
 wsl --list
 ```
 
 If the output includes `Ubuntu` or `Ubuntu (Default)`, then run the following
 command to determine its version:
 
-`PowerShell`
 ```
+# PowerShell
 wsl -d Ubuntu -e lsb_release --description
 ```
 
@@ -71,8 +71,8 @@ This option only relies on the wsl tool. The process looks like this:
 Below are some example commands. These assume that the preexisting distribution
 is using WSL version 2 and that its virtual disk uses the default ext4 filesystem.
 
-`PowerShell`
 ```
+# PowerShell
 wsl --terminate <Distribution Name>
 wsl --export <Distribution Name> <Vhdx FileName> --vhd
 wsl --import-in-place <Alternative Distribution Name> <Vhdx FileName>
@@ -101,8 +101,8 @@ Assuming that you didn't have a preexisting Ubuntu 20.04 instance or that you
 used Fixup Option 1, you can now create a fresh Ubuntu 20.04 instance. Run the
 following command:
 
-`PowerShell`
 ```
+# PowerShell
 wsl --install Ubuntu-20.04
 ```
 
@@ -127,8 +127,8 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generati
 Run the following command on the new Ubuntu-20.04 host. Substitute your email
 address, omitting the brackets.
 
-`WSL Ubuntu-20.04`
 ```bash
+# WSL Ubuntu-20.04
 ssh-keygen -t ed25519 -C '[your email address]'
 ```
 
@@ -146,8 +146,8 @@ You may already have a keypair registered with GitHub that you've been using for
 local development. Here are some commands that you could use to copy it into
 place if those files are stored in the mounted filesystem:
 
-`WSL Ubuntu-20.04`
 ```bash
+# WSL Ubuntu-20.04
 install -m 700 -d ~/.ssh
 install -m 600 /mnt/c/[path to private key] -t ~/.ssh
 install -m 644 /mnt/c/[path to public key] -t ~/.ssh
@@ -170,8 +170,8 @@ described here:
 
 https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 
-`WSL Ubuntu-20.04`
 ```bash
+# WSL Ubuntu-20.04
 (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
 	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
 	&& wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
@@ -212,8 +212,8 @@ in ~/.gitconfig. This will take some time.
 
 ### Step 8. Exit and then start a new terminal session to enable all changes
 
-`WSL Ubuntu-20.04`
 ```bash
+# WSL Ubuntu-20.04
 exit
 ```
 
@@ -226,8 +226,8 @@ the newly created distribution.
 
 #### Option 2. Use the wsl tool
 
-`PowerShell`
 ```
+# PowerShell
 wsl -d Ubuntu-20.04
 ```
 
@@ -236,8 +236,8 @@ wsl -d Ubuntu-20.04
 Within the WSL2 environment, run the setup script for the docker native platform
 environment. This will take some time.
 
-`WSL Ubuntu-20.04`
 ```zsh
+# WSL Ubuntu-20.04
 denv build --ssh-keypair-name id_ed25519
 ```
 
@@ -247,8 +247,8 @@ The script in Step 9 will print some information about the container that it
 builds. After reading that info, run the following command to enter the docker
 native platform environment.
 
-`WSL Ubuntu-20.04`
 ```zsh
+# WSL Ubuntu-20.04
 denv exec
 ```
 
@@ -262,8 +262,8 @@ The WSL extension for VSCode for Windows allows you to drive a WSL environment.
 After installing that extension, run the following command from within the WSL
 environment:
 
-`WSL Ubuntu-20.04`
 ```zsh
+# WSL Ubuntu-20.04
 cd ~/Jugglebot && code .
 ```
 
@@ -284,8 +284,8 @@ how to use a dedicated conda environment to build and to run an app that has
 different dependencies from your primary Jugglebot project. Running it will
 produce ~/bin/SavvyCAN, which will launch the app.
 
-`WSL Ubuntu-20.04`
 ```zsh
+# WSL Ubuntu-20.04
 install-savvycan
 SavvyCAN
 ```
@@ -293,8 +293,8 @@ SavvyCAN
 To see how this works, you can peek at those two Bash scripts.
 
 
-`WSL Ubuntu-20.04`
 ```zsh
+# WSL Ubuntu-20.04
 pygmentize -g ~/bin/install-savvycan | less -R
 pygmentize -g ~/bin/SavvyCAN | less -R
 ```
@@ -339,24 +339,24 @@ Briefly, the process on Windows 11 goes like this:
 
 Here are some example commands:
 
-`PowerShell`
 ```
+# PowerShell
 winget install --interactive --exact dorssel.usbipd-win
 ```
 
-`Administrator PowerShell`
 ```
+# Administrator PowerShell
 usbipd list
 usbipd bind --busid <BUSID>
 ```
 
-`PowerShell`
 ```
+# PowerShell
 usbipd attach --wsl --busid <BUSID>
 ```
 
-`WSL Ubuntu-20.04`
 ```zsh
+# WSL Ubuntu-20.04
 lsusb
 ```
 
