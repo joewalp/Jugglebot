@@ -12,10 +12,10 @@ task() {
 
 task 'Assert that SavvyCAN is not already installed'
 
-# if [[ -n "$( which SavvyCAN )" ]]; then
-#   echo "[ERROR]: SavvyCAN already exists in the path at $( which SavvyCAN )" >&2
-#   exit 1
-# fi
+if [[ -n "$( which SavvyCAN )" ]]; then
+  echo "[ERROR]: SavvyCAN already exists in the path at $( which SavvyCAN )" >&2
+  exit 1
+fi
 
 task 'Initialize variables'
 
