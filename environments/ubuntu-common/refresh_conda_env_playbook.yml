@@ -123,7 +123,7 @@
   - name: Refresh the jugglebot Conda environment .. please be patient
     shell:
       cmd: "conda env update -n jugglebot -f '{{ repo_dir }}/ros_ws/conda_env.yml' --prune"
-    when: jugglebot_env_exists
+    when: jugglebot_env_exists and refresh_jugglebot_conda_env_enabled is truthy(convert_bool=True)
 
   - name: Install ~/.jugglebot/conda_env.sh
     import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
