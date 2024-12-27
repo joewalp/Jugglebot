@@ -405,15 +405,15 @@ and features work within an arm64 platform environment.
 
 ## Noteworthy future milestones
 
-- Provide instructions for how to configure VSCode for Windows to drive a Linux
-  shell environment and Linux build tools in each environment.
 - Demonstrate dev environment provisioning on an Ubuntu for arm64 Docker image
   emulated by Qemu. This environment won't be used within a development
   workflow; it's only intended to verify that all of the environment dependences
   are available for arm64.
 - Demonstrate ROS2 Foxy startup in Ubuntu for arm64.
-- Demonstrate how to run a Python unit test in the Linux environment using
-  VSCode.
+- Build a minimal ROS app that uses the Jugglebot fork of Yasmin to provide a
+  demo testbed for example code that doesn't have robot hardware dependencies.
+- Demonstrate how to use VSCode for Windows to connect to a Linux environment
+  over ssh and to run a unit test in that remote environment.
 - On a Windows 11 machine with an Nvidia GPU, demonstrate passthrough of Cuda
   tasks from a guest Linux development environment host where those tasks are
   driven by a Jetson SDK.
