@@ -158,16 +158,26 @@ source $ZSH/oh-my-zsh.sh
 alias paliases='"${EDITOR:-vim}" "${ZSH_CUSTOM}/aliases.zsh" && source "${ZSH_CUSTOM}/aliases.zsh"'
 
 
-# TASK [Enable keychain]
-#
-# Note 1: Keychain remembers ssh-agent keys across logins during a host
-# uptime session.
-# 
-# Note 2: Keychain does not work inside a docker container because it cannot
-# inherit the identities within an auth socket.
 
-if [[ ! -f /.dockerenv ]]; then
-  eval "$(keychain --eval --quiet --agents ssh)"
+if [[ -f /.dockerenv ]]; then
+
+  # TASK [Export DBUS_SESSION_BUS_ADDRESS in the Docker container]
+  #
+  # Note: Docker doesn't have a session manager, so we run this upon creating
+  # a terminal session.
+
+  eval "$( dbus-launch --sh-syntax )"
+else
+
+  # TASK [Enable keychain]
+  #
+  # Note 1: Keychain remembers ssh-agent keys across logins during a host
+  # uptime session.
+  #
+  # Note 2: Keychain should not be necessary inside a docker container because
+  # we forward the auth socket upon connecting via `docker exec` or ssh.
+
+  eval "$( keychain --eval --quiet --agents ssh )"
 fi
 
 # TASK [Reclaim Ctrl+s and Ctrl+q from the terminal]
