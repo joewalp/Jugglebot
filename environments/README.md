@@ -336,7 +336,7 @@ described here:
 
 https://github.com/dorssel/usbipd-win/blob/v4.3.0/README.md
 
-Briefly, the process on Windows 11 goes like this:
+The process on Windows 11 goes like this:
 
 1. Within PowerShell, use winget to install the usbipd tool.
 
