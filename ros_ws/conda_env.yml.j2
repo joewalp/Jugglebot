@@ -26,15 +26,14 @@ dependencies:
 
   - pip:
     
+    # TASK [Specify the Jugglebot project pip requirements]
+    
+    - numpy-quaternion==2022.4.4
+    - pyspacemouse==1.0.9
+
     # TASK [Specify the shell environment pip requirements]
     #
     # Note: We choose the pip package for tmuxp because we prefer to use the
     # tmux binary that is provided by the Ubuntu apt repository.
     
     - tmuxp
-    
-    # TASK [Specify the Jugglebot project pip requirements]
-    
-    - numpy-quaternion==2022.4.4
-    - pyspacemouse==1.0.9
-
