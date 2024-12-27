@@ -248,7 +248,7 @@ wsl -d Ubuntu-20.04
 
 ### Step 9. Run the Docker container native platform environment build utility
 
-Within the WSL2 environment, run the setup script for the docker native
+Within the WSL2 environment, run the build utility for the Docker native
 platform environment. The run duration of this script depends on the download
 speed of your internet connection. It takes roughly 40 minutes on a slow
 connection. It does not prompt for passwords, so you don't need to supervise
