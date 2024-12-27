@@ -70,7 +70,7 @@ task 'Build SavvyCAN'
 
 cd "${SAVVYCAN_DIR}"
 
-qmake || rc="$rc"
+qmake || rc="$?"
 
 if [[ $rc -ne 0 ]]; then
   echo -e "[ERROR]: Preparing using qmake failed with return code ${rc}." >&2
