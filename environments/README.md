@@ -389,14 +389,14 @@ lsusb
 ## Notes
 
 Each of these environments uses Z Shell (zsh) with Oh My Zsh and the 'clean'
-built-in theme. The Python environment is managed by conda and pip rather than
+built-in theme. The Python environment is managed by Conda and pip rather than
 virtualenv and pip because the conda-forge dependency management makes life
 easier.
 
 The Jugglebot repo is checked out separately in each environment. If anyone ends
-up using the docker container environment in tandem with the WSL2 environment
+up using the Docker container environment in tandem with the WSL2 environment
 for interactive coding and testing, we may end up mounting the WSL2 Jugglebot
-repo into the container. However, I currently consider the docker native
+repo into the container. However, I currently consider the Docker native
 platform container environment to be a stepping stone toward building the Ubuntu
 for arm64 Docker container. The native platform container environment is
 considerably faster than the arm64 platform container environment, so I want to
@@ -414,12 +414,6 @@ and features work within an arm64 platform environment.
 - Demonstrate ROS2 Foxy startup in Ubuntu for arm64.
 - Demonstrate how to run a Python unit test in the Linux environment using
   VSCode.
-- Test the usability of Wayland/X11 rendering by WSLg of an app running on
-  Ubuntu for WSL2.
-- Test the usability of Wayland/X11 rendering by WSLg of an app running on
-  Ubuntu within Docker Engine for Linux.
-- Provide instructions for how to configure Docker Desktop for Windows to manage
-  Docker Engine for Linux for WSL2.
 - On a Windows 11 machine with an Nvidia GPU, demonstrate passthrough of Cuda
   tasks from a guest Linux development environment host where those tasks are
   driven by a Jetson SDK.
