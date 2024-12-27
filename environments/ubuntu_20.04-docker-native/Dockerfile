@@ -286,7 +286,7 @@ COPY entrypoint.sh /entrypoint/
 
 # TASK [Move the default user home directory into the /entrypoint directory]
 
-RUN mv "/home/${USERNAME}" "/entrypoint/${USERNAME}"
+RUN mv -v "/home/${USERNAME}" "/entrypoint/${USERNAME}"
 
 # TASK [Specify additional environment variables for interactive sessions]
 
