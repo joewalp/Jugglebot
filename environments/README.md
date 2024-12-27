@@ -298,7 +298,7 @@ Windows to make that workflow convenient is still in progress.
 #### Task 2. Run SavvyCAN in WSL
 
 You'll find the `install-savvycan` utility in `~/bin`. That script demonstrates
-how to use a dedicated conda environment to build and to run an app that has
+how to use a dedicated Conda environment to build and to run an app that has
 different dependencies from your primary Jugglebot project. Running it will
 produce ~/bin/SavvyCAN, which will launch the app.
 
