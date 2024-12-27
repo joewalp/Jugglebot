@@ -213,7 +213,9 @@ cd ~ && GIT_SSH_COMMAND="ssh -i ${HOME}/.ssh/id_ed25519 -o IdentitiesOnly=yes -o
 
 Within the WSL2 environment, run the setup script for the WSL2 development
 environment while specifying your name and email address that will be configured
-in ~/.gitconfig. This will take some time.
+in ~/.gitconfig. This will take some time. Midway through its setup, it will
+prompt you to enter your Linux account password so that it can install
+applications.
 
 ```bash
 # WSL Ubuntu-20.04
