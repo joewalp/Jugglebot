@@ -64,6 +64,11 @@ while [[ $# -gt 0 ]]; do
       REPO_CACHE_ID="$(date +%s)"
       shift
       ;;
+    --retain-home-volume)
+      RETAIN_HOME_VOLUME="$2" # no|yes
+      shift
+      shift
+      ;;
     -*|--*)
       echo "[ERROR]: Unknown option $1" >&2
       exit 1
@@ -99,6 +104,7 @@ fi
 CONTAINER_NAME="${CONTAINER_NAME:-jugglebot-native-dev}"
 BUILD_NO_CACHE_OPTION="${BUILD_NO_CACHE_OPTION:-}"
 REPO_CACHE_ID="${REPO_CACHE_ID:-0}"
+RETAIN_HOME_VOLUME="${RETAIN_HOME_VOLUME:-no}"
 DEV_ENV_USERNAME='devops' # This is also the default password for the user.
 SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
 SSH_PUBLIC_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}.pub"
@@ -161,12 +167,6 @@ rm -f "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
 rm -f "${BUILD_CONTEXT_DIR}/build/gitconfig"
 rm -f "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
 
-task "Ensure that the docker volume named ${HOME_VOLUME_NAME} exists"
-
-if ! does_docker_volume_exist "${HOME_VOLUME_NAME}"; then
-  docker volume create "${HOME_VOLUME_NAME}"  
-fi
-
 task 'Ensure that the docker container is not running'
 
 if is_docker_container_running "${CONTAINER_NAME}"; then
@@ -177,6 +177,30 @@ task "Ensure that the ${CONTAINER_NAME} docker container does not exist"
 
 if does_docker_container_exist "${CONTAINER_NAME}"; then
   docker container rm --force --volumes "${CONTAINER_NAME}"
+fi
+
+if does_docker_volume_exist "${HOME_VOLUME_NAME}"; then
+  if [[ "${RETAIN_HOME_VOLUME}" == 'no' ]]; then
+    
+    task "Remove the volume named ${HOME_VOLUME_NAME}"
+    
+    docker volume rm "${HOME_VOLUME_NAME}"
+
+    task "Create the volume named ${HOME_VOLUME_NAME}"
+
+    docker volume create "${HOME_VOLUME_NAME}"
+
+  else
+
+    task "Retain the volume named ${HOME_VOLUME_NAME}"
+
+  fi
+else
+  
+  task "Create the volume named ${HOME_VOLUME_NAME}"
+  
+  docker volume create "${HOME_VOLUME_NAME}"
+
 fi
 
 task "Create the ${CONTAINER_NAME} docker container"
