@@ -246,10 +246,13 @@ the newly created distribution.
 wsl -d Ubuntu-20.04
 ```
 
-### Step 9. Run the docker native platform environment setup script
+### Step 9. Run the Docker container native platform environment build utility
 
-Within the WSL2 environment, run the setup script for the docker native platform
-environment. This will take some time.
+Within the WSL2 environment, run the setup script for the docker native
+platform environment. The run duration of this script depends on the download
+speed of your internet connection. It takes roughly 40 minutes on a slow
+connection. It does not prompt for passwords, so you don't need to supervise
+it.
 
 ```zsh
 # WSL Ubuntu-20.04
@@ -257,11 +260,11 @@ environment. This will take some time.
 denv build --ssh-keypair-name id_ed25519
 ```
 
-### Step 10. Run the ~/bin/docker-native-env script
+### Step 10. Try the Docker container native platform environment
 
-The script in Step 9 will print some information about the container that it
-builds. After reading that info, run the following command to enter the docker
-native platform environment.
+The command in Step 9 will print some information about the container that it
+has built. After reading that info, run the following command to enter the
+Docker container native platform environment.
 
 ```zsh
 # WSL Ubuntu-20.04
