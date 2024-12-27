@@ -31,8 +31,14 @@ while [[ $# -gt 0 ]]; do
       print_usage
       exit 0
       ;;
-    -p|--refresh-host-provisioning)
-      REFRESH_HOST_PROVISIONING=yes
+    --refresh-host-provisioning-conda-env)
+      REFRESH_HOST_PROVISIONING_ENV_ENABLED="$2" # yes|no
+      shift
+      shift
+      ;;
+    --refresh-jugglebot-conda-env)
+      REFRESH_JUGGLEBOT_ENV_ENABLED="$2" # yes|no
+      shift
       shift
       ;;
     -*|--*)
@@ -48,7 +54,8 @@ done
 
 task 'Initialize variables'
 
-REFRESH_HOST_PROVISIONING="${REFRESH_HOST_PROVISIONING:-no}"
+REFRESH_HOST_PROVISIONING_ENV_ENABLED="${REFRESH_HOST_PROVISIONING_ENV_ENABLED:-yes}"
+REFRESH_JUGGLEBOT_ENV_ENABLED="${REFRESH_JUGGLEBOT_ENV_ENABLED:-yes}"
 CONDA_FILEPATH="${HOME}/miniforge3/bin/conda"
 REPO_DIR="${REPO_DIR:-${HOME}/Jugglebot}"
 HOST_PROVISIONING_CONDA_ENV_FILEPATH="${HOST_PROVISIONING_CONDA_ENV_FILEPATH:-${REPO_DIR}/environments/ubuntu-common/host_provisioning_conda_env.yml}"
@@ -63,7 +70,7 @@ task 'Check whether the host-provisioning Conda environment exists'
 
 if conda info --envs | grep -q '^host-provisioning\s'; then
 
-  if [[ "${REFRESH_HOST_PROVISIONING}" == 'yes' ]]; then
+  if [[ "${REFRESH_HOST_PROVISIONING_ENV_ENABLED}" == 'yes' ]]; then
 
     task 'Refresh the host-provisioning Conda environment'
 
@@ -85,8 +92,11 @@ conda activate host-provisioning
 
 task 'Run the refresh jugglebot Conda environment playbook'
 
-ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
-  "${REFRESH_PLAYBOOK_FILEPATH}" || rc="$?"
+ANSIBLE_LOCALHOST_WARNING=False \
+  ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
+  ansible-playbook "${REFRESH_PLAYBOOK_FILEPATH}" \
+    -e "refresh_jugglebot_conda_env_enabled='${REFRESH_JUGGLEBOT_ENV_ENABLED}'" \
+  || rc="$?"
 
 # failed_when: the return code is nonzero
 

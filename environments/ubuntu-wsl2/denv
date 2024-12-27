@@ -140,7 +140,7 @@ do_exec() {
 
   if [[ "${identity_count}" -eq 0 ]]; then
     if [[ -f "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}" ]]; then
-      local default_ssh_key_filepath="$(< "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}")"
+      local default_ssh_key_filepath="$( < "${DEFAULT_SSH_KEY_CONFIG_FILEPATH}" )"
       if [[ -f "${default_ssh_key_filepath}" ]]; then
         ssh-add "${default_ssh_key_filepath}"
       else
