@@ -411,7 +411,7 @@ and features work within an arm64 platform environment.
   are available for arm64.
 - Demonstrate ROS2 Foxy startup in Ubuntu for arm64.
 - Build a minimal ROS app that uses the Jugglebot fork of Yasmin to provide a
-  demo testbed for example code that doesn't have robot hardware dependencies.
+  testbed for example code that doesn't have robot hardware dependencies.
 - Demonstrate how to use VSCode for Windows to connect to a Linux environment
   over ssh and to run a unit test in that remote environment.
 - On a Windows 11 machine with an Nvidia GPU, demonstrate passthrough of Cuda
