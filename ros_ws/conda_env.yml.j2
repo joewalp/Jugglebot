@@ -1,3 +1,27 @@
+# TASK [Educate about how to apply changes]
+# 
+# After editing this file, you can apply changes by running the following
+# utility:
+#
+#   ~/bin/refresh-conda-env
+#
+# That tool will run the following Ansible playbook:
+#
+#   $JUGGLEBOT_REPO_DIR/environments/ubuntu-common/refresh_conda_env_playbook.yml
+#
+# That playbook will interpolate the `python_version` and then install your
+# revised jugglebot Conda environment requirements. It will also try to upgrade
+# the Jugglebot runtime configuration (`~/.jugglebot/jugglebot_rc.yml`) and the
+# jugglebot Conda environment activation handler script
+# (`~/.jugglebot/conda_env.sh`) with the latest versions that are checked-in here:
+#
+#   $JUGGLEBOT_REPO_DIR/environments/ubuntu-common/jugglebot_rc.yml.j2
+#   $JUGGLEBOT_REPO_DIR/environments/ubuntu-common/conda_env.sh
+#
+# However, it will not overwrite those `~/.jugglebot` config files if you have
+# manually made changes to the installed versions.
+
+
 name: jugglebot
 channels:
   - conda-forge
