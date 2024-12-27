@@ -11,10 +11,6 @@ INIT_FLAG_FILEPATH="${HOME}/.user-dir-initialized"
 
 sudo /usr/bin/dbus-daemon --system &
 
-# TASK [Set the dbus environment variables]
-
-eval "$(dbus-launch --sh-syntax)"
-
 # TASK [Start sshd]
 
 sudo /usr/sbin/sshd -D &
