@@ -9,7 +9,7 @@ Ubuntu-20.04 docker container that uses a native platform base image. Ansible
 tasks and a Dockerfile perform the bulk of the provisioning.
 
 Both environments have the ROS2 Desktop and the ROS development tools installed. 
-The Ubuntu 20.04 Docker environment runs ROS2 foxy, and the Ubuntu WSL2 
+The Ubuntu 20.04 Docker environment runs ROS2 Foxy, and the Ubuntu WSL2 
 environment runs the version of ROS2 that has tier 1 support for that Ubuntu 
 release. If you want to run the same version of ROS2 as Prod runs, you should 
 install Ubuntu-20.04 for WSL despite that Ubuntu LTS release being relatively old.
@@ -62,7 +62,7 @@ Ubuntu for WSL.
 
 #### Fixup Option 1 [RECOMMENDED]. Move your Ubuntu 20.04 instance
 
-This option only relies on the wsl tool. The process looks like this:
+This option only relies on the `wsl` tool. The process looks like this:
 
 1. Shutdown the preexisting distribution
 2. Export the preexising distribution to a vhdx or a tarball
@@ -114,8 +114,9 @@ wsl --install Ubuntu-20.04
 Eventually, it will prompt you to supply a username and a password. This
 username and password don't need to match your Windows username and password.
 Typically, a linux username will be all lowercase alphanumeric characters
-beginning with an alpha character. If you want a username suggestion, use your
-first name in lowercase.
+beginning with an alpha character. If you want a username suggestion, either (a)
+use your first name (e.g. joe) or (b) use your first initial followed by
+your last name (e.g. jwalp).
 
 These credentials will not be used to sign-in. Rather, they will be used to
 grant access to run privileged system administration commands using sudo.
@@ -156,7 +157,9 @@ place if those files are stored in the mounted filesystem:
 # WSL Ubuntu-20.04
 
 install -m 700 -d ~/.ssh
+
 install -m 600 /mnt/c/[path to private key] -t ~/.ssh
+
 install -m 644 /mnt/c/[path to public key] -t ~/.ssh
 ```
 
@@ -213,7 +216,7 @@ cd ~ && GIT_SSH_COMMAND="ssh -i ${HOME}/.ssh/id_ed25519 -o IdentitiesOnly=yes -o
 
 Within the WSL2 environment, run the setup script for the WSL2 development
 environment while specifying your name and email address that will be configured
-in ~/.gitconfig. This will take some time. Midway through its setup, it will
+in `~/.gitconfig`. This will take some time. Midway through its setup, it will
 prompt you to enter your Linux account password so that it can install
 applications.
 
@@ -238,7 +241,7 @@ To start a new terminal session, you have a couple options
 In the dropdown menu of the Windows Terminal tab bar, you'll find an entry for
 the newly created distribution.
 
-#### Option 2. Use the wsl tool
+#### Option 2. Use the `wsl` tool
 
 ```
 # PowerShell
@@ -303,22 +306,23 @@ Windows to make that workflow convenient is still in progress.
 You'll find the `install-savvycan` utility in `~/bin`. That script demonstrates
 how to use a dedicated Conda environment to build and to run an app that has
 different dependencies from your primary Jugglebot project. Running it will
-produce ~/bin/SavvyCAN, which will launch the app.
+produce `~/bin/SavvyCAN`, which will launch the app.
 
 ```zsh
 # WSL Ubuntu-20.04
 
 install-savvycan
+
 SavvyCAN
 ```
 
 To see how this works, you can peek at those two Bash scripts.
 
-
 ```zsh
 # WSL Ubuntu-20.04
 
 pygmentize -O style=native -g ~/bin/install-savvycan | less -R
+
 pygmentize -O style=native -g ~/bin/SavvyCAN | less -R
 ```
 
@@ -327,33 +331,33 @@ pygmentize -O style=native -g ~/bin/SavvyCAN | less -R
 > The second and third lines of each of those scripts aren't essential. They
 > make the Bash interpreter more fail-fast and more predictable. The fail-fast
 > characteristic tends to make it easier to recover manually when a script fails
-> midway. The IFS initialization avoids the issue where the script behavior
-> could change based on a previously exported IFS value.
+> midway. The `IFS` initialization avoids the issue where the script behavior
+> could change based on a previously exported `IFS` value.
 
 ---
 
 #### Task 3. Expose a USB device to WSL
 
-To use your USB ports in WSL, you need to expose them using the usbipd tool as
+To use your USB ports in WSL, you need to expose them using the `usbipd` tool as
 described here:
 
 https://github.com/dorssel/usbipd-win/blob/v4.3.0/README.md
 
 The process on Windows 11 goes like this:
 
-1. Within PowerShell, use winget to install the usbipd tool.
+1. Within PowerShell, use `winget` to install the `usbipd` tool.
 
 2. Attach the physical device that you want to use.
 
-3. Within an Administrator PowerShell, use the usbipd tool to identify and to
+3. Within an Administrator PowerShell, use the `usbipd` tool to identify and to
    bind the device by specifying its busid. This is a one-time operation.
 
 4. Within PowerShell during each Windows session prior to using the device in
-   WSL, use the usbipd tool to attach the device to WSL. This will make the
+   WSL, use the `usbipd` tool to attach the device to WSL. This will make the
    device available to all of the WSL distributions that have a compatible
    kernel.
 
-5. Within the WSL Ubuntu-20.04 environment, use the lsusb tool to verify that
+5. Within the WSL Ubuntu-20.04 environment, use the `lsusb` tool to verify that
    you can see the device.
 
 6. [Optional] Install the USBIP Connect extension in VSCode. This will add an
@@ -372,6 +376,7 @@ winget install --interactive --exact dorssel.usbipd-win
 # Administrator PowerShell
 
 usbipd list
+
 usbipd bind --busid <BUSID>
 ```
 
@@ -397,7 +402,7 @@ virtualenv and pip because the conda-forge dependency management makes life
 easier.
 
 The Jugglebot repo is checked out separately in each environment. If anyone ends
-up using the Docker container environment in tandem with the WSL2 environment
+up using a Docker container environment in tandem with the WSL2 environment
 for interactive coding and testing, we may end up mounting the WSL2 Jugglebot
 repo into the container. However, I currently consider the Docker native
 platform container environment to be a stepping stone toward building the Ubuntu
