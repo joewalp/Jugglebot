@@ -95,21 +95,6 @@ RUN export debian_frontend=noninteractive \
     # Clean up
     && apt-get autoremove -y
 
-# TASK [Install the same packages as in dev_env_tasks.yml to benefit from caching]
-#
-# Note: We include recommended packages because gnome-terminal and terminator
-# behave more nicely with those packages.
-
-RUN export debian_frontend=noninteractive \
-    && apt-get install -yq \
-      git \
-      gnome-terminal \
-      jq \
-      keychain \
-      terminator \
-      tmux \
-      zsh
-
 # TASK [Ensure that at least the en_US.UTF-8 UTF-8 locale is available]
 
 RUN if ! grep -o -E '^\s*en_US.UTF-8\s+UTF-8' /etc/locale.gen > /dev/null; then \
@@ -127,7 +112,7 @@ EXPOSE 22
 # TASK [Install the VSCode Server]
 
 RUN export DEBIAN_FRONTEND=noninteractive \
-    && mkdir /etc/apt/keyrings \
+    && install -m 0755 -d /etc/apt/keyrings \
     && wget -qO- https://packages.microsoft.com/keys/microsoft.asc \
       | gpg --dearmor > /etc/apt/keyrings/packages.microsoft.gpg \
     && echo "deb [arch=amd64,arm64,armhf \
@@ -139,7 +124,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 # TASK [Install ROS2 Desktop and its many dependencies]
 #
-# Note: We install this here rather than in the playbook to benefit from of
+# Note: We install this here rather than in the playbook to benefit from
 # dockerfile caching.
 
 RUN export DEBIAN_FRONTEND=noninteractive \
@@ -156,6 +141,37 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       ros-foxy-desktop \
       ros-foxy-webots-ros2 \
     && /usr/bin/rosdep init
+
+# TASK [Install the Docker CLI]
+#
+# Note: We install this here rather than in the playbook to benefit from
+# dockerfile caching.
+
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+      -o /etc/apt/keyrings/docker.asc \
+    && chmod a+r /etc/apt/keyrings/docker.asc \
+    && echo "deb [arch=$(dpkg --print-architecture) \
+      signed-by=/etc/apt/keyrings/docker.asc] \
+      https://download.docker.com/linux/ubuntu $(lsb_release -c -s) stable" \
+      | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+    && apt-get update \
+    && apt-get install -yq docker-ce-cli
+
+# TASK [Install the same packages as in dev_env_tasks.yml to benefit from caching]
+#
+# Note: We include recommended packages because gnome-terminal and terminator
+# behave more nicely with those packages.
+
+RUN export debian_frontend=noninteractive \
+    && apt-get install -yq \
+      git \
+      gnome-terminal \
+      jq \
+      keychain \
+      terminator \
+      tmux \
+      zsh
 
 # TASK [Specify /home and /tmp as volumes]
 
@@ -233,7 +249,8 @@ ARG REPO_CACHE_ID='0'
 
 RUN --mount=type=ssh,mode=0666 ssh-keyscan -t rsa github.com > \
       /home/$USERNAME/.ssh/known_hosts \
-    && git clone "${JUGGLEBOT_REPO_SSH_URL}" "/home/${USERNAME}/Jugglebot"
+    && git clone "${JUGGLEBOT_REPO_SSH_URL}" "/home/${USERNAME}/Jugglebot" \
+    && rm -f "/entrypoint/${USERNAME}/.user-dir-initialized"
 
 # TASK [Initialize the repo branch variable]
 
