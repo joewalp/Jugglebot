@@ -91,6 +91,7 @@ fi
 
 JUGGLEBOT_CONDA_ENV_FILEPATH="${REPO_DIR}/ros_ws/conda_env.yml"
 SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
+CLONE_REPO_ENABLED="${CLONE_REPO_ENABLED:-yes}"
 
 task 'Enable ssh-agent'
 
