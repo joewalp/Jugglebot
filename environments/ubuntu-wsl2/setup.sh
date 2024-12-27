@@ -29,7 +29,22 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
-    -r|--debug-repo-dir)
+    --refresh-host-provisioning-conda-env)
+      REFRESH_HOST_PROVISIONING_ENV_ENABLED="$2" # yes|no
+      shift
+      shift
+      ;;
+    --refresh-jugglebot-conda-env)
+      REFRESH_JUGGLEBOT_ENV_ENABLED="$2" # yes|no
+      shift
+      shift
+      ;;
+    --clone-repo)
+      CLONE_REPO_ENABLED="$2" # yes|no
+      shift
+      shift
+      ;;
+    --debug-repo-dir)
       REPO_DIR="$2"
       shift
       shift
@@ -102,6 +117,7 @@ ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible
   -e "ssh_keypair_name='${SSH_KEYPAIR_NAME}'" \
   -e "git_name='${GIT_NAME}'" \
   -e "git_email='${GIT_EMAIL}'" \
+  -e "clone_repo_enabled='${CLONE_REPO_ENABLED}'" \
   -e "DISPLAY='${DISPLAY}'" || rc="$?"
 
 # failed_when: the return code is nonzero
