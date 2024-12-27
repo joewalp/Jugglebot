@@ -28,12 +28,6 @@
     vars:
       environments_dir: "{{ playbook_dir }}/.."
 
-  - name: Install the Docker CLI package
-    package:
-      name: docker-ce-cli
-      state: present
-    become: yes
-
   - name: Update the rosdep package manager
     command:
       cmd: /usr/bin/rosdep update
