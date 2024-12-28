@@ -92,6 +92,7 @@
   import_tasks: "{{ environments_dir }}/ubuntu-common/install_yq_tasks.yml"
   vars:
     yq_download_url: "https://github.com/mikefarah/yq/releases/download/v4.44.5/"
+  when: not '/usr/bin/yq' is file
 
 - name: Read the zsh path
   command:
@@ -107,7 +108,7 @@
 
 - name: Clone the Oh My Zsh repo
   git:
-    repo: "{{ ohmyzsh_git_repo }}"
+    repo: "{{ ohmyzsh_git_repo_url }}"
     dest: "{{ ohmyzsh_dir }}"
     version: master
     update: "{{ upgrade_software|bool }}"
@@ -126,7 +127,7 @@
     that: True
     success_msg: "[WARNING]: Oh My Zsh was not upgraded. To upgrade, run this playbook with `-e 'upgrade_software=yes'`."
   when: not upgrade_software|bool
-  
+
 - name: Install ~/.zshrc
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
@@ -171,6 +172,7 @@
     url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     dest: "{{ home_dir }}/.vim/autoload/plug.vim"
     mode: 0644
+  when: not ( home_dir ~ '/.vim/autoload/plug.vim' ) is file
 
 - name: Install ~/.vimrc
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
@@ -185,7 +187,7 @@
   shell:
     cmd: vim -c PlugInstall -c qall
 
-- name: Create or diff ~/.oh-my-zsh/custom/aliases.zsh
+- name: Install ~/.oh-my-zsh/custom/aliases.zsh
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
     src: "{{ environments_dir }}/ubuntu-common/aliases.zsh"
