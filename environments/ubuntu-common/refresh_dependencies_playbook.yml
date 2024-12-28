@@ -173,7 +173,7 @@
 
   - name: Install fnm
     shell:
-      cmd: "{{ host_setup_dir }}/fast_node_manager_setup.sh --no-shell"
+      cmd: "{{ host_setup_dir }}/fast_node_manager_setup.sh --skip-shell"
       executable: /usr/bin/bash
     when: not ( home_dir ~ '/.local/share/fnm/fnm' ) is file
 
