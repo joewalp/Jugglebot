@@ -1,5 +1,5 @@
 ---
-- name: Refresh the jugglebot Conda environment
+- name: Refresh the project dependencies
   hosts: localhost
   connection: local
   vars:
@@ -8,11 +8,13 @@
     ubuntu_codename: "{{ ansible_facts['distribution_release'] }}"
     home_dir: "{{ ansible_facts['env']['HOME'] }}"
     jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
+    host_setup_dir: "{{ home_dir }}/.jugglebot/host_setup"
     host_setup_backups_dir: "{{ home_dir }}/.jugglebot/host_setup/backups"
     host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
     host_setup_diffs_dir: "{{ home_dir }}/.jugglebot/host_setup/diffs"
     conda_base_updated_filepath: "{{ home_dir }}/.jugglebot/host_setup/conda_base_updated_timestamp"
     conda_filepath: "{{ home_dir }}/miniforge3/bin/conda"
+    fast_node_manager_url: 'https://fnm.vercel.app/install'
 
   tasks:
 
@@ -89,7 +91,7 @@
   - name: Render the jugglebot Conda env config with the Python version
     template:
       src: "{{ repo_dir }}/ros_ws/conda_env.yml.j2"
-      dest: "{{ repo_dir }}/ros_ws/conda_env.yml"
+      dest: "{{ host_setup_defaults_dir }}/conda_env.yml"
 
   - name: Check whether the jugglebot Conda environment exists
     shell:
@@ -104,7 +106,7 @@
 
   - name: Create the jugglebot Conda environment .. please be patient
     command:
-      cmd: "conda env create -f '{{ repo_dir }}/ros_ws/conda_env.yml'"
+      cmd: "conda env create -f '{{ host_setup_defaults_dir }}/conda_env.yml'"
     when: not jugglebot_env_exists
   
   - name: Create a file for the jugglebot Conda environment backup
@@ -122,7 +124,7 @@
 
   - name: Refresh the jugglebot Conda environment .. please be patient
     shell:
-      cmd: "conda env update -n jugglebot -f '{{ repo_dir }}/ros_ws/conda_env.yml' --prune"
+      cmd: "conda env update -n jugglebot -f '{{ host_setup_defaults_dir }}/conda_env.yml' --prune"
     when: jugglebot_env_exists and refresh_jugglebot_conda_env_enabled is truthy(convert_bool=True)
 
   - name: Install ~/.jugglebot/conda_env.sh
@@ -144,20 +146,52 @@
       src: 'conda_env_deactivate.sh'
       dest: '{{ home_dir }}/miniforge3/envs/jugglebot/etc/conda/deactivate.d/'
 
-  - name: Install ~/bin/refresh-conda-env
+  - name: Install ~/bin/refresh-dependencies
     import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
     vars:
-      src: "{{ environments_dir }}/ubuntu-common/refresh-conda-env"
+      src: "{{ environments_dir }}/ubuntu-common/refresh-dependencies"
       remote_src: no
-      dest: "{{ home_dir }}/bin/refresh-conda-env"
-      readable_dest: ~/bin/refresh-conda-env
+      dest: "{{ home_dir }}/bin/refresh-dependencies"
+      readable_dest: ~/bin/refresh-dependencies
       mode: '0755'
 
   - name: Verify that the jugglebot Conda environment can be activated
     shell:
-      cmd: "export ROS_WORKAROUND_ENABLED=yes \
-        && eval \"$('{{ conda_filepath }}' 'shell.bash' 'hook' 2> /dev/null)\" \
-        && conda activate jugglebot"
+      cmd: |
+        export ROS_WORKAROUND_ENABLED=yes \
+        && eval "$('{{ conda_filepath }}' 'shell.bash' 'hook' 2> /dev/null)" \
+        && conda activate jugglebot
       executable: /usr/bin/bash
     changed_when: False
+
+  - name: Download the Fast Node Manager installation script
+    get_url:
+      url: "{{ fast_node_manager_url }}"
+      dest: "{{ host_setup_dir }}/fast_node_manager_setup.sh"
+      mode: 0755
+    when: not ( host_setup_dir ~ '/fast_node_manager_setup.sh' ) is file
+
+  - name: Install fnm
+    shell:
+      cmd: "{{ host_setup_dir }}/fast_node_manager_setup.sh --no-shell"
+      executable: /usr/bin/bash
+    when: not ( home_dir ~ '/.local/share/fnm/fnm' ) is file
+
+  - name: Read the ros_ws/gui/.node_version
+    slurp:
+      src: "{{ repo_dir }}/ros_ws/gui/.node_version"
+    register: node_version_read_result
+
+  - name: Set the node_version variable
+    set_fact:
+      node_version: "{{ node_version_read_result.content|b64decode|trim }}"
+
+  - name: "Ensure that Node.js version {{ node_version }} is installed"
+    shell:
+      cmd: |
+        export ROS_WORKAROUND_ENABLED=yes \
+        && eval "$('{{ home_dir }}/.local/share/fnm/fnm' env)" \
+        && {{ home_dir }}/.local/share/fnm/fnm use \
+        --install-if-missing {{ node_version }}
+      executable: /usr/bin/bash
 

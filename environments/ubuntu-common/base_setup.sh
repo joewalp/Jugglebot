@@ -32,9 +32,8 @@ REFRESH_JUGGLEBOT_ENV_ENABLED="${REFRESH_JUGGLEBOT_ENV_ENABLED:-yes}"
 CONDA_SETUP_SCRIPT_URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$( uname )-$( uname -m ).sh"
 HOST_SETUP_DIR="${HOME}/.jugglebot/host_setup"
 CONDA_SETUP_SCRIPT_FILEPATH="${HOME}/.jugglebot/host_setup/miniforge_setup.sh"
-CONDA_BASE_UPDATED_FILEPATH="${HOME}/.jugglebot/host_setup/conda_base_updated_timestamp"
 CONDA_FILEPATH="${HOME}/miniforge3/bin/conda"
-REPO_DIR="${REPO_DIR:-${HOME}/Jugglebot}"
+JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
 
 task 'Ensure that the host setup directory exists'
 
@@ -69,7 +68,7 @@ if [[ ! -f "${CONDA_FILEPATH}" ]]; then
   exit 3
 fi
 
-"${REPO_DIR}/environments/ubuntu-common/refresh-conda-env" \
+"${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/refresh-dependencies" \
   --refresh-host-provisioning-conda-env "${REFRESH_HOST_PROVISIONING_ENV_ENABLED}" \
   --refresh-jugglebot-conda-env "${REFRESH_JUGGLEBOT_ENV_ENABLED}"
   
