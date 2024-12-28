@@ -394,7 +394,7 @@ lsusb
 
 ---
 
-#### Task 3. Determine whether WSLg can use accelerated rendering
+#### Task 4. Determine whether WSLg can use accelerated rendering
 
 WSL ships with a component called WSLg that acts as a display server for X11 and
 Wayland graphical applications. WSLg supports accelerated rendering only if your
