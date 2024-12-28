@@ -3,7 +3,7 @@
 <package format="3">
   <name>minimal_testbed</name>
   <version>0.1.0</version>
-  <description>TODO: Package description</description>
+  <description>Testbed with the Yasmin fork and without robot hardware dependencies</description>
   <maintainer email="joewalp@gmail.com">Joe Walp</maintainer>
   <license>MIT License</license>
 
