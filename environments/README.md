@@ -394,6 +394,38 @@ lsusb
 
 ---
 
+#### Task 3. Determine whether WSLg can use accelerated rendering
+
+WSL ships with a component called WSLg that acts as a display server for X11 and
+Wayland graphical applications. WSLg supports accelerated rendering only if your
+display driver supports WDDM 2.9 or greater.
+
+Windows ships with a tool called DirectX Diagnostic Tool that will display the
+WDDM version that your display driver supports. Run it using the following
+command:
+
+```
+# PowerShell
+
+dxdiag
+```
+
+Within the DirectX Diagnostic Tool, navigate to the following field:
+
+> `Display` tab > `Drivers` section > `Driver Model` field
+
+If that field indicates, WDDM 2.9 or greater, you have the option to run
+graphical apps (such as VSCode for Linux, the Chromium web browser or the
+Arduino IDE) within WSL. If your display driver doesn't indicate WDDM 2.9 or
+higher, those graphical applications will still run, but they may exhibit poor
+rendering performance and high cpu utilization.
+
+Additionally, we have found that applications that are built using the QT SDK
+(such as SavvyCAN or the Falkon web browser) exhibit good rendering performance
+regardless whether WSLg is providing accelerated rendering.
+
+---
+
 ## Notes
 
 Each of these environments uses Z Shell (zsh) with Oh My Zsh and the 'clean'
