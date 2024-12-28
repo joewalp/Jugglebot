@@ -256,13 +256,9 @@ ARG JUGGLEBOT_REPO_BRANCH='main'
 
 # TASK [Ensure that the specified branch is checked out]
 
-WORKDIR "/home/${USERNAME}/Jugglebot"
-
-RUN --mount=type=ssh,mode=0666 git pull \
-    && git checkout "${JUGGLEBOT_REPO_BRANCH}" \
-    && git pull
-
-WORKDIR "/home/${USERNAME}"
+RUN --mount=type=ssh,mode=0666 cd "/home/${USERNAME}/Jugglebot" \
+    && git pull \
+    && git checkout "${JUGGLEBOT_REPO_BRANCH}"
 
 # TASK [Initialize the base setup and playbook variable]
 
@@ -271,7 +267,9 @@ ARG ROS_WORKSPACE_DIR="/home/${USERNAME}/Jugglebot/ros_ws"
 
 # TASK [Run the ubuntu-common base setup and then the playbook]
 
-RUN "${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native/base_setup_and_playbook.sh" \
+RUN --mount=type=ssh,mode=0666 cd "/home/${USERNAME}/Jugglebot" \
+    && git pull \
+    && "${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native/base_setup_and_playbook.sh" \
       --environments-dir "${ENVIRONMENTS_DIR}" \
       --jugglebot-conda-env-filepath "${ENVIRONMENTS_DIR}/ubuntu-common/jugglebot_conda_env.yml" \
       --ros-workspace-dir "${ROS_WORKSPACE_DIR}" \
