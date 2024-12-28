@@ -163,8 +163,8 @@ if [[ -f /.dockerenv ]]; then
 
   # TASK [Export DBUS_SESSION_BUS_ADDRESS in the Docker container]
   #
-  # Note: Docker doesn't have a session manager, so we run this upon creating
-  # a terminal session.
+  # Note: Our Docker containers don't have a user session manager, so we run
+  # this upon creating a terminal session.
 
   eval "$( dbus-launch --sh-syntax )"
 else
@@ -194,7 +194,7 @@ if [[ -d /snap/bin ]]; then
 fi
 
 
-# TASK [Include the conda initialize block]
+# TASK [Include the Conda initialize block]
 # ...
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -212,9 +212,17 @@ unset __conda_setup
 # <<< conda initialize <<<
 
 
-# TASK [Activate the jugglebot conda environment]
+# TASK [Activate the jugglebot Conda environment]
 
 conda activate jugglebot
+
+
+# TASK [Enable fnm to configure the Node.js version]
+
+if [ -d "${HOME}/.local/share/fnm" ]; then
+  export PATH="${HOME}/.local/share/fnm:${PATH}"
+  eval "$( fnm env --use-on-cd --version-file-strategy=recursive )"
+fi
 
 
 # TASK [Add ~/bin to the $PATH]

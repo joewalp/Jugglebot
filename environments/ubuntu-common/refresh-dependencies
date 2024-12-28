@@ -7,7 +7,7 @@ rc=0
 
 print_usage() {
   echo '
-usage: refresh-conda-env [Options]
+usage: refresh-dependencies [Options]
 
 Options:
   -h|--help              Display this usage message
@@ -60,7 +60,7 @@ CONDA_FILEPATH="${HOME}/miniforge3/bin/conda"
 JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
 HOST_PROVISIONING_CONDA_ENV_FILEPATH="${HOST_PROVISIONING_CONDA_ENV_FILEPATH:-${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/host_provisioning_conda_env.yml}"
 JUGGLEBOT_CONDA_ENV_FILEPATH="${JUGGLEBOT_CONDA_ENV_FILEPATH:-${JUGGLEBOT_REPO_DIR}/ros_ws/conda_env.yml}"
-REFRESH_PLAYBOOK_FILEPATH="${REFRESH_PLAYBOOK_FILEPATH:-${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/refresh_conda_env_playbook.yml}"
+REFRESH_PLAYBOOK_FILEPATH="${REFRESH_PLAYBOOK_FILEPATH:-${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/refresh_dependencies_playbook.yml}"
 
 task 'Enable Conda'
 

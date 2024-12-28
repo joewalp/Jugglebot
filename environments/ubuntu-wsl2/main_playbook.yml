@@ -86,6 +86,7 @@
     git:
       repo: "{{ jugglebot_repo_ssh_url }}"
       dest: "{{ jugglebot_repo_dir }}"
+    when: clone_repo_enabled is truthy(convert_bool=True)
 
   - name: Provision the Docker Engine & Qemu
     import_tasks: "{{ environments_dir }}/ubuntu-common/docker_engine_tasks.yml"
