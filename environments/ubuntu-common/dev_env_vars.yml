@@ -13,7 +13,7 @@ zshrc_filepath: "{{ home_dir }}/.zshrc"
 vimrc_filepath: "{{ home_dir }}/.vimrc"
 gitconfig_filepath: "{{ home_dir }}/.gitconfig"
 jugglebot_conda_env_filepath: "{{ host_setup_dir }}/jugglebot_conda_env.yml }}"
-ohmyzsh_git_repo: 'https://github.com/ohmyzsh/ohmyzsh.git'
+ohmyzsh_git_repo_url: 'https://github.com/ohmyzsh/ohmyzsh.git'
 ohmyzsh_dir: "{{ home_dir }}/.oh-my-zsh"
 zsh_aliases_filepath: "{{ home_dir }}/.oh-my-zsh/custom/aliases.zsh"
 packages_upgraded_filepath: "{{ host_setup_dir }}/packages_upgraded_timestamp"
