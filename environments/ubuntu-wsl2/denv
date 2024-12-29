@@ -23,8 +23,10 @@ Global Options:
 Build Command Options:
   -k|--ssh-keypair-name  [Required] The name of the ssh keypair for Github
                          authentication (e.g. `denv build -k id_ed25519`)
+  --arch [native|arm64]  The platform architecture for the container. 
+                         (default: native)
 
-Set-key Command Options:
+Set-key Command Option:
   -k|--ssh-keypair-name  [Required] The name of the ssh keypair for Github
                          authentication (e.g. `denv set-key -k id_ed25519`)
 '
@@ -54,9 +56,16 @@ get_ssh_identity_count() {
 do_build() {
   local container_name="$1"
   local ssh_keypair_name="$2"
+  local base_image_architecture="$3"
   
   if [[ -z "${ssh_keypair_name}" ]]; then
     echo '[ERROR]: An ssh keypair name is required' >&2
+    print_usage
+    exit 2
+  fi
+
+  if [[ ! " native arm64 " =~ " ${base_image_architecture} " ]]; then
+    echo "[ERROR]: Unsupported target architecture $base_image_architecture" >&2
     print_usage
     exit 2
   fi
@@ -67,6 +76,7 @@ do_build() {
   # container. 
 
   "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-docker/setup.sh" \
+    --arch "${base_image_architecture}" \
     --debug-git-branch dev-env-provisioning \
     --container-name "${container_name}" \
     --ssh-keypair-name "${ssh_keypair_name}" || rc=$?
@@ -186,6 +196,11 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    --arch)
+      BASE_IMAGE_ARCHITECTURE="$2"
+      shift;
+      shift;
+      ;;
     -*|--*)
       echo "[ERROR]: Unknown option $1" >&2
       exit 1
@@ -202,6 +217,7 @@ done
 CONTAINER_NAME="${CONTAINER_NAME:-jugglebot-native-dev}"
 JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
 SSH_KEYPAIR_NAME="${SSH_KEYPAIR_NAME:-}"
+BASE_IMAGE_ARCHITECTURE="${BASE_IMAGE_ARCHITECTURE:-native}"
 DEFAULT_SSH_KEY_CONFIG_FILEPATH="${HOME}/.jugglebot/default_github_ssh_key_filepath"
 EX_UNAVAILABLE=69
 
@@ -213,7 +229,7 @@ fi
 
 case "${POSITIONAL_ARGS[0]}" in
   build)
-    do_build "${CONTAINER_NAME}" "${SSH_KEYPAIR_NAME}"
+    do_build "${CONTAINER_NAME}" "${SSH_KEYPAIR_NAME}" "${BASE_IMAGE_ARCHITECTURE}"
     ;;
   exec)
     do_exec "${CONTAINER_NAME}"
