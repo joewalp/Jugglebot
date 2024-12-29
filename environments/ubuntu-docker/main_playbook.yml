@@ -1,5 +1,5 @@
 ---
-- name: Provision the Ubuntu 20.04 docker native platform host
+- name: Provision the Ubuntu host in the Docker container
   hosts: localhost
   connection: local
   vars:
