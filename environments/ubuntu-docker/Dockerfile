@@ -1,4 +1,6 @@
-FROM ubuntu:focal
+ARG BASE_IMAGE='ubuntu:focal'
+
+FROM ${BASE_IMAGE}
 
 # TASK [Upgrade the packages and restore the man command]
 
@@ -127,6 +129,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 # Note: We install this here rather than in the playbook to benefit from
 # dockerfile caching.
 
+ARG ROS_PACKAGE_LIST='python3-argcomplete ros-dev-tools ros-foxy-desktop \
+    ros-foxy-webots-ros2'
+
 RUN export DEBIAN_FRONTEND=noninteractive \
     && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
       -o /usr/share/keyrings/ros-archive-keyring.gpg \
@@ -135,11 +140,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       http://packages.ros.org/ros2/ubuntu $(lsb_release -c -s) main" \
       | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
     && apt-get update \
-    && apt-get install -yq --no-install-recommends \
-      python3-argcomplete \
-      ros-dev-tools \
-      ros-foxy-desktop \
-      ros-foxy-webots-ros2 \
+    && apt-get install -yq --no-install-recommends ${ROS_PACKAGE_LIST} \
     && /usr/bin/rosdep init
 
 # TASK [Install the Docker CLI]
@@ -269,7 +270,7 @@ ARG ROS_WORKSPACE_DIR="/home/${USERNAME}/Jugglebot/ros_ws"
 
 RUN --mount=type=ssh,mode=0666 cd "/home/${USERNAME}/Jugglebot" \
     && git pull \
-    && "${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native/base_setup_and_playbook.sh" \
+    && "${ENVIRONMENTS_DIR}/ubuntu-docker/base_setup_and_playbook.sh" \
       --environments-dir "${ENVIRONMENTS_DIR}" \
       --jugglebot-conda-env-filepath "${ENVIRONMENTS_DIR}/ubuntu-common/jugglebot_conda_env.yml" \
       --ros-workspace-dir "${ROS_WORKSPACE_DIR}" \
