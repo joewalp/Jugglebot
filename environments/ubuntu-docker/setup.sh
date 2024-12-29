@@ -57,7 +57,7 @@ while [[ $# -gt 0 ]]; do
       shift;
       ;;
     -e|--debug-repo-dir)
-      REPO_DIR="$2"
+      DEBUG_REPO_DIR="$2"
       shift
       shift
       ;;
@@ -97,33 +97,6 @@ if [[ -z "${SSH_KEYPAIR_NAME:-}" ]]; then
   exit 2
 fi
 
-task 'Initialize variables'
-
-if [[ -z "${REPO_DIR:-}" ]]; then
-  REPO_DIR="${HOME}/Jugglebot"
-else
-  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
-fi
-
-if [[ -z "${GIT_BRANCH:-}" ]]; then
-  GIT_BRANCH='main'
-elif [[ "${GIT_BRANCH}" != 'main' ]]; then
-  echo -e "\n[WARNING]: Using git branch ${GIT_BRANCH} instead of main\n" >&2
-fi
-
-CONTAINER_NAME="${CONTAINER_NAME:-jugglebot-native-dev}"
-BASE_IMAGE_ARCHITECTURE="${BASE_IMAGE_ARCHITECTURE:-native}"
-BASE_IMAGE_OS_RELEASE="${BASE_IMAGE_OS_RELEASE:-focal}"
-BUILD_NO_CACHE_OPTION="${BUILD_NO_CACHE_OPTION:-}"
-REPO_CACHE_ID="${REPO_CACHE_ID:-0}"
-RETAIN_HOME_VOLUME="${RETAIN_HOME_VOLUME:-no}"
-DEV_ENV_USERNAME='devops' # This is also the default password for the user.
-SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
-SSH_PUBLIC_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}.pub"
-BUILD_CONTEXT_DIR="${REPO_DIR}/environments/ubuntu_20.04-docker-native"
-IMAGE_NAME='jugglebot-native-dev:focal'
-HOME_VOLUME_NAME='jugglebot-native-dev-home'
-
 task 'Determine the ROS package requirements'
 
 ROS_PACKAGES=('ros-dev-tools')
@@ -146,14 +119,44 @@ task 'Determine the base image and the platform option'
 case "${BASE_IMAGE_ARCHITECTURE}" in
   native)
     BASE_IMAGE="ubuntu:${BASE_IMAGE_OS_RELEASE}"
+    ;;
   arm64)
     BASE_IMAGE="arm64v8/ubuntu:${BASE_IMAGE_OS_RELEASE}"
-    PLATFORM_OPTION="--platform 'linux/arm64'"
+    PLATFORM_OPTION="--platform=linux/arm64"
+    ;;
   *)
     echo "[ERROR]: The specified architecture ${BASE_IMAGE_ARCHITECTURE} is not supported" >&2
     exit 2
     ;;
 esac
+
+task 'Initialize variables'
+
+if [[ -z "${DEBUG_REPO_DIR:-}" ]]; then
+  JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
+else
+  JUGGLEBOT_REPO_DIR="${DEBUG_REPO_DIR}"
+  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
+fi
+
+if [[ -z "${GIT_BRANCH:-}" ]]; then
+  GIT_BRANCH='main'
+elif [[ "${GIT_BRANCH}" != 'main' ]]; then
+  echo -e "\n[WARNING]: Using git branch ${GIT_BRANCH} instead of main\n" >&2
+fi
+
+BASE_IMAGE_ARCHITECTURE="${BASE_IMAGE_ARCHITECTURE:-native}"
+CONTAINER_NAME="${CONTAINER_NAME:-jugglebot-${BASE_IMAGE_ARCHITECTURE}-dev}"
+BASE_IMAGE_OS_RELEASE="${BASE_IMAGE_OS_RELEASE:-focal}"
+BUILD_NO_CACHE_OPTION="${BUILD_NO_CACHE_OPTION:-}"
+REPO_CACHE_ID="${REPO_CACHE_ID:-0}"
+RETAIN_HOME_VOLUME="${RETAIN_HOME_VOLUME:-no}"
+DEV_ENV_USERNAME='devops' # This is also the default password for the user.
+SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
+SSH_PUBLIC_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}.pub"
+BUILD_CONTEXT_DIR="${JUGGLEBOT_REPO_DIR}/environments/ubuntu-docker"
+IMAGE_NAME="jugglebot-${BASE_IMAGE_ARCHITECTURE}-dev:${BASE_IMAGE_OS_RELEASE}"
+HOME_VOLUME_NAME="jugglebot-${BASE_IMAGE_ARCHITECTURE}-${BASE_IMAGE_OS_RELEASE}-dev-home"
 
 task 'Enable ssh-agent'
 
@@ -167,12 +170,12 @@ ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 
 task 'Copy the host-provisioning Conda environment file into the build context'
 
-install -D -T "${REPO_DIR}/environments/ubuntu-common/host_provisioning_conda_env.yml" \
+install -D -T "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/host_provisioning_conda_env.yml" \
   "${BUILD_CONTEXT_DIR}/build/host_provisioning_conda_env.yml"
 
 task 'Copy the jugglebot Conda environment template file into the build context'
 
-install -D -T "${REPO_DIR}/ros_ws/conda_env.yml.j2" \
+install -D -T "${JUGGLEBOT_REPO_DIR}/ros_ws/conda_env.yml.j2" \
   "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
 
 task 'Set the Python version in the jugglebot Conda environnment file'
@@ -188,10 +191,6 @@ task "Copy ~/.ssh/${SSH_KEYPAIR_NAME}.pub into the build context"
 
 install -D -T "${SSH_PUBLIC_KEY_FILEPATH}" \
   "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
-
-task 'Determine the base image name'
-
-case  "${BASE_IMAGE_ARCHITECTURE}"
 
 task "Build the docker image named ${IMAGE_NAME}"
 

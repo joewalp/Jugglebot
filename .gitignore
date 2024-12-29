@@ -69,5 +69,5 @@ log/
 /rosinstall/
 
 # Ignore the temporary Docker build context directory
-/environments/ubuntu_20.04-docker-native/build/
+/environments/ubuntu-docker/build/
 
