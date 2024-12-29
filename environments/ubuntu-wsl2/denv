@@ -23,7 +23,11 @@ Global Options:
 Build Command Options:
   -k|--ssh-keypair-name  [Required] The name of the ssh keypair for Github
                          authentication (e.g. `denv build -k id_ed25519`)
-  --arch [native|arm64]  The platform architecture for the container. 
+  --arch [native|arm64]  The platform architecture for the container 
+                         (default: native)
+
+Exec Command Options:
+  --arch [native|arm64]  The platform architecture for the container
                          (default: native)
 
 Set-key Command Option:
