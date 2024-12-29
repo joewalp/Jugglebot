@@ -84,7 +84,7 @@ task 'Run the playbook'
 ANSIBLE_LOCALHOST_WARNING=False \
   ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
   ANSIBLE_BECOME_PASS="${ANSIBLE_BECOME_PASS}" \
-  ansible-playbook "${ENVIRONMENTS_DIR}/ubuntu_20.04-docker-native/main_playbook.yml" \
+  ansible-playbook "${ENVIRONMENTS_DIR}/ubuntu-docker/main_playbook.yml" \
     -e upgrade_software=yes \
     -e "ros_workspace_dir=${ROS_WORKSPACE_DIR}"
 

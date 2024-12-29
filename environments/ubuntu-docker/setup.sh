@@ -46,6 +46,16 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    --arch)
+      BASE_IMAGE_ARCHITECTURE="$2"
+      shift;
+      shift;
+      ;;
+    --os-release)
+      BASE_IMAGE_OS_RELEASE="$2"
+      shift;
+      shift;
+      ;;
     -e|--debug-repo-dir)
       REPO_DIR="$2"
       shift
@@ -102,6 +112,8 @@ elif [[ "${GIT_BRANCH}" != 'main' ]]; then
 fi
 
 CONTAINER_NAME="${CONTAINER_NAME:-jugglebot-native-dev}"
+BASE_IMAGE_ARCHITECTURE="${BASE_IMAGE_ARCHITECTURE:-native}"
+BASE_IMAGE_OS_RELEASE="${BASE_IMAGE_OS_RELEASE:-focal}"
 BUILD_NO_CACHE_OPTION="${BUILD_NO_CACHE_OPTION:-}"
 REPO_CACHE_ID="${REPO_CACHE_ID:-0}"
 RETAIN_HOME_VOLUME="${RETAIN_HOME_VOLUME:-no}"
@@ -111,6 +123,37 @@ SSH_PUBLIC_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}.pub"
 BUILD_CONTEXT_DIR="${REPO_DIR}/environments/ubuntu_20.04-docker-native"
 IMAGE_NAME='jugglebot-native-dev:focal'
 HOME_VOLUME_NAME='jugglebot-native-dev-home'
+
+task 'Determine the ROS package requirements'
+
+ROS_PACKAGES=('ros-dev-tools')
+
+case "${BASE_IMAGE_OS_RELEASE}" in
+  focal) ROS_CODENAME='foxy'; ROS_PACKAGES+=('python3-argcomplete') ;;
+  jammy) ROS_CODENAME='humble' ;;
+  noble) ROS_CODENAME='jazzy' ;;
+  *)
+    echo "[ERROR]: The specified OS release ${BASE_IMAGE_OS_RELEASE} is not supported" >&2
+    exit 2
+    ;;
+esac
+
+ROS_PACKAGES+=("ros-${ROS_CODENAME}-desktop")
+ROS_PACKAGES+=("ros-${ROS_CODENAME}-webots-ros2")
+
+task 'Determine the base image and the platform option'
+
+case "${BASE_IMAGE_ARCHITECTURE}" in
+  native)
+    BASE_IMAGE="ubuntu:${BASE_IMAGE_OS_RELEASE}"
+  arm64)
+    BASE_IMAGE="arm64v8/ubuntu:${BASE_IMAGE_OS_RELEASE}"
+    PLATFORM_OPTION="--platform 'linux/arm64'"
+  *)
+    echo "[ERROR]: The specified architecture ${BASE_IMAGE_ARCHITECTURE} is not supported" >&2
+    exit 2
+    ;;
+esac
 
 task 'Enable ssh-agent'
 
@@ -146,9 +189,15 @@ task "Copy ~/.ssh/${SSH_KEYPAIR_NAME}.pub into the build context"
 install -D -T "${SSH_PUBLIC_KEY_FILEPATH}" \
   "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
 
+task 'Determine the base image name'
+
+case  "${BASE_IMAGE_ARCHITECTURE}"
+
 task "Build the docker image named ${IMAGE_NAME}"
 
-docker buildx build ${BUILD_NO_CACHE_OPTION} \
+docker buildx build ${BUILD_NO_CACHE_OPTION} ${PLATFORM_OPTION} \
+  --build-arg "BASE_IMAGE=${BASE_IMAGE}" \
+  --build-arg "ROS_PACKAGE_LIST=$(IFS=' '; echo "${ROS_PACKAGES[*]}")" \
   --build-arg "USER_UID=$(id --user)" \
   --build-arg "USER_GID=$(id --group)" \
   --build-arg "DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)" \
@@ -210,7 +259,8 @@ task "Create the ${CONTAINER_NAME} docker container"
 # shared Docker Engine. We expose ~/.oh-my-zsh/custom so that we can more
 # easily keep aliases and shell features in sync across environments.
 
-docker container create --name "${CONTAINER_NAME}" \
+docker container create ${PLATFORM_OPTION} \
+  --name "${CONTAINER_NAME}" \
   -v '/tmp:/tmp' \
   -v '/var/run/docker.sock:/var/run/docker.sock' \
   -v "${HOME_VOLUME_NAME}:/home" \
