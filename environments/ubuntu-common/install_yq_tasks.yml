@@ -8,14 +8,16 @@
   register: which_yq_result
   failed_when: which_yq_result.rc not in [0, 1]
 
-- name: Set the yq_installed variable
+- name: Set the yq_installed, arch and arch_to_yq_arch variables
   set_fact:
     yq_installed: "{{ which_yq_result.rc == 0 }}"
+    arch: "{{ ansible_facts['architecture'] }}"
+    arch_to_yq_arch: "{{ { 'x86_64':'amd64', 'aarch64':'arm64' } }}" 
 
 - name: Determine the yq architecture
   # Note: We only attempt to support Linux and OS X
   set_fact:
-    yq_architecture: "{{ 'amd64' if ansible_facts['architecture'] == 'x86_64' else ansible_facts['architecture'] }}"
+    yq_architecture: "{{ arch_to_yq_arch[arch] if arch in arch_to_yq_arch else arch }}"
     yq_family: "{{ 'darwin' if ansible_facts['os_family']|lower == 'darwin' else 'linux' }}"
   when: not yq_installed
 
