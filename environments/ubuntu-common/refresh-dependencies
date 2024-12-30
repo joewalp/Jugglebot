@@ -48,8 +48,9 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     -*|--*)
-      echo "[ERROR]: Unknown option $1"
-      exit 1
+      echo "[ERROR]: Unknown option $1" >&2
+      print_usage
+      exit 2
       ;;
     *)
       POSITIONAL_ARGS+=("$1")
