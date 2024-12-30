@@ -124,11 +124,13 @@ case "${BASE_IMAGE_ARCHITECTURE}" in
   native)
     BASE_IMAGE="ubuntu:${BASE_IMAGE_OS_RELEASE}"
     LOCALHOST_SSH_PORT='4022'
+    DENV_EXEC_COMMAND='denv exec'
     ;;
   arm64)
     BASE_IMAGE="arm64v8/ubuntu:${BASE_IMAGE_OS_RELEASE}"
     PLATFORM_OPTION="--platform=linux/arm64"
     LOCALHOST_SSH_PORT='4122'
+    DENV_EXEC_COMMAND='denv exec --arch arm64'
     ;;
   *)
     echo "[ERROR]: The specified architecture ${BASE_IMAGE_ARCHITECTURE} is not supported" >&2
@@ -299,7 +301,7 @@ echo -e "
 
 Run the following command to open a shell in the ${CONTAINER_NAME} container:
 
-  denv exec
+  ${DENV_EXEC_COMMAND}
 
 Alternately, you can ssh into the container using the following command:
 
