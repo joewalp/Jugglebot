@@ -121,12 +121,12 @@ task 'Determine the base image and the platform option'
 case "${BASE_IMAGE_ARCHITECTURE}" in
   native)
     BASE_IMAGE="ubuntu:${BASE_IMAGE_OS_RELEASE}"
-    LOCALHOST_SSH_PORT='4422'
+    LOCALHOST_SSH_PORT='4022'
     ;;
   arm64)
     BASE_IMAGE="arm64v8/ubuntu:${BASE_IMAGE_OS_RELEASE}"
     PLATFORM_OPTION="--platform=linux/arm64"
-    LOCALHOST_SSH_PORT='4522'
+    LOCALHOST_SSH_PORT='4122'
     ;;
   *)
     echo "[ERROR]: The specified architecture ${BASE_IMAGE_ARCHITECTURE} is not supported" >&2
