@@ -101,20 +101,31 @@ task 'Determine the ROS package requirements'
 
 BASE_IMAGE_OS_RELEASE="${BASE_IMAGE_OS_RELEASE:-focal}"
 
+if [[ -z "${DEBUG_REPO_DIR:-}" ]]; then
+  JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
+else
+  JUGGLEBOT_REPO_DIR="${DEBUG_REPO_DIR}"
+  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
+fi
+
+VERSION_LOOKUP_FILEPATH="${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/package_version_lookup_vars.yml"
+
+ROS_CODENAME="$(yq -r ".ubuntu_codename_to_ros_codename.${BASE_IMAGE_OS_RELEASE}" \
+  "${VERSION_LOOKUP_FILEPATH}")"
+
 ROS_PACKAGES=('ros-dev-tools')
 
-case "${BASE_IMAGE_OS_RELEASE}" in
-  focal) ROS_CODENAME='foxy'; ROS_PACKAGES+=('python3-argcomplete') ;;
-  jammy) ROS_CODENAME='humble' ;;
-  noble) ROS_CODENAME='jazzy' ;;
-  *)
-    echo "[ERROR]: The specified OS release ${BASE_IMAGE_OS_RELEASE} is not supported" >&2
-    exit 2
-    ;;
-esac
+if [[ "${ROS_CODENAME}" == 'foxy' ]]; then
+  ROS_PACKAGES+=('python3-argcomplete') ;;
+fi
 
 ROS_PACKAGES+=("ros-${ROS_CODENAME}-desktop")
 ROS_PACKAGES+=("ros-${ROS_CODENAME}-webots-ros2")
+
+task 'Determine the Python version'
+
+PYTHON_VERSION="$(yq -r ".ubuntu_codename_to_python_version.${BASE_IMAGE_OS_RELEASE}" \
+  "${VERSION_LOOKUP_FILEPATH}")"
 
 task 'Determine the base image and the platform option'
 
@@ -139,13 +150,6 @@ case "${BASE_IMAGE_ARCHITECTURE}" in
 esac
 
 task 'Initialize variables'
-
-if [[ -z "${DEBUG_REPO_DIR:-}" ]]; then
-  JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
-else
-  JUGGLEBOT_REPO_DIR="${DEBUG_REPO_DIR}"
-  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
-fi
 
 if [[ -z "${GIT_BRANCH:-}" ]]; then
   GIT_BRANCH='main'
@@ -176,26 +180,22 @@ task 'Add the ssh private key'
 
 ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 
-task 'Copy the host-provisioning Conda environment file into the build context'
+task 'Copy the host-provisioning Conda environment file'
 
 install -D -T "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/host_provisioning_conda_env.yml" \
   "${BUILD_CONTEXT_DIR}/build/host_provisioning_conda_env.yml"
 
-task 'Copy the jugglebot Conda environment template file into the build context'
+task 'Interpolate the jugglebot Conda environment file'
 
-install -D -T "${JUGGLEBOT_REPO_DIR}/ros_ws/conda_env.yml.j2" \
-  "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
+python_version="${PYTHON_VERSION}" j2 \
+  -o "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml" \
+  -e 'python_version' "${JUGGLEBOT_REPO_DIR}/ros_ws/conda_env.yml.j2"
 
-task 'Set the Python version in the jugglebot Conda environnment file'
-
-sed -i 's/[{][{]\s*python_version\s*[}][}]/3.8/' \
-  "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
-
-task 'Copy ~/.gitconfig into the build context'
+task 'Copy ~/.gitconfig'
 
 install -D -T "${HOME}/.gitconfig" "${BUILD_CONTEXT_DIR}/build/gitconfig"
 
-task "Copy ~/.ssh/${SSH_KEYPAIR_NAME}.pub into the build context"
+task "Copy ~/.ssh/${SSH_KEYPAIR_NAME}.pub"
 
 install -D -T "${SSH_PUBLIC_KEY_FILEPATH}" \
   "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
