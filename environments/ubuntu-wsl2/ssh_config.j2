@@ -8,7 +8,7 @@ Host github.com
 
 Host docker-native-env
     Hostname localhost
-    Port 4422
+    Port 4022
     IdentityFile {{ home_dir }}/.ssh/{{ ssh_keypair_name }}
     IdentitiesOnly yes
     User devops
@@ -18,7 +18,7 @@ Host docker-native-env
 
 Host docker-arm64-env
     Hostname localhost
-    Port 4522
+    Port 4122
     IdentityFile {{ home_dir }}/.ssh/{{ ssh_keypair_name }}
     IdentitiesOnly yes
     User devops
