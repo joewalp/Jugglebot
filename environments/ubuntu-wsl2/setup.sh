@@ -84,9 +84,9 @@ fi
 task 'Initialize variables'
 
 if [[ -z "${DEBUG_REPO_DIR:-}" ]]; then
-  JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
+  REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
 else
-  JUGGLEBOT_REPO_DIR="${DEBUG_REPO_DIR}"
+  REPO_DIR="${DEBUG_REPO_DIR}"
   echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
 fi
 
@@ -105,14 +105,14 @@ ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 
 task 'Source ubuntu-common/base_setup.sh'
 
-source "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/base_setup.sh"
+source "${REPO_DIR}/environments/ubuntu-common/base_setup.sh"
 
 task 'Run the ubuntu-wsl2 Ansible playbook'
 
 echo -e "\nEnter your password to enable the playbook to configure this Ubuntu host"
 
 ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
-  "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-wsl2/main_playbook.yml" \
+  "${REPO_DIR}/environments/ubuntu-wsl2/main_playbook.yml" \
   --ask-become-pass \
   -e upgrade_software=yes \
   -e "ssh_keypair_name='${SSH_KEYPAIR_NAME}'" \
