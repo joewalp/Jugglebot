@@ -270,7 +270,6 @@ ARG ROS_WORKSPACE_DIR="/home/${USERNAME}/Jugglebot/ros_ws"
 
 RUN "${ENVIRONMENTS_DIR}/ubuntu-docker/base_setup_and_playbook.sh" \
       --environments-dir "${ENVIRONMENTS_DIR}" \
-      --jugglebot-conda-env-filepath "${ENVIRONMENTS_DIR}/ubuntu-common/jugglebot_conda_env.yml" \
       --ros-workspace-dir "${ROS_WORKSPACE_DIR}" \
       --ansible-become-pass "${USERNAME}"
 
