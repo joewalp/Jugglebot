@@ -61,6 +61,14 @@ if [[ -z "${ANSIBLE_BECOME_PASS:-}" ]]; then
   exit 2
 fi
 
+task 'Configure base_setup.sh'
+
+# Note: We disable the refresh of the Conda environments because this is
+# handled by the Dockerfile to benefit from caching.
+
+REFRESH_HOST_PROVISIONING_ENV_ENABLED='no'
+REFRESH_JUGGLEBOT_ENV_ENABLED='no'
+
 task 'Source base_setup.sh'
 
 source "${ENVIRONMENTS_DIR}/ubuntu-common/base_setup.sh"
