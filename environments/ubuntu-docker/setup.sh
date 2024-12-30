@@ -200,7 +200,7 @@ task "Copy ~/.ssh/${SSH_KEYPAIR_NAME}.pub into the build context"
 install -D -T "${SSH_PUBLIC_KEY_FILEPATH}" \
   "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
 
-task "Build the docker image named ${IMAGE_NAME}"
+task "Build the Docker image named ${IMAGE_NAME}"
 
 docker buildx build ${BUILD_NO_CACHE_OPTION} ${PLATFORM_OPTION} \
   --build-arg "BASE_IMAGE=${BASE_IMAGE}" \
@@ -223,13 +223,13 @@ rm -f "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
 rm -f "${BUILD_CONTEXT_DIR}/build/gitconfig"
 rm -f "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
 
-task 'Ensure that the docker container is not running'
+task 'Ensure that the Docker container is not running'
 
 if is_docker_container_running "${CONTAINER_NAME}"; then
   docker container stop "${CONTAINER_NAME}"
 fi
 
-task "Ensure that the ${CONTAINER_NAME} docker container does not exist"
+task "Ensure that the ${CONTAINER_NAME} Docker container does not exist"
 
 if does_docker_container_exist "${CONTAINER_NAME}"; then
   docker container rm --force --volumes "${CONTAINER_NAME}"
@@ -259,7 +259,7 @@ else
 
 fi
 
-task "Create the ${CONTAINER_NAME} docker container"
+task "Create the ${CONTAINER_NAME} Docker container"
 
 # Note: We expose /tmp because that is where $SSH_AUTH_SOCK is stored. We
 # expose /var/run/docker.sock because that enables the container to control the
