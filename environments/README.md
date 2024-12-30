@@ -275,6 +275,24 @@ Docker container native platform environment.
 denv exec
 ```
 
+You can also connect to that environment via ssh:
+
+```zsh
+# WSL Ubuntu-20.04
+
+ssh docker-native-env
+```
+
+If you're interested in how that works, see the `docker-native-env` host
+definition within `~/.ssh/config`.
+
+Note that the localhost ssh port for the container is also visible from Windows.
+Consequently, you can also connect VSCode for Windows to this environment via
+ssh using the `Remote SSH` and the `Remote SSH: Editing Configuration Files`
+extensions. See the following tutorial:
+
+https://code.visualstudio.com/docs/remote/ssh-tutorial
+
 ### Additional things to try
 
 ---
@@ -423,6 +441,39 @@ rendering performance and high cpu utilization.
 Additionally, we have found that applications that are built using the QT SDK
 (such as SavvyCAN or the Falkon web browser) exhibit good rendering performance
 regardless whether WSLg is providing accelerated rendering.
+
+---
+
+#### Task 5. Try the arm64-based Docker container environment
+
+At this time, the arm64-based Docker container environment is not intended to be
+used for development. It's primarily a testbed for the development environment
+provisioning. However, you can attempt to build it if you'd like to take a peek.
+As of this writing, we're encountering a couple build issues:
+
+> Issue 1. We experience intermittent timeouts during the phase where it's
+> downloading packages from the Ubuntu ports apt repository.
+>
+> Issue 2. We receive a 'nosuid' error upon executing the first task that
+> requires sudo in `ubuntu-docker/main_playbook.yml`.
+
+Within the WSL2 environment, run the build utility for the Docker native
+platform environment. The run duration of this script depends on the download
+speed of your internet connection. It takes roughly an hour on a slow
+connection. It does not prompt for passwords, so you don't need to supervise it.
+This arm64-based Docker container can run simultaneously with the native
+environment Docker container that you built in Step 9 of the Instructions.
+
+```zsh
+# WSL Ubuntu-20.04
+
+denv build --ssh-keypair-name id_ed25519 --arch arm64
+
+denv exec --arch arm64
+
+ssh docker-arm64-env
+```
+
 
 ---
 
