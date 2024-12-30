@@ -118,6 +118,8 @@ ROS_PACKAGES+=("ros-${ROS_CODENAME}-webots-ros2")
 
 task 'Determine the base image and the platform option'
 
+BASE_IMAGE_ARCHITECTURE="${BASE_IMAGE_ARCHITECTURE:-native}"
+
 case "${BASE_IMAGE_ARCHITECTURE}" in
   native)
     BASE_IMAGE="ubuntu:${BASE_IMAGE_OS_RELEASE}"
@@ -149,7 +151,6 @@ elif [[ "${GIT_BRANCH}" != 'main' ]]; then
   echo -e "\n[WARNING]: Using git branch ${GIT_BRANCH} instead of main\n" >&2
 fi
 
-BASE_IMAGE_ARCHITECTURE="${BASE_IMAGE_ARCHITECTURE:-native}"
 PLATFORM_OPTION="${PLATFORM_OPTION:-}"
 IMAGE_NAME="jugglebot-${BASE_IMAGE_ARCHITECTURE}-dev:${BASE_IMAGE_OS_RELEASE}"
 HOME_VOLUME_NAME="jugglebot-${BASE_IMAGE_ARCHITECTURE}-${BASE_IMAGE_OS_RELEASE}-dev-home"
