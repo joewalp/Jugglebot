@@ -11,9 +11,15 @@ usage: refresh-dependencies [Options]
 
 Options:
   -h|--help              Display this usage message
-  -p|--refresh-host-provisioning
+  --refresh-host-provisioning-conda-env [yes|no]
                          If the host-provisioning Conda environment already
                          exists, update it from its configuration file
+                         (default: yes)
+  --refresh-jugglebot-conda-env [yes|no]
+                         If the jugglebot Conda environment already exists,
+                         update it from its configuration file (default: 
+                         yes)
+
 '
 }
 
