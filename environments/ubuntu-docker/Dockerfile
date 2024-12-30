@@ -261,14 +261,16 @@ RUN --mount=type=ssh,mode=0666 cd "/home/${USERNAME}/Jugglebot" \
     && git pull \
     && git checkout "${JUGGLEBOT_REPO_BRANCH}"
 
-# TASK [Initialize the base setup and playbook variables]
+# TASK [Initialize the base setup and playbook variable]
 
 ARG ENVIRONMENTS_DIR="/home/${USERNAME}/Jugglebot/environments"
 ARG ROS_WORKSPACE_DIR="/home/${USERNAME}/Jugglebot/ros_ws"
 
 # TASK [Run the ubuntu-common base setup and then the playbook]
 
-RUN "${ENVIRONMENTS_DIR}/ubuntu-docker/base_setup_and_playbook.sh" \
+RUN --mount=type=ssh,mode=0666 cd "/home/${USERNAME}/Jugglebot" \
+    && git pull \
+    && "${ENVIRONMENTS_DIR}/ubuntu-docker/base_setup_and_playbook.sh" \
       --environments-dir "${ENVIRONMENTS_DIR}" \
       --ros-workspace-dir "${ROS_WORKSPACE_DIR}" \
       --ansible-become-pass "${USERNAME}"
