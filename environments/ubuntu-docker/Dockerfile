@@ -268,9 +268,7 @@ ARG ROS_WORKSPACE_DIR="/home/${USERNAME}/Jugglebot/ros_ws"
 
 # TASK [Run the ubuntu-common base setup and then the playbook]
 
-RUN --mount=type=ssh,mode=0666 cd "/home/${USERNAME}/Jugglebot" \
-    && git pull \
-    && "${ENVIRONMENTS_DIR}/ubuntu-docker/base_setup_and_playbook.sh" \
+RUN "${ENVIRONMENTS_DIR}/ubuntu-docker/base_setup_and_playbook.sh" \
       --environments-dir "${ENVIRONMENTS_DIR}" \
       --ros-workspace-dir "${ROS_WORKSPACE_DIR}" \
       --ansible-become-pass "${USERNAME}"
