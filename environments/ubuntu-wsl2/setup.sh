@@ -90,7 +90,8 @@ else
   echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
 fi
 
-JUGGLEBOT_CONDA_ENV_FILEPATH="${JUGGLEBOT_REPO_DIR}/ros_ws/conda_env.yml"
+JUGGLEBOT_CONFIG_DIR="${JUGGLEBOT_CONFIG_DIR:-${HOME}/.jugglebot}"
+JUGGLEBOT_CONDA_ENV_FILEPATH="${JUGGLEBOT_CONFIG_DIR}/host_setup/defaults/conda_env.yml"
 SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
 CLONE_REPO_ENABLED="${CLONE_REPO_ENABLED:-yes}"
 
