@@ -24,11 +24,6 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
-    -c|--jugglebot-conda-env-filepath)
-      JUGGLEBOT_CONDA_ENV_FILEPATH="$2"
-      shift
-      shift
-      ;;
     -p|--ansible-become-pass)
       ANSIBLE_BECOME_PASS="$2"
       shift
@@ -59,13 +54,6 @@ if [[ -z "${ROS_WORKSPACE_DIR:-}" ]]; then
   exit 2
 fi
 
-task 'Assert that a conda environment config file was specified'
-
-if [[ -z "${JUGGLEBOT_CONDA_ENV_FILEPATH:-}" ]]; then
-  echo '[ERROR]: The jugglebot conda env config file is required. Invoke this command with the `--jugglebot-conda-env-filepath "[conda environment config file]"` option.' >&2
-  exit 2
-fi
-
 task 'Assert that the Ansible become password was specified'
 
 if [[ -z "${ANSIBLE_BECOME_PASS:-}" ]]; then
@@ -74,8 +62,6 @@ if [[ -z "${ANSIBLE_BECOME_PASS:-}" ]]; then
 fi
 
 task 'Source base_setup.sh'
-
-# Note: This requires JUGGLEBOT_CONDA_ENV_FILEPATH to be set.
 
 source "${ENVIRONMENTS_DIR}/ubuntu-common/base_setup.sh"
 
