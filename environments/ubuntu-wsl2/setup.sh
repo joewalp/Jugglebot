@@ -106,14 +106,14 @@ ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 
 task 'Source ubuntu-common/base_setup.sh'
 
-source "${REPO_DIR}/environments/ubuntu-common/base_setup.sh"
+source "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/base_setup.sh"
 
 task 'Run the ubuntu-wsl2 Ansible playbook'
 
 echo -e "\nEnter your password to enable the playbook to configure this Ubuntu host"
 
 ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
-  "${REPO_DIR}/environments/ubuntu-wsl2/main_playbook.yml" \
+  "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-wsl2/main_playbook.yml" \
   --ask-become-pass \
   -e upgrade_software=yes \
   -e "ssh_keypair_name='${SSH_KEYPAIR_NAME}'" \
