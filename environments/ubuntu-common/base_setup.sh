@@ -18,13 +18,6 @@ task() {
   echo -e "\nTASK [${task_desc}] ********"
 }
 
-task 'Assert that a jugglebot Conda env config file was specified'
-
-if [[ -z "${JUGGLEBOT_CONDA_ENV_FILEPATH:-}" ]]; then
-  echo -e '[ERROR]: A jugglebot Conda env config file is required. Set\nJUGGLEBOT_CONDA_ENV_FILEPATH before sourcing this script.' >&2
-  exit 2
-fi
-
 task 'Initialize variables'
 
 REFRESH_HOST_PROVISIONING_ENV_ENABLED="${REFRESH_HOST_PROVISIONING_ENV_ENABLED:-yes}"
@@ -68,10 +61,11 @@ if [[ ! -f "${CONDA_FILEPATH}" ]]; then
   exit 3
 fi
 
+task 'Run the repo copy of refresh-dependencies'
+
 "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/refresh-dependencies" \
   --refresh-host-provisioning-conda-env "${REFRESH_HOST_PROVISIONING_ENV_ENABLED}" \
   --refresh-jugglebot-conda-env "${REFRESH_JUGGLEBOT_ENV_ENABLED}"
-  
 
 eval "$("${CONDA_FILEPATH}" 'shell.bash' 'hook' 2> /dev/null)"
 
