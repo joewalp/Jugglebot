@@ -45,7 +45,7 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --debug-repo-dir)
-      REPO_DIR="$2"
+      DEBUG_REPO_DIR="$2"
       shift
       shift
       ;;
@@ -83,9 +83,10 @@ fi
 
 task 'Initialize variables'
 
-if [[ -z "${REPO_DIR:-}" ]]; then
-  REPO_DIR="${HOME}/Jugglebot"
+if [[ -z "${DEBUG_REPO_DIR:-}" ]]; then
+  JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
 else
+  JUGGLEBOT_REPO_DIR="${DEBUG_REPO_DIR}"
   echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
 fi
 
