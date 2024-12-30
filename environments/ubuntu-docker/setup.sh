@@ -116,7 +116,7 @@ ROS_CODENAME="$(yq -r ".ubuntu_codename_to_ros_codename.${BASE_IMAGE_OS_RELEASE}
 ROS_PACKAGES=('ros-dev-tools')
 
 if [[ "${ROS_CODENAME}" == 'foxy' ]]; then
-  ROS_PACKAGES+=('python3-argcomplete') ;;
+  ROS_PACKAGES+=('python3-argcomplete')
 fi
 
 ROS_PACKAGES+=("ros-${ROS_CODENAME}-desktop")
