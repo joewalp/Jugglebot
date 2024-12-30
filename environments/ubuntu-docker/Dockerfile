@@ -261,16 +261,14 @@ RUN --mount=type=ssh,mode=0666 cd "/home/${USERNAME}/Jugglebot" \
     && git pull \
     && git checkout "${JUGGLEBOT_REPO_BRANCH}"
 
-# TASK [Initialize the base setup and playbook variable]
+# TASK [Initialize the base setup and playbook variables]
 
 ARG ENVIRONMENTS_DIR="/home/${USERNAME}/Jugglebot/environments"
 ARG ROS_WORKSPACE_DIR="/home/${USERNAME}/Jugglebot/ros_ws"
 
 # TASK [Run the ubuntu-common base setup and then the playbook]
 
-RUN --mount=type=ssh,mode=0666 cd "/home/${USERNAME}/Jugglebot" \
-    && git pull \
-    && "${ENVIRONMENTS_DIR}/ubuntu-docker/base_setup_and_playbook.sh" \
+RUN "${ENVIRONMENTS_DIR}/ubuntu-docker/base_setup_and_playbook.sh" \
       --environments-dir "${ENVIRONMENTS_DIR}" \
       --jugglebot-conda-env-filepath "${ENVIRONMENTS_DIR}/ubuntu-common/jugglebot_conda_env.yml" \
       --ros-workspace-dir "${ROS_WORKSPACE_DIR}" \
