@@ -16,3 +16,13 @@ Host docker-native-env
     AddKeysToAgent yes
     ForwardX11 yes
 
+Host docker-arm64-env
+    Hostname localhost
+    Port 4522
+    IdentityFile {{ home_dir }}/.ssh/{{ ssh_keypair_name }}
+    IdentitiesOnly yes
+    User devops
+    StrictHostKeyChecking no
+    AddKeysToAgent yes
+    ForwardX11 yes
+

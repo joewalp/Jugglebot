@@ -121,10 +121,12 @@ task 'Determine the base image and the platform option'
 case "${BASE_IMAGE_ARCHITECTURE}" in
   native)
     BASE_IMAGE="ubuntu:${BASE_IMAGE_OS_RELEASE}"
+    LOCALHOST_SSH_PORT='4422'
     ;;
   arm64)
     BASE_IMAGE="arm64v8/ubuntu:${BASE_IMAGE_OS_RELEASE}"
     PLATFORM_OPTION="--platform=linux/arm64"
+    LOCALHOST_SSH_PORT='4522'
     ;;
   *)
     echo "[ERROR]: The specified architecture ${BASE_IMAGE_ARCHITECTURE} is not supported" >&2
@@ -149,7 +151,10 @@ fi
 
 BASE_IMAGE_ARCHITECTURE="${BASE_IMAGE_ARCHITECTURE:-native}"
 PLATFORM_OPTION="${PLATFORM_OPTION:-}"
+IMAGE_NAME="jugglebot-${BASE_IMAGE_ARCHITECTURE}-dev:${BASE_IMAGE_OS_RELEASE}"
+HOME_VOLUME_NAME="jugglebot-${BASE_IMAGE_ARCHITECTURE}-${BASE_IMAGE_OS_RELEASE}-dev-home"
 CONTAINER_NAME="${CONTAINER_NAME:-jugglebot-${BASE_IMAGE_ARCHITECTURE}-dev}"
+SSH_HOST="${CONTAINER_NAME}"
 BUILD_NO_CACHE_OPTION="${BUILD_NO_CACHE_OPTION:-}"
 REPO_CACHE_ID="${REPO_CACHE_ID:-0}"
 RETAIN_HOME_VOLUME="${RETAIN_HOME_VOLUME:-no}"
@@ -157,8 +162,6 @@ DEV_ENV_USERNAME='devops' # This is also the default password for the user.
 SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
 SSH_PUBLIC_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}.pub"
 BUILD_CONTEXT_DIR="${JUGGLEBOT_REPO_DIR}/environments/ubuntu-docker"
-IMAGE_NAME="jugglebot-${BASE_IMAGE_ARCHITECTURE}-dev:${BASE_IMAGE_OS_RELEASE}"
-HOME_VOLUME_NAME="jugglebot-${BASE_IMAGE_ARCHITECTURE}-${BASE_IMAGE_OS_RELEASE}-dev-home"
 
 task 'Enable ssh-agent'
 
@@ -266,7 +269,7 @@ docker container create ${PLATFORM_OPTION} \
   -v '/var/run/docker.sock:/var/run/docker.sock' \
   -v "${HOME_VOLUME_NAME}:/home" \
   -v "${HOME}/.oh-my-zsh/custom:/entrypoint/oh-my-zsh-custom" \
-  -p '4422:22' \
+  -p "${LOCALHOST_SSH_PORT}:22" \
   -e "DISPLAY=${DISPLAY}" \
   --dns '8.8.8.8' \
   "${IMAGE_NAME}"
@@ -292,17 +295,21 @@ docker container stop "${CONTAINER_NAME}"
 task 'Prompt next steps'
 
 echo -e "
-Run the following command to open a shell in the jugglebot-native-dev
-container:
+
+Run the following command to open a shell in the ${CONTAINER_NAME} container:
 
   denv exec
+
+Alternately, you can ssh into the container using the following command:
+
+  ssh ${SSH_HOST}
 
 ---
 
 Notes:
 
-1. By default, the user in the container is named ${DEV_ENV_USERNAME}, and the password for
-   that user is the same as the username.
+1. By default, the user in the container is named ${DEV_ENV_USERNAME}, and the password
+   for that user is the same as the username.
 
 2. Only the /home directory and the /tmp directory will persist across 
    container restarts. The /home directory is a mounted docker volume named 
