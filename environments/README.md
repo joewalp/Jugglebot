@@ -44,9 +44,9 @@ command to determine its version:
 wsl -d Ubuntu -e lsb_release --description
 ```
 
-If neither of the commands above indicates that some version of Ubuntu 20.04 (such
-as `Ubuntu-20.04` or `Ubuntu 20.04.1 LTS`) is registered, then you can proceed
-to step 2. 
+If neither of the commands above indicates that some version of Ubuntu 20.04
+(such as `Ubuntu-20.04` or `Ubuntu 20.04.1 LTS`) is registered, then you can
+proceed to step 2.
 
 If either of the commands above indicates that you have a prexisting Ubuntu
 20.04 distribution, then you have a few options for how to proceed. If you just
@@ -114,8 +114,8 @@ Eventually, it will prompt you to supply a username and a password. This
 username and password don't need to match your Windows username and password.
 Typically, a linux username will be all lowercase alphanumeric characters
 beginning with an alpha character. If you want a username suggestion, either (a)
-use your first name (e.g. joe) or (b) use your first initial followed by
-your last name (e.g. jwalp).
+use your first name (e.g. joe) or (b) use your first initial followed by your
+last name (e.g. jwalp).
 
 These credentials will not be used to sign-in. Rather, they will be used to
 grant access to run privileged system administration commands using sudo.
@@ -250,13 +250,13 @@ wsl -d Ubuntu-20.04
 
 ### Step 9 [Optional]. Configure Docker Desktop for Windows to use WSL
 
-It's helpful to visualize Docker as having three major distributables: Docker Engine,
-Docker CLI and Docker Desktop. The Docker Engine is responsible for hosting
-containers and volumes. The Docker CLI is what our scripts use to command the
-Docker Engine. The Docker Desktop is a bundle that includes a Docker Engine and
-a graphical interface that covers some of the same command functions as Docker
-CLI and that also enables browsing online Docker-related resources such as the Docker
-images that have been published by other people.
+It's helpful to visualize Docker as having three major distributables: Docker
+Engine, Docker CLI and Docker Desktop. The Docker Engine is responsible for
+hosting containers and volumes. The Docker CLI is what our scripts use to
+command the Docker Engine. The Docker Desktop is a bundle that includes a Docker
+Engine and a graphical interface that covers some of the same command functions
+as Docker CLI and that also enables browsing online Docker-related resources
+such as the Docker images that have been published by other people.
 
 The Docker Engine that is bundled with Docker Desktop for Windows is somewhat
 less performant than the Docker Engine that we installed during Step 7.
@@ -289,9 +289,8 @@ There, you will see an entry for Ubuntu-20.04. Enable that switch.
 
 Depending on whether Ubuntu-20.04 is also your default WSL distro, the checkbox
 above that's labeled `Enable integration with my default WSL distro` may be
-equivalent to the aformentioned switch. Using the switch to avoids any
-ambiguity about which WSL distributions are being
-integrated.
+equivalent to the aformentioned switch. Using the switch to avoids any ambiguity
+about which WSL distributions are being integrated.
 
 Now, click the `Apply & Restart` button.
 
@@ -300,8 +299,7 @@ Now, click the `Apply & Restart` button.
 Within the WSL2 environment, run the build utility for the Docker native
 platform environment. The run duration of this script depends on the download
 speed of your internet connection. It takes roughly 40 minutes on a slow
-connection. It does not prompt for passwords, so you don't need to supervise
-it.
+connection. It does not prompt for passwords, so you don't need to supervise it.
 
 ```zsh
 # WSL Ubuntu-20.04
@@ -354,11 +352,55 @@ https://code.visualstudio.com/docs/remote/ssh-tutorial
 
 ---
 
-#### Task 1. Drive WSL from VSCode for Windows
+#### Task 1. Run the ROS demos
 
-The `WSL` extension for VSCode for Windows allows you to drive a WSL environment.
-After installing that extension, run the following command from within the WSL
-environment:
+The ROS2 tutorials walk you through running some prebuilt ROS projects. These
+include (a) the `demo_nodes` `talker` and `listener` and (b) the `turtlesim`
+app. You can try these in the WSL environment and the Docker native container
+environment. See the following two pages for instructions:
+
+https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html#try-some-examples
+
+https://docs.ros.org/en/foxy/Tutorials/Beginner-CLI-Tools/Introducing-Turtlesim/Introducing-Turtlesim.html
+
+Here are some example commands:
+
+```
+# Ubuntu
+
+# in terminal session 1
+
+ros2 run demo_nodes_cpp talker
+
+# in terminal session 2
+
+ros2 run demo_nodes_py listener
+```
+
+```
+# Ubuntu
+
+# in terminal session 3
+
+ros2 run turtlesim turtlesim_node
+
+# in terminal session 4
+
+ros2 run turtlesim turtle_teleop_key
+
+# in terminal session 5
+
+rqt
+```
+
+Within the `rqt` UI, select `Plugins` > `Services` > `Service Caller`. See the
+`turtlesim` tutorial linked above for suggestions about which services to call.
+
+#### Task 2. Drive WSL from VSCode for Windows
+
+The `WSL` extension for VSCode for Windows allows you to drive a WSL
+environment.  After installing that extension, run the following command from
+within the WSL environment:
 
 ```zsh
 # WSL Ubuntu-20.04
@@ -371,7 +413,7 @@ save that VSCode workspace locally in Windows to facilitate opening it later.
 
 ---
 
-#### Task 2. Run SavvyCAN in WSL
+#### Task 3. Run SavvyCAN in WSL
 
 You'll find the `install-savvycan` utility in `~/bin`. That script demonstrates
 how to use a dedicated Conda environment to build and to run an app that has
@@ -397,7 +439,7 @@ pygmentize -O style=native -g ~/bin/SavvyCAN | less -R
 ```
 
 > Note:
-> 
+>
 > The second and third lines of each of those scripts aren't essential. They
 > make the Bash interpreter more fail-fast and more predictable. The fail-fast
 > characteristic tends to make it easier to recover manually when a script fails
@@ -406,7 +448,7 @@ pygmentize -O style=native -g ~/bin/SavvyCAN | less -R
 
 ---
 
-#### Task 3. Expose a USB device to WSL
+#### Task 4. Expose a USB device to WSL
 
 To use your USB ports in WSL, you need to expose them using the `usbipd` tool as
 described here:
@@ -464,7 +506,7 @@ lsusb
 
 ---
 
-#### Task 4. Determine whether WSLg can use accelerated rendering
+#### Task 5. Determine whether WSLg can use accelerated rendering
 
 WSL ships with a component called WSLg that acts as a display server for X11 and
 Wayland graphical applications. WSLg supports accelerated rendering only if your
@@ -496,12 +538,12 @@ regardless whether WSLg is providing accelerated rendering.
 
 ---
 
-#### Task 5. Try the arm64-based Docker container environment
+#### Task 6. Try the arm64-based Docker container environment
 
 The arm64-based Docker container environment is not currently intended to be
 used for development. It's primarily a testbed for the development environment
-provisioning. However, you can build it if you'd like to take a peek. On machine with
-an Intel i7-8550U and 16GB, this takes approximately two hours.
+provisioning. However, you can build it if you'd like to take a peek. On machine
+with an Intel i7-8550U and 16GB, this takes approximately two hours.
 
 ```zsh
 # WSL Ubuntu-20.04
@@ -574,11 +616,11 @@ virtualenv and pip because the conda-forge dependency management makes life
 easier.
 
 The Jugglebot repo is checked out separately in each environment. If anyone ends
-up using a Docker container environment in tandem with the WSL2 environment
-for interactive coding and testing, we may end up mounting the WSL2 Jugglebot
-repo into the container. However, I currently consider the Docker native
-platform container environment to be a stepping stone toward building the Ubuntu
-for arm64 Docker container. The native platform container environment is
+up using a Docker container environment in tandem with the WSL2 environment for
+interactive coding and testing, we may end up mounting the WSL2 Jugglebot repo
+into the container. However, I currently consider the Docker native platform
+container environment to be a stepping stone toward building the Ubuntu for
+arm64 Docker container. The native platform container environment is
 considerably faster than the arm64 platform container environment, so I want to
 use it for iterating on features before confirming that the same provisioning
 and features work within an arm64 platform environment.
