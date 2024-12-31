@@ -500,8 +500,8 @@ regardless whether WSLg is providing accelerated rendering.
 
 The arm64-based Docker container environment is not currently intended to be
 used for development. It's primarily a testbed for the development environment
-provisioning. However, you can build it if you'd like to take a peek. On my
-machine, this takes approximately two hours.
+provisioning. However, you can build it if you'd like to take a peek. On machine with
+an Intel i7-8550U and 16GB, this takes approximately two hours.
 
 ```zsh
 # WSL Ubuntu-20.04
