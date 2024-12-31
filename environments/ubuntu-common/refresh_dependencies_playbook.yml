@@ -38,7 +38,7 @@
       path: "{{ home_dir }}/bin"
       state: directory
 
-  - name: Initialize the bash runtime config for conda
+  - name: Initialize the Bash runtime config for Conda
     # Note: We don't use Bash for development, but we still want that shell to
     # be usable for exploration by a potential contributor who may not be
     # familiar with Z Shell.
@@ -56,7 +56,7 @@
     register: update_conda_base_result
     failed_when: update_conda_base_result.rc != 0
 
-  - name: Set the conda base updated timestamp
+  - name: Set the Conda base updated timestamp
     copy:
       content: "{{ now(utc=True, fmt='%s') }}"
       dest: "{{ conda_base_updated_filepath }}"
