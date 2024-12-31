@@ -223,9 +223,7 @@ ENV USER="${USERNAME}" SHELL='/bin/bash' HOME="/home/${USERNAME}"
 
 WORKDIR "/home/${USERNAME}"
 
-# TASK [Precreate the Conda environments to benefit from caching]
-
-COPY build/host_provisioning_conda_env.yml build/jugglebot_conda_env.yml .
+# TASK [Precache miniforge]
 
 RUN install -d .jugglebot/host_setup \
     && wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$( uname )-$( uname -m ).sh" -O - > \
@@ -233,11 +231,29 @@ RUN install -d .jugglebot/host_setup \
     && sh .jugglebot/host_setup/miniforge_setup.sh -b \
     && /usr/bin/bash -c '\
       eval "$(./miniforge3/bin/conda shell.bash hook 2> /dev/null)" \
-      && conda update -y -n base -c conda-forge conda \
-      && conda env create -f host_provisioning_conda_env.yml \
+      && conda update -y -n base -c conda-forge conda' \
+    && date +%s > .jugglebot/host_setup/conda_base_updated_timestamp
+
+# TASK [Precache the host-provisioning Conda environment]
+
+COPY build/host_provisioning_conda_env.yml .
+
+RUN /usr/bin/bash -c '\
+      eval "$(./miniforge3/bin/conda shell.bash hook 2> /dev/null)" \
+      && conda env create -f host_provisioning_conda_env.yml' \
+    && rm host_provisioning_conda_env.yml
+
+# TASK [Prerun the creation of the jugglebot Conda environment]
+#
+# Note: This will not be cached if the created and modfied times on
+# build/jugglebot_conda_env.yml have changed upon its generation from its
+# Jinja2 template.
+
+COPY build/jugglebot_conda_env.yml .
+
+RUN /usr/bin/bash -c '\
+      eval "$(./miniforge3/bin/conda shell.bash hook 2> /dev/null)" \
       && conda env create -f jugglebot_conda_env.yml' \
-    && date +%s > .jugglebot/host_setup/conda_base_updated_timestamp \
-    && rm host_provisioning_conda_env.yml \
     && rm jugglebot_conda_env.yml
 
 # TASK [Initialize the repo clone variables]
