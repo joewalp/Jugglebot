@@ -289,8 +289,8 @@ There, you will see an entry for Ubuntu-20.04. Enable that switch.
 
 Depending on whether Ubuntu-20.04 is also your default WSL distro, the checkbox
 above that's labeled `Enable integration with my default WSL distro` may be
-equivalent to the aformentioned switch. However, I recommend that you use the
-switch to avoid any ambiguity about which WSL distributions are being
+equivalent to the aformentioned switch. Using the switch to avoids any
+ambiguity about which WSL distributions are being
 integrated.
 
 Now, click the `Apply & Restart` button.
