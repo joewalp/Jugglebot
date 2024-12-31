@@ -532,6 +532,45 @@ ssh docker-arm64-env
 
 ---
 
+#### Task 7. Refresh project dependencies or upgrade the environment
+
+The Python dependencies for the ROS workspace are configured using the jugglebot
+Conda environment specification in the following file:
+
+https://github.com/joewalp/Jugglebot/blob/dev-env-provisioning/ros_ws/conda_env.yml.j2
+
+We use that Conda environment specification instead of the pip
+`requirements.txt` files because Conda handles dependencies for us. As of this
+writing, the `conda_env.yml.j2` doesn't yet constrain the version of every
+package. In the near future, we will constrain at least the major version number
+of each package that our code calls directly.
+
+Suppose that you want to constrain a package version number or add a dependency.
+The prototypical process goes like this:
+
+1. Edit `conda_env.yml.j2`
+2. Run `refresh-dependencies`
+3. Verify that the new dependencies work
+4. Commit the changed `conda_env.yml.j2` to the repo
+
+A lengthy comment at the top of `conda_env.yml.j2`, describes all of the work
+that the `refresh-dependencies` utility performs.
+
+The WSL environment setup script that we ran in Step 7 of the Instructions
+behaves similarly to the `refresh-dependencies` script in the sense that you can
+safely re-run the setup script to automatically upgrade the provisioned
+resources to their latest versions that are checked-in to the `environments`
+subtree of the repo. Most of these files are in `environments/ubuntu-common`.
+
+A collaborator can keep their WSL environment in sync merely by running either
+the `refresh-dependencies` script or the `ubuntu-wsl/setup.sh` script.
+
+If you manually make changes to a provisioned script such as the `~/.zshrc`, the
+setup script won't clobber those changes. Instead, it will produce a diff in
+`~/.jugglebot/host_setup/diffs`.
+
+---
+
 ## Notes
 
 Each of these environments uses Z Shell (zsh) with Oh My Zsh and the 'clean'
