@@ -568,7 +568,7 @@ setup script won't clobber those changes. Instead, it will produce a diff in
 
 ## Notes
 
-Each of these environments uses Z Shell (zsh) with Oh My Zsh and the 'clean'
+Each of these environments uses Z Shell (zsh) with Oh My Zsh and the `clean`
 built-in theme. The Python environment is managed by Conda and pip rather than
 virtualenv and pip because the conda-forge dependency management makes life
 easier.
