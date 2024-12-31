@@ -23,7 +23,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 # Note: We do not install manpages-posix and manpages-posix-dev, which are
 # non-free packages in Debian.
 
-RUN export debian_frontend=noninteractive \
+RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -yq --no-install-recommends \
       apt-transport-https \
       apt-utils \
@@ -164,7 +164,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 # Note: We include recommended packages because gnome-terminal and terminator
 # behave more nicely with those packages.
 
-RUN export debian_frontend=noninteractive \
+RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -yq \
       git \
       gnome-terminal \
