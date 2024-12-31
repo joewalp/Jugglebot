@@ -15,6 +15,7 @@ dependencies:
   # TASK [Specify the host provisioning requirements]
   
   - ansible
+  - unzip
 
   - pip:
 
