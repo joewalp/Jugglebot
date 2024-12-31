@@ -309,7 +309,7 @@ it.
 denv build --ssh-keypair-name id_ed25519
 ```
 
-If you performed step 9, you will be able to use Docker Desktop to monitor the
+If you performed Step 9, you will be able to use Docker Desktop to monitor the
 ongoing `Active build` that denv has initiated:
 
 `Builds` sidebar tab > `Builds` pane > `Active builds` tab > Click on the
