@@ -2,18 +2,17 @@
 ## Introduction
 
 This is a preview of the environment provisioning project. Currently, the
-instructions and scripts encompass provisioning two shell environments: (1) an
+instructions and scripts encompass provisioning three shell environments: (1) an
 Ubuntu LTS WSL2 host that runs the Docker Engine for Linux that has Qemu
-integration installed and that has the Qemu arm64 emulator registered and (2) an
-Ubuntu-20.04 docker container that uses a native platform base image. Ansible
-tasks and a Dockerfile perform the bulk of the provisioning.
+integration installed and that has the Qemu arm64 emulator registered, (2) an
+Ubuntu-20.04 docker container that uses a native platform base image and (3) an
+Ubuntu-20.04 docker container that uses an arm64 base image.
 
-Both environments have the ROS2 Desktop and the ROS development tools installed. 
-The Ubuntu 20.04 Docker environment runs ROS2 Foxy, and the Ubuntu WSL2 
-environment runs the version of ROS2 that has tier 1 support for that Ubuntu 
-release. If you want to run the same version of ROS2 as Prod runs, you should 
-install Ubuntu-20.04 for WSL despite that Ubuntu LTS release being relatively old.
-
+All environments have the ROS2 Desktop and the ROS development tools installed.
+Each environment runs the version of ROS2 that has tier 1 support for its Ubuntu
+release. If you want to run the same version of ROS2 as Prod runs, you should
+install Ubuntu-20.04 for WSL despite that Ubuntu LTS release being relatively
+old.
 
 
 ## Instructions
@@ -249,7 +248,54 @@ the newly created distribution.
 wsl -d Ubuntu-20.04
 ```
 
-### Step 9. Run the Docker container native platform environment build utility
+### Step 9 [Optional]. Configure Docker Desktop for Windows to use WSL
+
+It's helpful to visualize Docker as having three major parts: Docker Engine,
+Docker CLI and Docker Desktop. The Docker Engine is responsible for hosting
+containers and volumes. The Docker CLI is what our scripts use to command the
+Docker Engine. The Docker Desktop is a bundle that includes a Docker Engine and
+a graphical interface that covers some of the same command functions as Docker
+CLI and also enables browsing online Docker-related resources such as the Docker
+images that have been published by other people.
+
+The Docker Engine that is bundled with Docker Desktop for Windows is somewhat
+less performant than the Docker Engine that we installed during Step 7.
+Thankfully, we can configure Docker Desktop to use the WSL 2 Docker Engine. In
+fact, Docker Desktop can use multiple WSL 2 Docker Engines simultaneously, but
+we will only configure one.
+
+After installing/updating Docker Desktop for Windows, navigate to the
+following checkbox:
+
+`Gear icon` > `General` sidebar tab > `General` Settings pane > `Use the WSL 2
+based engine` checkbox
+
+Enable that checkbox. Do not apply changes.
+
+Directly beneath that checkbox, you'll find another checkbox:
+
+`Add the *.docker.internal names to the host's /etc/hosts file (Requires
+password)`
+
+Currently, this project doesn't depend on that `/etc/hosts` feature. Either
+unchecked or checked is fine.
+
+Next, navigate to the following pane in the Settings:
+
+`Resources` sidebar tab > `WSL integration` sidebar menu item > `Resources WSL
+Integration` Settings pane
+
+There, you will see an entry for Ubuntu-20.04. Enable that switch.
+
+Depending on whether Ubuntu-20.04 is also your default WSL distro, the checkbox
+above that's labeled `Enable integration with my default WSL distro` may be
+equivalent to the aformentioned switch. However, I recommend that you use the
+switch to avoid any ambiguity about which WSL distributions are being
+integrated.
+
+Now, click the `Apply & Restart` button.
+
+### Step 10. Run the Docker container native platform environment build utility
 
 Within the WSL2 environment, run the build utility for the Docker native
 platform environment. The run duration of this script depends on the download
@@ -263,9 +309,16 @@ it.
 denv build --ssh-keypair-name id_ed25519
 ```
 
-### Step 10. Try the Docker container native platform environment
+If you performed step 9, you will be able to use Docker Desktop to monitor the
+ongoing `Active build` that denv has initiated:
 
-The command in Step 9 will print some information about the container that it
+`Builds` sidebar tab > `Builds` pane > `Active builds` tab > Click on the
+in-progress item > `Logs` tab of the `Builds / environments/ubuntu-docker` pane
+
+
+### Step 11. Try the Docker container native platform environment
+
+The command in Step 10 will print some information about the container that it
 has built. After reading that info, run the following command to enter the
 Docker container native platform environment.
 
@@ -283,15 +336,19 @@ You can also connect to that environment via ssh:
 ssh docker-native-env
 ```
 
-If you're interested in how that works, see the `docker-native-env` host
-definition within `~/.ssh/config`.
+> Note:
+>
+> If you're interested in more detail about how that ssh command works, see the
+> `docker-native-env` host definition within `~/.ssh/config`.
 
-Note that the localhost ssh port for the container is also visible from Windows.
+The localhost ssh port for the container is also visible from Windows.
 Consequently, you can also connect VSCode for Windows to this environment via
 ssh using the `Remote SSH` and the `Remote SSH: Editing Configuration Files`
 extensions. See the following tutorial:
 
 https://code.visualstudio.com/docs/remote/ssh-tutorial
+
+---
 
 ### Additional things to try
 
@@ -361,7 +418,7 @@ described here:
 
 https://github.com/dorssel/usbipd-win/blob/v4.3.0/README.md
 
-The process on Windows 11 goes like this:
+The process on **Windows 11** goes like this:
 
 1. Within PowerShell, use `winget` to install the `usbipd` tool.
 
@@ -446,23 +503,10 @@ regardless whether WSLg is providing accelerated rendering.
 
 #### Task 5. Try the arm64-based Docker container environment
 
-At this time, the arm64-based Docker container environment is not intended to be
+The arm64-based Docker container environment is not currently intended to be
 used for development. It's primarily a testbed for the development environment
-provisioning. However, you can attempt to build it if you'd like to take a peek.
-As of this writing, we're encountering a couple build issues:
-
-> Issue 1. We experience intermittent timeouts during the phase where it's
-> downloading packages from the Ubuntu ports apt repository.
->
-> Issue 2. We receive a 'nosuid' error upon executing the first task that
-> requires sudo in `ubuntu-docker/main_playbook.yml`.
-
-Within the WSL2 environment, run the build utility for the Docker native
-platform environment. The run duration of this script depends on the download
-speed of your internet connection. It takes roughly an hour on a slow
-connection. It does not prompt for passwords, so you don't need to supervise it.
-This arm64-based Docker container can run simultaneously with the native
-environment Docker container that you built in Step 9 of the Instructions.
+provisioning. However, you can build it if you'd like to take a peek. On my
+machine, this takes approximately two hours.
 
 ```zsh
 # WSL Ubuntu-20.04
@@ -474,6 +518,17 @@ denv exec --arch arm64
 ssh docker-arm64-env
 ```
 
+> Note:
+>
+> We have experienced problems when building the arm64 image that we haven't
+> experienced when building the native image.
+>
+> Issue 1. Occasionally, the ubuntu-ports apt repository times out. This seems
+> to occur more often if the internet connection is slow.
+>
+> Issue 2. We've encountered a 'nosuid' error upon executing the first task that
+> requires sudo in `ubuntu-docker/main_playbook.yml`. This error remains
+> mysterious. It disappeared upon rebooting Windows 11.
 
 ---
 
@@ -496,11 +551,6 @@ and features work within an arm64 platform environment.
 
 ## Noteworthy future milestones
 
-- Demonstrate dev environment provisioning on an Ubuntu for arm64 Docker image
-  emulated by Qemu. This environment won't be used within a development
-  workflow; it's only intended to verify that all of the environment dependences
-  are available for arm64.
-- Demonstrate ROS2 Foxy startup in Ubuntu for arm64.
 - Build a minimal ROS app that uses the Jugglebot fork of Yasmin to provide a
   testbed for example code that doesn't have robot hardware dependencies.
 - Demonstrate how to use VSCode for Windows to connect to a Linux environment
