@@ -8,5 +8,6 @@
         ci = commit
         st = status
         last = !git --no-pager log -1 HEAD
+        lastdiff = !git --no-pager log -p -1 HEAD
         staged = diff --cached
         unstage = reset HEAD --
