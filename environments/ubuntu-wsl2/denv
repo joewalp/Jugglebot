@@ -27,12 +27,21 @@ Build Command Options:
                          (default: native)
 
 Exec Command Options:
-  --arch [native|arm64]  The platform architecture for the container
+  --arch [native|arm64]  The platform architecture of the container
                          (default: native)
 
 Set-key Command Option:
   -k|--ssh-keypair-name  [Required] The name of the ssh keypair for Github
                          authentication (e.g. `denv set-key -k id_ed25519`)
+
+Start Command Options:
+  --arch [native|arm64]  The platform architecture of the container
+                         (default: native)
+
+Stop Command Options:
+  --arch [native|arm64]  The platform architecture of the container
+                         (default: native)
+
 '
 }
 
