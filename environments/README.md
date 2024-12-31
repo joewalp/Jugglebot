@@ -250,12 +250,12 @@ wsl -d Ubuntu-20.04
 
 ### Step 9 [Optional]. Configure Docker Desktop for Windows to use WSL
 
-It's helpful to visualize Docker as having three major parts: Docker Engine,
+It's helpful to visualize Docker as having three major distributables: Docker Engine,
 Docker CLI and Docker Desktop. The Docker Engine is responsible for hosting
 containers and volumes. The Docker CLI is what our scripts use to command the
 Docker Engine. The Docker Desktop is a bundle that includes a Docker Engine and
 a graphical interface that covers some of the same command functions as Docker
-CLI and also enables browsing online Docker-related resources such as the Docker
+CLI and that also enables browsing online Docker-related resources such as the Docker
 images that have been published by other people.
 
 The Docker Engine that is bundled with Docker Desktop for Windows is somewhat
@@ -356,7 +356,7 @@ https://code.visualstudio.com/docs/remote/ssh-tutorial
 
 #### Task 1. Drive WSL from VSCode for Windows
 
-The WSL extension for VSCode for Windows allows you to drive a WSL environment.
+The `WSL` extension for VSCode for Windows allows you to drive a WSL environment.
 After installing that extension, run the following command from within the WSL
 environment:
 
@@ -430,7 +430,7 @@ The process on **Windows 11** goes like this:
 5. Within the WSL Ubuntu-20.04 environment, use the `lsusb` tool to verify that
    you can see the device.
 
-6. [Optional] Install the USBIP Connect extension in VSCode. This will add an
+6. [Optional] Install the `USBIP Connect` extension in VSCode. This will add an
    `Attach` button to the status bar that will enable you to attach any device
    that you had previously exposed via `usbipd bind`.
 
