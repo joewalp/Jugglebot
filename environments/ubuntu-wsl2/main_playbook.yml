@@ -17,7 +17,7 @@
     upgrade_mode_enabled: "{{ upgrade_mode_enabled__ | bool }}"
     clone_repo_enabled: "{{ clone_repo_enabled__ | bool }}"
     jugglebot_repo_dir: "{{ home_dir }}/Jugglebot"
-    juggelbot_config_dir: "{{ home_dir }}/.jugglebot"
+    jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
     host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
     wsl_welcome_flag_filepath: "{{ home_dir }}/.hushlogin"
     jugglebot_repo_ssh_url: 'git@github.com:joewalp/Jugglebot.git'
