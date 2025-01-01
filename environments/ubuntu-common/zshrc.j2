@@ -1,19 +1,19 @@
 # TASK [Educate about this default zshrc]
 #
-# This default ~/.zshrc was adapted from the default zshrc provided by Oh My 
+# This default ~/.zshrc was adapted from the default zshrc provided by Oh My
 # Zsh. It was provisioned by an Ansible task that was run by the host setup
-# script. If you re-run that host setup script, it will not overwrite the 
-# changes that you've made to this file. Instead, it will produce a diff in 
+# script. If you re-run that host setup script, it will not overwrite the
+# changes that you've made to this file. Instead, it will produce a diff in
 # `~/.jugglebot/host_setup/diffs`.
 
 
 # TASK [Educate about Jugglebot environment variables]
 #
-# You should prefer to define project-related configuration variables within 
-# `~/.jugglebot/conda_env.sh`. For example, that script defines 
+# You should prefer to define project-related configuration variables within
+# `~/.jugglebot/conda_env.sh`. For example, that script defines
 # `JUGGLEBOT_CONFIG_DIR="${HOME}/.jugglebot"`. The default conda_env.sh was
 # provisioned by an Ansible task that was run by the host setup script. If you
-# re-run that host setup script, it will not overwrite that file. If you had 
+# re-run that host setup script, it will not overwrite that file. If you had
 # made changes, it will produce a diff in `~/.jugglebot/host_setup/diffs`.
 
 
@@ -35,7 +35,7 @@ export ZSH="$HOME/.oh-my-zsh"
 
 # TASK [Enable H. Low's preferred Oh My Zsh theme]
 
-ZSH_THEME='clean'
+ZSH_THEME='{{ config['oh_my_zsh']['theme'] }}'
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -112,10 +112,10 @@ plugins=( git per-directory-history )
 # Note 1: H. Low uses the per-directory-history Oh My Zsh plugin within his
 # development workflow. Change $HISTORY_START_WITH_GLOBAL to false to enable
 # the per-directory behavior by default.
-# 
+#
 # Note 2: You can change this value either (a) by editing it here or (b) by
 # setting it within a zsh script within the $ZSH_CUSTOM directory.
-# 
+#
 # Note 3: See the per-directory-history repo for instructions:
 # https://github.com/jimhester/per-directory-history
 
@@ -136,6 +136,8 @@ source $ZSH/oh-my-zsh.sh
 # else
 #   export EDITOR='nvim'
 # fi
+
+export EDITOR='{{ config['zsh']['editor'] }}'
 
 # Compilation flags
 # export ARCHFLAGS="-arch $(uname -m)"
@@ -234,7 +236,7 @@ fi
 
 # TASK [Ensure that we start in $HOME]
 #
-# Note: This is a workaround for the issue that running 
+# Note: This is a workaround for the issue that running
 # `wsl -d <Distribution Name>` from PowerShell will begin in the working
 # directory of the PowerShell session.
 
