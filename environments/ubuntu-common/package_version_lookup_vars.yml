@@ -6,6 +6,11 @@ ubuntu_codename_to_ros_codename:
   noble: jazzy
 
 ros_codename_to_ros_package_names:
+  #
+  # Note: We install the webots package because it supplies the
+  # webots_ros2_driver that is required by the following package:
+  # Jugglebot/ros_ws/src/jugglebot_simulator/package.xml
+  #
   foxy:
   - python3-argcomplete
   - ros-foxy-desktop
