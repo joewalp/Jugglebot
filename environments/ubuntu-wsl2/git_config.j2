@@ -13,5 +13,5 @@
         last = !git --no-pager log -1 HEAD
         lastdiff = !git --no-pager log -p -1 HEAD
         staged = diff --cached
-        stagedws = !git --no-pager diff --cached --name-only --relative --diff-filter=ACMRTUXB -z | xargs --null -I % sh -c 'sed -i ''s/[[:space:]]*$//'' ''%'' && git add ''%'''
+        stagedws = !git --no-pager diff --cached --name-only --relative --diff-filter=ACMRTUXB -z | xargs --null -I % sh -c 'grep -q -e ''.*[[:space:]]$'' ''%'' && sed -i ''s/[[:space:]]*$//'' ''%'' && git add ''%'''
         unstage = reset HEAD --

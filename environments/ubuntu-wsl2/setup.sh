@@ -17,13 +17,8 @@ task 'Parse the arguments'
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    -u|--upgrade)
-      UPGRADE_MODE_ENABLED='yes'
-      shift
-      shift
-      ;;
-    -i)
-      SSH_IDENTITY_FILEPATH="$2"
+    -e|--editor)
+      EDITOR="$2"
       shift
       shift
       ;;
@@ -37,23 +32,38 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
-    --refresh-host-provisioning-conda-env)
-      REFRESH_HOST_PROVISIONING_ENV_ENABLED="$2" # yes|no
+    -i)
+      SSH_IDENTITY_FILEPATH="$2"
       shift
       shift
       ;;
-    --refresh-jugglebot-conda-env)
-      REFRESH_JUGGLEBOT_ENV_ENABLED="$2" # yes|no
+    -u|--upgrade-mode)
+      UPGRADE_MODE_ENABLED="$2"
       shift
       shift
       ;;
-    --clone-repo)
+    --x-clone-repo)
       CLONE_REPO_ENABLED="$2" # yes|no
       shift
       shift
       ;;
-    --debug-repo-dir)
+    --x-refresh-host-provisioning-conda-env)
+      REFRESH_HOST_PROVISIONING_ENV_ENABLED="$2" # yes|no
+      shift
+      shift
+      ;;
+    --x-refresh-jugglebot-conda-env)
+      REFRESH_JUGGLEBOT_ENV_ENABLED="$2" # yes|no
+      shift
+      shift
+      ;;
+    --x-repo-dir)
       DEBUG_REPO_DIR="$2"
+      shift
+      shift
+      ;;
+    --x-upgrade-packages)
+      UPGRADE_PACKAGES_ENABLED="$2"
       shift
       shift
       ;;
@@ -73,25 +83,40 @@ task 'Initialize variables'
 JUGGLEBOT_CONFIG_DIR="${JUGGLEBOT_CONFIG_DIR:-${HOME}/.jugglebot}"
 JUGGLEBOT_CONFIG_FILEPATH="${JUGGLEBOT_CONFIG_DIR}/config.yml"
 
-task 'Determine whether upgrade mode is enabled'
-
+EDITOR="${EDITOR:-}"
+GIT_EMAIL="${GIT_EMAIL:-}"
+GIT_NAME="${GIT_NAME:-}"
+SSH_IDENTITY_FILEPATH="${SSH_IDENTITY_FILEPATH:-}"
 UPGRADE_MODE_ENABLED="${UPGRADE_MODE_ENABLED:-no}"
+
+CLONE_REPO_ENABLED="${CLONE_REPO_ENABLED:-yes}"
+REFRESH_HOST_PROVISIONING_ENV_ENABLED="${REFRESH_HOST_PROVISIONING_ENABLED:-yes}"
+REFRESH_JUGGLEBOT_ENV_ENABLED="${REFRESH_JUGGLEBOT_ENV_ENABLED:-yes}"
+DEBUG_REPO_DIR="${DEBUG_REPO_DIR:-}"
+UPGRADE_PACKAGES_ENABLED="${UPGRADE_PACKAGES_ENABLED:-yes}"
+
+if [[ -z "${DEBUG_REPO_DIR}" ]]; then
+  REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
+else
+  REPO_DIR="${DEBUG_REPO_DIR}"
+  echo -e "\n[Warning]: Specifying an alternate repo location is not supported. The '--x-repo-dir' flag should only be used when testing this script.\n" >&2
+fi
 
 task 'Assert that an ssh identity file was specified'
 
-if [[ -z "${SSH_IDENTITY_FILEPATH:-}" ]]; then
+if [[ -z "${SSH_IDENTITY_FILEPATH}" ]]; then
 
   if [[ "${UPGRADE_MODE_ENABLED}" == 'yes' ]]; then
     if which yq >/dev/null 2>&1 ; then
       SSH_IDENTITY_FILEPATH="$( yq -r .ssh.github_com.identity_filepath \
         "${JUGGLEBOT_CONFIG_FILEPATH}" )"
     else
-      echo '[ERROR]: The yq utility is not available. Upgrade mode cannot be \
+      echo '[Error]: The yq utility is not available. Upgrade mode cannot be \
 used until yq has been provisioned.' >&2
       exit $EX_UNAVAILABLE
     fi
   else
-    echo '[ERROR]: An ssh identity file is required when the `--upgrade` \
+    echo '[Error]: An ssh identity file is required when the `--upgrade` \
 option is not specified. Invoke this command with the `-i [identity file]` \
 switch (eg. `-i ~/.ssh/ed25519`)' >&2
     exit 2
@@ -101,38 +126,30 @@ fi
 task 'Assert that the ssh identity file exists'
 
 if [[ ! -f "${SSH_IDENTITY_FILEPATH}" ]]; then
-  echo "[ERROR]: The identity file ${SSH_IDENTITY_FILEPATH} does not exist." >&2
+  echo "[Error]: The identity file ${SSH_IDENTITY_FILEPATH} does not exist." >&2
   exit $EX_OSFILE
 fi
 
 task 'Assert that a git name was specified'
 
-if [[ -z "${GIT_NAME:-}" && "${UPGRADE_MODE_ENABLED}" == 'no' ]]; then
-  echo '[ERROR]: A git name is required when the `--upgrade` option is not specified. Invoke this command with the `--git-name "[Your full name]"` switch (eg. `--git-name "Jane Doe"`)' >&2
+if [[ -z "${GIT_NAME}" && "${UPGRADE_MODE_ENABLED}" == 'no' ]]; then
+  echo '[Error]: A git name is required when the `--upgrade` option is not specified. Invoke this command with the `--git-name "[Your full name]"` switch (eg. `--git-name "Jane Doe"`)' >&2
   exit 2
 fi
-
-GIT_NAME="${GIT_NAME:-}"
 
 task 'Assert that a git email was specified'
 
-if [[ -z "${GIT_EMAIL:-}" && "${UPGRADE_MODE_ENABLED}" == 'no' ]]; then
-  echo '[ERROR]: A git email is required when the `--upgrade` option is not specified. Invoke this command with the `--git-email "[your email address]"` switch (eg. `--git-email "jane.doe@gmail.com"`)' >&2
+if [[ -z "${GIT_EMAIL}" && "${UPGRADE_MODE_ENABLED}" == 'no' ]]; then
+  echo '[Error]: A git email is required when the `--upgrade` option is not specified. Invoke this command with the `--git-email "[your email address]"` switch (eg. `--git-email "jane.doe@gmail.com"`)' >&2
   exit 2
 fi
 
-GIT_EMAIL="${GIT_EMAIL:-}"
-
-task 'Initialize variables'
-
-if [[ -z "${DEBUG_REPO_DIR:-}" ]]; then
-  REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
-else
-  REPO_DIR="${DEBUG_REPO_DIR}"
-  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
+if [[ -n "${EDITOR}" ]]; then
+  if ! which "${EDITOR}" >/dev/null 2>&1 ; then
+    echo "[Error]: The specified editor ${EDITOR} is not installed. Supported editors include vim [recommended] and nano. If you want to use a different editor, install it before running this script." >&2
+    exit $EX_UNAVAILABLE
+  fi
 fi
-
-CLONE_REPO_ENABLED="${CLONE_REPO_ENABLED:-yes}"
 
 task 'Enable ssh-agent'
 
@@ -157,9 +174,10 @@ ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible
   --ask-become-pass \
   -e "git_email='${GIT_EMAIL}'" \
   -e "git_name='${GIT_NAME}'" \
-  -e "raw_clone_repo_enabled='${CLONE_REPO_ENABLED}'" \
-  -e "raw_upgrade_mode_enabled='${UPGRADE_MODE_ENABLED}'" \
-  -e "raw_upgrade_software_enabled='yes'" \
+  -e "clone_repo_enabled__='${CLONE_REPO_ENABLED}'" \
+  -e "editor='${EDITOR}'" \
+  -e "upgrade_mode_enabled__='${UPGRADE_MODE_ENABLED}'" \
+  -e "upgrade_packages_enabled__='${UPGRADE_PACKAGES_ENABLED}'" \
   -e "ssh_identity_filepath='${SSH_IDENTITY_FILEPATH}'" \
   -e "DISPLAY='${DISPLAY}'" || rc="$?"
 

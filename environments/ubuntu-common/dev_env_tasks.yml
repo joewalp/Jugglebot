@@ -2,7 +2,7 @@
 # parameters:
 # - environments_dir
 # - config
-# - upgrade_software_enabled
+# - upgrade_packages_enabled
 
 - name: Load variables
   include_vars: "{{ environments_dir }}/ubuntu-common/dev_env_vars.yml"
@@ -44,17 +44,17 @@
   set_fact:
     packages_stale: "{{ ( now(utc=True, fmt='%s')|int - packages_upgraded_timestamp|int ) > ( 60 * 60 * 24 * 7 ) }}"
 
-- name: If the apt cache is more than a week stale and upgrade_software isn't requested, offer to abort
+- name: If the apt cache is more than a week stale and upgrade_packages isn't requested, offer to abort
   pause:
-    prompt: "\nTo perform safe package upgrades, run this playbook with `-e 'raw_upgrade_software_enabled=yes'`.\n\nDo you want to continue without upgrading packages? (yes/no)"
+    prompt: "\nTo perform safe package upgrades, run this playbook with `-e 'upgrade_packages_enabled__=yes'`.\n\nDo you want to continue without upgrading packages? (yes/no)"
   register: continue_without_upgrades_result
   delegate_to: localhost
-  when: packages_stale and not upgrade_software_enabled
+  when: packages_stale and not upgrade_packages_enabled
 
 - name: Interpret the response for the offer to abort
   fail:
     msg: "[WARNING]: Aborting as requested"
-  when: packages_stale and not upgrade_software_enabled and not continue_without_upgrades_result.user_input|bool
+  when: packages_stale and not upgrade_packages_enabled and not continue_without_upgrades_result.user_input|bool
 
 - name: Run apt commands update, upgrade and autoremove .. please be patient
   apt:
@@ -63,13 +63,13 @@
     autoremove: yes
   become: yes
   register: upgrade_packages_result
-  when: upgrade_software_enabled
+  when: upgrade_packages_enabled
 
 - name: Write the packages upgraded timestamp
   copy:
     content: "{{ now(utc=True, fmt='%s') }}"
     dest: "{{ packages_upgraded_filepath }}"
-  when: upgrade_software_enabled and upgrade_packages_result is succeeded
+  when: upgrade_packages_enabled and upgrade_packages_result is succeeded
 
 - name: Ensure that essential applications are installed .. please be patient
   package:
@@ -87,7 +87,7 @@
       # including them because tmux will be highly useful if we enable remote
       # access to Prod over ssh.
     - zsh
-    state: present
+    state: "{{ 'latest' if upgrade_packages_enabled else 'present' }}"
   become: yes
 
 - name: Ensure that yq is installed
@@ -113,7 +113,7 @@
     repo: "{{ ohmyzsh_git_repo_url }}"
     dest: "{{ home_dir }}/.oh-my-zsh"
     version: master
-    update: "{{ upgrade_software_enabled }}"
+    update: "{{ upgrade_packages_enabled }}"
     depth: 1
     accept_hostkey: yes
   register: ohmyzsh_update_result
@@ -122,13 +122,13 @@
   copy:
     content: "{{ now(utc=True, fmt='%s') }}"
     dest: "{{ ohmyzsh_upgraded_filepath }}"
-  when: ohmyzsh_update_result is changed or upgrade_software_enabled
+  when: ohmyzsh_update_result is changed or upgrade_packages_enabled
 
 - name: Warn if Oh My Zsh wasn't upgraded
   assert:
     that: True
-    success_msg: "[WARNING]: Oh My Zsh was not upgraded. To upgrade, run this playbook with `-e 'upgrade_software=yes'`."
-  when: not upgrade_software_enabled
+    success_msg: "[WARNING]: Oh My Zsh was not upgraded. To upgrade, run this playbook with `-e 'upgrade_packages_enabled__=yes'`."
+  when: not upgrade_packages_enabled
 
 - name: Render the zsh runtime config file
   template:

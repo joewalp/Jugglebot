@@ -5,16 +5,17 @@
   vars:
     # git_email
     # git_name
-    # raw_clone_repo_enabled
-    # raw_upgrade_mode_enabled
-    # raw_upgrade_software_enabled
+    # clone_repo_enabled__
+    # editor
+    # upgrade_mode_enabled__
+    # upgrade_packages_enabled__
     # ssh_identity_filepath
     environments_dir: "{{ playbook_dir }}/.."
     home_dir: "{{ ansible_facts['env']['HOME'] }}"
     ubuntu_codename: "{{ ansible_facts['distribution_release'] }}"
-    upgrade_software_enabled: "{{ raw_upgrade_software_enabled is truthy(convert_bool=True) }}"
-    upgrade_mode_enabled: "{{ raw_upgrade_mode_enabled is truthy(convert_bool=True) }}"
-    clone_repo_enabled: "{{ raw_clone_repo_enabled is truthy(convert_bool=True) }}"
+    upgrade_packages_enabled: "{{ upgrade_packages_enabled__ | bool }}"
+    upgrade_mode_enabled: "{{ upgrade_mode_enabled__ | bool }}"
+    clone_repo_enabled: "{{ clone_repo_enabled__ | bool }}"
     jugglebot_repo_dir: "{{ home_dir }}/Jugglebot"
     juggelbot_config_dir: "{{ home_dir }}/.jugglebot"
     host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
@@ -51,6 +52,19 @@
       fail_msg: 'When upgrade mode is not enabled, this playbook requires that the git name be specified using `-e "git_email=''[your email address]''"`.'
     when: not upgrade_mode_enabled
 
+  - name: Check whether the specifed editor exists
+    shell:
+      cmd: "which {{ editor }}"
+    register: which_editor_result
+    when: editor
+
+  - name: Assert that the specified editor exists
+    assert:
+      that: which_editor_result.rc == 0
+      quiet: yes
+      fail_msg: "The specified editor {{ editor }} is not installed."
+    when: editor
+
   - name: Ensure that the Jugglebot repo has been cloned
     git:
       repo: "{{ jugglebot_repo_ssh_url }}"
@@ -69,6 +83,60 @@
     set_fact:
       default_config: "{{ config_defaults_read_result.content | b64decode | from_yaml }}"
 
+  - name: Set the ros_config variable
+    set_fact:
+      ros_config:
+        ros:
+          version_codename: "{{ ubuntu_codename_to_ros_codename[ubuntu_codename] }}"
+
+  - name: Set default config variables
+    set_fact:
+      editor_config: "{{ {} }}"
+      git_name_config: "{{ {} }}"
+      git_email_config: "{{ {} }}"
+      ssh_identity_config: "{{ {} }}"
+      current_config: "{{ {} }}"
+
+  - name: Set the editor_config variable
+    set_fact:
+      editor_config:
+        zsh:
+          editor: editor
+        git:
+          core:
+            editor: editor
+    when: editor
+
+  - name: Set the git_name_config variable
+    set_fact:
+      git_name_config:
+        git:
+          user:
+            name: "{{ git_name }}"
+    when: git_name
+
+  - name: Set the git_name_config variable
+    set_fact:
+      git_email_config:
+        git:
+          user:
+            email: "{{ git_email }}"
+    when: git_email
+
+  - name: Set the ssh_identity_config variable
+    set_fact:
+      ssh_identity_config:
+        denv:
+          identity_filepath: "{{ ssh_identity_filepath }}"
+        ssh:
+          github_com:
+            identity_filepath: "{{ ssh_identity_filepath }}"
+          docker_native_env:
+            identity_filepath: "{{ ssh_identity_filepath }}"
+          docker_arm64_env:
+            identity_filepath: "{{ ssh_identity_filepath }}"
+    when: ssh_identity_filepath
+
   - name: Read the current config file
     slurp:
       src: "{{ jugglebot_config_dir }}/config.yml"
@@ -80,34 +148,18 @@
       current_config: >
         "{{ current_config_read_result.content | b64decode |
         from_yaml if current_config_read_result is defined else {} }}"
-
-  - name: Set the command_config variable
-    set_fact:
-      command_config:
-        denv:
-          identityfile: "{{ ssh_identity_filepath }}"
-        git:
-          user: "{{ git_user }}"
-          email: "{{ git_email }}"
-        ros:
-          version_codename: "{{ ubuntu_codename_to_ros_codename[ubuntu_codename] }}"
-        ssh:
-          github_com:
-            identityfile: "{{ ssh_identity_filepath }}"
-          docker_native_env:
-            identityfile: "{{ ssh_identity_filepath }}"
-          docker_arm64_env:
-            identityfile: "{{ ssh_identity_filepath }}"
-    when: not upgrade_mode_enabled
-
-  - name: Set the command_config variable in upgrade mode
-    set_fact:
-      command_config: "{{ {} }}"
-    when: upgrade_mode_enabled
+    when: (jugglebot_config_dir ~ '/config.yml') is file
 
   - name: Create the overlayed config
     set_fact:
-      config: "{{ default_config | combine(current_config) | combine(command_config) }}"
+      config: >
+        "{{ default_config
+        | combine(ros_config)
+        | combine(current_config)
+        | combine(editor_config)
+        | combine(git_name_config)
+        | combine(git_email_config)
+        | combine(ssh_identity_config) }}"
 
   - name: Ensure that the host setup defaults directory exists
     file:
@@ -148,7 +200,7 @@
     vars:
       environments_dir: "{{ playbook_dir }}/.."
       # config
-      # upgrade_software_enabled
+      # upgrade_packages_enabled
 
   - name: Render the ssh config file
     template:
@@ -206,15 +258,6 @@
       ros_version_codename: "{{ runtime_config['ros']['version_codename'] }}"
 
   - name: "Install ROS2 {{ ros_version_codename|capitalize }} Desktop .. please be very patient"
-    #
-    # Note 1: We install version of ROS2 that has tier 1 support for this
-    # Ubuntu LTS release. See the ~/ubuntu-common/jugglebot_rc.yml.j2 for the
-    # mapping of LTS release to ROS2 codename.
-    #
-    # Note 2: We also install the webots package because it supplies the
-    # webots_ros2_driver that is required by the following package:
-    # Jugglebot/ros_ws/src/jugglebot_simulator/package.xml
-    #
     package:
       name: "{{ ros_codename_to_ros_package_names[ros_version_codename] }}"
       state: present
