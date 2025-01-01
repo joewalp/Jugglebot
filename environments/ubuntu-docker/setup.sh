@@ -36,8 +36,8 @@ task 'Parse the arguments'
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    -k|--ssh-keypair-name)
-      SSH_KEYPAIR_NAME="$2"
+    -i)
+      SSH_IDENTITY_FILEPATH="$2"
       shift
       shift
       ;;
@@ -90,10 +90,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-task 'Assert that an ssh keypair name was specified'
+task 'Assert that an ssh identity was specified'
 
-if [[ -z "${SSH_KEYPAIR_NAME:-}" ]]; then
-  echo '[ERROR]: An ssh keypair name is required. Invoke this command with the `--ssh-keypair-name [keypair name]` switch (eg. `--ssh-keypair-name ed25519`)' >&2
+if [[ -z "${SSH_IDENTITY_FILEPATH:-}" ]]; then
+  echo '[ERROR]: An ssh identity file is required. Invoke this command with the `-i [identity file]` switch (eg. `-i ~/.ssh/ed25519`)' >&2
   exit 2
 fi
 
@@ -110,21 +110,16 @@ fi
 
 VERSION_LOOKUP_FILEPATH="${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/package_version_lookup_vars.yml"
 
-ROS_CODENAME="$(yq -r ".ubuntu_codename_to_ros_codename.${BASE_IMAGE_OS_RELEASE}" \
-  "${VERSION_LOOKUP_FILEPATH}")"
+ROS_CODENAME="$( yq -r ".ubuntu_codename_to_ros_codename.${BASE_IMAGE_OS_RELEASE}" \
+  "${VERSION_LOOKUP_FILEPATH}" )"
 
-ROS_PACKAGES=('ros-dev-tools')
-
-if [[ "${ROS_CODENAME}" == 'foxy' ]]; then
-  ROS_PACKAGES+=('python3-argcomplete')
-fi
-
-ROS_PACKAGES+=("ros-${ROS_CODENAME}-desktop")
-ROS_PACKAGES+=("ros-${ROS_CODENAME}-webots-ros2")
+ROS_PACKAGES_LIST="$( yq -r -o csv --csv-separator ' ' \
+  ".ros_codename_to_ros_package_names.${ROS_CODENAME}" \
+  "${VERSION_LOOKUP_FILEPATH}" )"
 
 task 'Determine the Python version'
 
-PYTHON_VERSION="$(yq -r ".ubuntu_codename_to_python_version.${BASE_IMAGE_OS_RELEASE}" \
+PYTHON_VERSION="$(yq -r ".ros_codename_to_python_version.${ROS_CODENAME}" \
   "${VERSION_LOOKUP_FILEPATH}")"
 
 task 'Determine the base image and the platform option'
@@ -166,8 +161,7 @@ BUILD_NO_CACHE_OPTION="${BUILD_NO_CACHE_OPTION:-}"
 REPO_CACHE_ID="${REPO_CACHE_ID:-0}"
 RETAIN_HOME_VOLUME="${RETAIN_HOME_VOLUME:-no}"
 DEV_ENV_USERNAME='devops' # This is also the default password for the user.
-SSH_PRIVATE_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}"
-SSH_PUBLIC_KEY_FILEPATH="${HOME}/.ssh/${SSH_KEYPAIR_NAME}.pub"
+SSH_PUBLIC_KEY_FILEPATH="${SSH_IDENTITY_FILEPATH}.pub"
 BUILD_CONTEXT_DIR="${JUGGLEBOT_REPO_DIR}/environments/ubuntu-docker"
 
 task 'Enable ssh-agent'
@@ -176,9 +170,9 @@ eval "$(ssh-agent -s)"
 
 task 'Add the ssh private key'
 
-# Note: This will prompt for the passphrase if the key requires one 
+# Note: This will prompt for the passphrase if the key requires one
 
-ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
+ssh-add "${SSH_IDENTITY_FILEPATH}"
 
 task 'Copy the host-provisioning Conda environment file'
 
@@ -193,9 +187,9 @@ python_version="${PYTHON_VERSION}" j2 \
 
 task 'Copy ~/.gitconfig'
 
-install -D -T "${HOME}/.gitconfig" "${BUILD_CONTEXT_DIR}/build/gitconfig"
+install -D -T "${HOME}/.gitconfig" "${BUILD_CONTEXT_DIR}/build/git_config"
 
-task "Copy ~/.ssh/${SSH_KEYPAIR_NAME}.pub"
+task "Copy ${SSH_PUBLIC_KEY_FILEPATH} to ssh_authorized_keys"
 
 install -D -T "${SSH_PUBLIC_KEY_FILEPATH}" \
   "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
@@ -204,7 +198,7 @@ task "Build the Docker image named ${IMAGE_NAME}"
 
 docker buildx build ${BUILD_NO_CACHE_OPTION} ${PLATFORM_OPTION} \
   --build-arg "BASE_IMAGE=${BASE_IMAGE}" \
-  --build-arg "ROS_PACKAGE_LIST=$(IFS=' '; echo "${ROS_PACKAGES[*]}")" \
+  --build-arg "ROS_PACKAGES_LIST=${ROS_PACKAGES_LIST}" \
   --build-arg "USER_UID=$(id --user)" \
   --build-arg "USER_GID=$(id --group)" \
   --build-arg "DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)" \
@@ -220,7 +214,7 @@ task 'Cleanup the build context'
 
 rm -f "${BUILD_CONTEXT_DIR}/build/host_provisioning_conda_env.yml"
 rm -f "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
-rm -f "${BUILD_CONTEXT_DIR}/build/gitconfig"
+rm -f "${BUILD_CONTEXT_DIR}/build/git_config"
 rm -f "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
 
 task 'Ensure that the Docker container is not running'
@@ -237,9 +231,9 @@ fi
 
 if does_docker_volume_exist "${HOME_VOLUME_NAME}"; then
   if [[ "${RETAIN_HOME_VOLUME}" == 'no' ]]; then
-    
+
     task "Remove the volume named ${HOME_VOLUME_NAME}"
-    
+
     docker volume rm "${HOME_VOLUME_NAME}"
 
     task "Create the volume named ${HOME_VOLUME_NAME}"
@@ -252,9 +246,9 @@ if does_docker_volume_exist "${HOME_VOLUME_NAME}"; then
 
   fi
 else
-  
+
   task "Create the volume named ${HOME_VOLUME_NAME}"
-  
+
   docker volume create "${HOME_VOLUME_NAME}"
 
 fi
@@ -314,24 +308,24 @@ Notes:
 1. By default, the user in the container is named ${DEV_ENV_USERNAME}, and the password
    for that user is the same as the username.
 
-2. Only the /home directory and the /tmp directory will persist across 
-   container restarts. The /home directory is a mounted docker volume named 
+2. Only the /home directory and the /tmp directory will persist across
+   container restarts. The /home directory is a mounted docker volume named
    ${HOME_VOLUME_NAME}.
 
 3. If you add your GitHub ssh key to the keychain prior to running
    docker-native-env, that key will be available within the container. This
    works because (a) the container shares the same /tmp directory with the
-   WSL2 environment and (b) the docker-native-env script propagates the 
+   WSL2 environment and (b) the docker-native-env script propagates the
    SSH_AUTH_SOCK environment variable into the container. You can add the key
    to the keychain using the following command:
 
    ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
 
-4. You can control the Docker Engine that is hosted by the WSL2 environment 
+4. You can control the Docker Engine that is hosted by the WSL2 environment
    from within the container. This has some security implications. Do not host
    internet-facing services within the container.
 
-5. The ~/.oh-my-zsh/custom directory in the WSL2 environment is mounted to the 
+5. The ~/.oh-my-zsh/custom directory in the WSL2 environment is mounted to the
    /home/${DEV_ENV_USERNAME}/.oh-my-zsh/custom directory in the container. This simplifies
    keeping the environments and aliases in sync.
 "

@@ -1,10 +1,12 @@
 ---
 # parameters:
 # - environments_dir
+# - config
+# - upgrade_software_enabled
 
 - name: Load variables
   include_vars: "{{ environments_dir }}/ubuntu-common/dev_env_vars.yml"
-  
+
 - name: Ensure that the ~/.jugglebot/host_setup/diffs directory exists
   file:
     path: "{{ host_setup_diffs_dir }}"
@@ -44,15 +46,15 @@
 
 - name: If the apt cache is more than a week stale and upgrade_software isn't requested, offer to abort
   pause:
-    prompt: "\nTo perform safe package upgrades, run this playbook with `-e 'upgrade_software=yes'`.\n\nDo you want to continue without upgrading packages? (yes/no)"
+    prompt: "\nTo perform safe package upgrades, run this playbook with `-e 'raw_upgrade_software_enabled=yes'`.\n\nDo you want to continue without upgrading packages? (yes/no)"
   register: continue_without_upgrades_result
   delegate_to: localhost
-  when: packages_stale and not upgrade_software|bool
+  when: packages_stale and not upgrade_software_enabled
 
 - name: Interpret the response for the offer to abort
   fail:
     msg: "[WARNING]: Aborting as requested"
-  when: packages_stale and not upgrade_software|bool and not continue_without_upgrades_result.user_input|bool
+  when: packages_stale and not upgrade_software_enabled and not continue_without_upgrades_result.user_input|bool
 
 - name: Run apt commands update, upgrade and autoremove .. please be patient
   apt:
@@ -61,13 +63,13 @@
     autoremove: yes
   become: yes
   register: upgrade_packages_result
-  when: upgrade_software|bool
+  when: upgrade_software_enabled
 
 - name: Write the packages upgraded timestamp
   copy:
     content: "{{ now(utc=True, fmt='%s') }}"
     dest: "{{ packages_upgraded_filepath }}"
-  when: upgrade_software|bool and upgrade_packages_result is succeeded
+  when: upgrade_software_enabled and upgrade_packages_result is succeeded
 
 - name: Ensure that essential applications are installed .. please be patient
   package:
@@ -81,9 +83,9 @@
     - tmux
       # required_by: tmuxp
       #
-      # Note: H. Low may not use tmux and tmuxp. J. Walp is including them
-      # because tmux will be highly useful if we enable remote access to Prod
-      # over ssh.
+      # Note: H. Low may not have a use for tmux and tmuxp. J. Walp is
+      # including them because tmux will be highly useful if we enable remote
+      # access to Prod over ssh.
     - zsh
     state: present
   become: yes
@@ -109,9 +111,9 @@
 - name: Clone the Oh My Zsh repo
   git:
     repo: "{{ ohmyzsh_git_repo_url }}"
-    dest: "{{ ohmyzsh_dir }}"
+    dest: "{{ home_dir }}/.oh-my-zsh"
     version: master
-    update: "{{ upgrade_software|bool }}"
+    update: "{{ upgrade_software_enabled }}"
     depth: 1
     accept_hostkey: yes
   register: ohmyzsh_update_result
@@ -120,31 +122,27 @@
   copy:
     content: "{{ now(utc=True, fmt='%s') }}"
     dest: "{{ ohmyzsh_upgraded_filepath }}"
-  when: ohmyzsh_update_result is changed or upgrade_software|bool
+  when: ohmyzsh_update_result is changed or upgrade_software_enabled
 
 - name: Warn if Oh My Zsh wasn't upgraded
   assert:
     that: True
     success_msg: "[WARNING]: Oh My Zsh was not upgraded. To upgrade, run this playbook with `-e 'upgrade_software=yes'`."
-  when: not upgrade_software|bool
+  when: not upgrade_software_enabled
+
+- name: Render the zsh runtime config file
+  template:
+    src: "{{ environments_dir }}/ubuntu-common/zshrc.j2"
+    dest: "{{ host_setup_defaults_dir }}/zshrc"
 
 - name: Install ~/.zshrc
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
-    src: "{{ environments_dir }}/ubuntu-common/zshrc"
+    src: "{{ host_setup_defaults_dir }}/zshrc"
     remote_src: no
-    dest: "{{ zshrc_filepath }}"
+    dest: "{{ home_dir }}/.zshrc"
     readable_dest: ~/.zshrc
-    mode: '0644'
-
-- name: Install ~/.gitconfig
-  import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
-  vars:
-    src: "{{ environments_dir }}/ubuntu-common/gitconfig"
-    remote_src: no
-    dest: "{{ gitconfig_filepath }}"
-    readable_dest: ~/.gitconfig
-    mode: '0644'
+    mode: 0644
 
 - name: Ensure that the ~/.vim/backup directory exists
   file:
@@ -179,9 +177,9 @@
   vars:
     src: "{{ environments_dir }}/ubuntu-common/vimrc"
     remote_src: no
-    dest: "{{ vimrc_filepath }}"
+    dest: "{{ home_dir }}.vimrc"
     readable_dest: ~/.vimrc
-    mode: '0644'
+    mode: 0644
 
 - name: Execute PlugInstall to install the configured vim-plug plugins
   shell:
@@ -192,16 +190,16 @@
   vars:
     src: "{{ environments_dir }}/ubuntu-common/aliases.zsh"
     remote_src: no
-    dest: "{{ zsh_aliases_filepath }}"
+    dest: "{{ home_dir }}/.oh-my-zsh/custom/aliases.zsh"
     readable_dest: ~/.oh-my-zsh/custom/aliases.zsh
-    mode: '0644'
+    mode: 0644
 
 - name: Disable the sudo welcome message
   file:
     path: "{{ sudo_welcome_flag_filepath }}"
     state: touch
   when: not sudo_welcome_flag_filepath is file
-  
+
 - name: Install ~/.tmux.conf
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
@@ -209,7 +207,7 @@
     remote_src: no
     dest: "{{ home_dir }}/.tmux.conf"
     readable_dest: ~/.tmux.conf
-    mode: '0644'
+    mode: 0644
 
 - name: Add the ROS2 package repository
   import_tasks: "{{ environments_dir }}/ansible-common/add_apt_repository.yml"
@@ -238,5 +236,5 @@
     remote_src: no
     dest: "{{ home_dir }}/bin/install-savvycan"
     readable_dest: ~/bin/install-savvycan
-    mode: '0755'
+    mode: 0755
 

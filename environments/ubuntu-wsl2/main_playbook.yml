@@ -3,38 +3,132 @@
   hosts: localhost
   connection: local
   vars:
+    # git_email
+    # git_name
+    # raw_clone_repo_enabled
+    # raw_upgrade_mode_enabled
+    # raw_upgrade_software_enabled
+    # ssh_identity_filepath
     environments_dir: "{{ playbook_dir }}/.."
+    home_dir: "{{ ansible_facts['env']['HOME'] }}"
+    ubuntu_codename: "{{ ansible_facts['distribution_release'] }}"
+    upgrade_software_enabled: "{{ raw_upgrade_software_enabled is truthy(convert_bool=True) }}"
+    upgrade_mode_enabled: "{{ raw_upgrade_mode_enabled is truthy(convert_bool=True) }}"
+    clone_repo_enabled: "{{ raw_clone_repo_enabled is truthy(convert_bool=True) }}"
+    jugglebot_repo_dir: "{{ home_dir }}/Jugglebot"
+    juggelbot_config_dir: "{{ home_dir }}/.jugglebot"
+    host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
+    wsl_welcome_flag_filepath: "{{ home_dir }}/.hushlogin"
+    jugglebot_repo_ssh_url: 'git@github.com:joewalp/Jugglebot.git'
 
   tasks:
 
-  - name: Ensure that the ssh_keypair_name was specified
+  - name: Ensure that the ssh_identity_filepath was specified
     assert:
-      that: ssh_keypair_name
+      that: ssh_identity_filepath
       quiet: yes
-      fail_msg: 'This playbook requires that the keypair name be specified using `-e "ssh_keypair_name=''[keypair name]''"`'
-  
+      fail_msg: 'When upgrade mode is not enabled, this playbook requires that the ssh identity file be specified using `-e "ssh_identity_filepath=''[identity file]''"`.'
+    when: not upgrade_mode_enabled
+
+  - name: Ensure that the specified ssh keypair exists
+    assert:
+      that: "ssh_identity_filepath is file and (ssh_identity_filepath ~ '.pub') is file"
+      quiet: yes
+      fail_msg: "The specified ssh keypair ('{{ ssh_identity_filepath }}', '{{ ssh_identity_filepath }}.pub') was not found."
+    when: not upgrade_mode_enabled
+
   - name: Ensure that the git_name was specified
     assert:
       that: git_name
       quiet: yes
-      fail_msg: 'This playbook requires that the git name be specified using `-e "git_name=''[your full name]''"`'
-  
+      fail_msg: 'When upgrade mode is not enabled, this playbook requires that the git name be specified using `-e "git_name=''[your full name]''"`.'
+    when: not upgrade_mode_enabled
+
   - name: Ensure that the git_email was specified
     assert:
       that: git_email
       quiet: yes
-      fail_msg: 'This playbook requires that the git name be specified using `-e "git_email=''[your email address]''"`'
-  
-  - name: Load variables
-    include_vars: "{{ environments_dir }}/ubuntu-wsl2/main_vars.yml"
+      fail_msg: 'When upgrade mode is not enabled, this playbook requires that the git name be specified using `-e "git_email=''[your email address]''"`.'
+    when: not upgrade_mode_enabled
 
-  - name: Ensure that the specified ssh keypair exists
-    assert:
-      that: "ssh_private_key_filepath is file and (ssh_private_key_filepath + '.pub') is file"
-      quiet: yes
-      fail_msg: "The specified ssh keypair ('{{ ssh_private_key_filepath }}', '{{ ssh_private_key_filepath }}.pub') was not found."
+  - name: Ensure that the Jugglebot repo has been cloned
+    git:
+      repo: "{{ jugglebot_repo_ssh_url }}"
+      dest: "{{ jugglebot_repo_dir }}"
+    when: clone_repo_enabled
 
-  - name: Ensure that wsl uses systemd
+  - name: Import the package version lookup dicts
+    include_vars: "{{ environments_dir }}/ubuntu-common/package_version_lookup_vars.yml"
+
+  - name: Read the config defaults file
+    slurp:
+      src: "{{ environments_dir }}/ubuntu-common/config_defaults.yml"
+    register: config_defaults_read_result
+
+  - name: Set the default_config variable
+    set_fact:
+      default_config: "{{ config_defaults_read_result.content | b64decode | from_yaml }}"
+
+  - name: Read the current config file
+    slurp:
+      src: "{{ jugglebot_config_dir }}/config.yml"
+    register: current_config_read_result
+    when: (jugglebot_config_dir ~ '/config.yml') is file
+
+  - name: Set the current_config variable
+    set_fact:
+      current_config: >
+        "{{ current_config_read_result.content | b64decode |
+        from_yaml if current_config_read_result is defined else {} }}"
+
+  - name: Set the command_config variable
+    set_fact:
+      command_config:
+        denv:
+          identityfile: "{{ ssh_identity_filepath }}"
+        git:
+          user: "{{ git_user }}"
+          email: "{{ git_email }}"
+        ros:
+          version_codename: "{{ ubuntu_codename_to_ros_codename[ubuntu_codename] }}"
+        ssh:
+          github_com:
+            identityfile: "{{ ssh_identity_filepath }}"
+          docker_native_env:
+            identityfile: "{{ ssh_identity_filepath }}"
+          docker_arm64_env:
+            identityfile: "{{ ssh_identity_filepath }}"
+    when: not upgrade_mode_enabled
+
+  - name: Set the command_config variable in upgrade mode
+    set_fact:
+      command_config: "{{ {} }}"
+    when: upgrade_mode_enabled
+
+  - name: Create the overlayed config
+    set_fact:
+      config: "{{ default_config | combine(current_config) | combine(command_config) }}"
+
+  - name: Ensure that the host setup defaults directory exists
+    file:
+      path: "{{ host_setup_defaults_dir }}"
+      state: directory
+
+  - name: Render the Jugglebot config file using the overlayed config
+    template:
+      src: "{{ environments_dir }}/ubuntu-common/config.yml.j2"
+      dest: "{{ host_setup_defaults_dir }}/config.yml"
+
+  - name: Install the Jugglebot config file
+    import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
+    vars:
+      src: "{{ host_setup_defaults_dir }}/config.yml"
+      remote_src: yes
+      dest: "{{ jugglebot_config_dir }}/config.yml"
+      readable_dest: ~/.jugglebot/config.yml
+      mode: 0644
+
+  - name: Ensure that WSL uses systemd
     # Note: Systemd is enabled by default, but this will change whitespace
     community.general.ini_file:
       path: '/etc/wsl.conf'
@@ -53,40 +147,36 @@
     import_tasks: "{{ environments_dir }}/ubuntu-common/dev_env_tasks.yml"
     vars:
       environments_dir: "{{ playbook_dir }}/.."
+      # config
+      # upgrade_software_enabled
 
   - name: Render the ssh config file
     template:
       src: "{{ environments_dir }}/ubuntu-wsl2/ssh_config.j2"
-      dest: "{{ ssh_config_rendered_filepath }}"
+      dest: "{{ host_setup_defaults_dir }}/ssh_config"
 
-  - name: Install ~/.ssh/config
+  - name: Install the ssh config file
     import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
     vars:
-      src: "{{ ssh_config_rendered_filepath }}"
+      src: "{{ host_setup_defaults_dir }}/ssh_config"
       remote_src: yes
       dest: "{{ home_dir }}/.ssh/config"
       readable_dest: ~/.ssh/config
-      mode: '0600'
+      mode: 0600
 
-  - name: Set user name in ~/.gitconfig
-    community.general.ini_file:
-      path: "{{ gitconfig_filepath }}"
-      section: 'user'
-      option: 'name'
-      value: "{{ git_name }}"
+  - name: Render the git config file
+    template:
+      src: "{{ environments_dir }}/ubuntu-wsl2/git_config.j2"
+      dest: "{{ host_setup_defaults_dir }}/git_config"
 
-  - name: Set user email in ~/.gitconfig
-    community.general.ini_file:
-      path: "{{ gitconfig_filepath }}"
-      section: 'user'
-      option: 'email'
-      value: "{{ git_email }}"
-
-  - name: Ensure that the Jugglebot repo has been cloned
-    git:
-      repo: "{{ jugglebot_repo_ssh_url }}"
-      dest: "{{ jugglebot_repo_dir }}"
-    when: clone_repo_enabled is truthy(convert_bool=True)
+  - name: Install the git config file
+    import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
+    vars:
+      src: "{{ host_setup_defaults_dir }}/git_config"
+      remote_src: yes
+      dest: "{{ home_dir }}/.gitconfig"
+      readable_dest: ~/.gitconfig
+      mode: 0644
 
   - name: Provision the Docker Engine & Qemu
     import_tasks: "{{ environments_dir }}/ubuntu-common/docker_engine_tasks.yml"
@@ -109,28 +199,11 @@
       remote_src: no
       dest: "{{ home_dir }}/bin/denv"
       readable_dest: ~/bin/denv
-      mode: '0755'
+      mode: 0755
 
-  - name: Set the default GitHub ssh key
-    command:
-      cmd: "{{ home_dir }}/bin/denv set-key -k '{{ ssh_keypair_name }}'"
-
-  - name: Read the ROS codename
-    command:
-      cmd: "/usr/bin/yq -r .ros.version_codename '{{ jugglebot_rc_rendered_filepath }}'"
-    register: yq_command_result
-    changed_when: False
-
-  - name: Set the ROS codename variable
+  - name: Set the ros_version_codename variable
     set_fact:
-      ros_version_codename: "{{ yq_command_result.stdout }}"
-
-  - name: Install python3-argcomplete if necessary
-    package:
-      name: python3-argcomplete
-      state: present
-    become: yes
-    when: ros_version_codename == 'foxy'
+      ros_version_codename: "{{ runtime_config['ros']['version_codename'] }}"
 
   - name: "Install ROS2 {{ ros_version_codename|capitalize }} Desktop .. please be very patient"
     #
@@ -143,10 +216,7 @@
     # Jugglebot/ros_ws/src/jugglebot_simulator/package.xml
     #
     package:
-      name: 
-        - "ros-{{ ros_version_codename }}-desktop"
-        - "ros-{{ ros_version_codename }}-webots-ros2"
-        - ros-dev-tools
+      name: "{{ ros_codename_to_ros_package_names[ros_version_codename] }}"
       state: present
     become: yes
 
@@ -162,7 +232,9 @@
 
   - name: Install the Jugglebot ROS dependencies
     shell:
-      cmd: "source /opt/ros/{{ ros_version_codename }}/setup.bash && rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}"
+      cmd: >
+        "source /opt/ros/{{ ros_version_codename }}/setup.bash
+        && rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}"
       executable: /usr/bin/bash
       chdir: "{{ home_dir }}/Jugglebot/ros_ws"
 

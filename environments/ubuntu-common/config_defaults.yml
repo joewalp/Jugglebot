@@ -1,0 +1,11 @@
+---
+git:
+  core:
+    editor: nano
+oh_my_zsh:
+  theme: clean
+ros:
+  domain_id: 0
+zsh:
+  editor: nano
+
