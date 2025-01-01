@@ -69,24 +69,13 @@
   - name: Import package version lookup dicts
     include_vars: "{{ environments_dir }}/ubuntu-common/package_version_lookup_vars.yml"
 
-  - name: Set the ros_codename variable and the python_version variable
+  - name: Set the ros_codename variable
     set_fact:
       ros_codename: "{{ ubuntu_codename_to_ros_codename[ubuntu_codename] }}"
-      python_version: "{{ ubuntu_codename_to_python_version[ubuntu_codename] }}"
 
-  - name: Render the Jugglebot runtime config file with the ROS codename
-    template:
-      src: "{{ environments_dir }}/ubuntu-common/jugglebot_rc.yml.j2"
-      dest: "{{ host_setup_defaults_dir }}/jugglebot_rc.yml"
-
-  - name: Install the Jugglebot runtime config file
-    import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
-    vars:
-      src: "{{ host_setup_defaults_dir }}/jugglebot_rc.yml"
-      remote_src: yes
-      dest: "{{ jugglebot_config_dir }}/jugglebot_rc.yml"
-      readable_dest: ~/.jugglebot/jugglebot_rc.yml
-      mode: '0644'
+  - name: Set the python_version variable
+    set_fact:
+      python_version: "{{ ros_codename_to_python_version[ros_codename] }}"
 
   - name: Render the jugglebot Conda env config with the Python version
     template:
