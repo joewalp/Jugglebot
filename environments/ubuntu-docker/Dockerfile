@@ -129,7 +129,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 # Note: We install this here rather than in the playbook to benefit from
 # dockerfile caching.
 
-ARG ROS_PACKAGE_LIST='python3-argcomplete ros-dev-tools ros-foxy-desktop \
+ARG ROS_PACKAGES_LIST='python3-argcomplete ros-dev-tools ros-foxy-desktop \
     ros-foxy-webots-ros2'
 
 RUN export DEBIAN_FRONTEND=noninteractive \
@@ -140,7 +140,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       http://packages.ros.org/ros2/ubuntu $(lsb_release -c -s) main" \
       | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
     && apt-get update \
-    && apt-get install -yq --no-install-recommends ${ROS_PACKAGE_LIST} \
+    && apt-get install -yq --no-install-recommends ${ROS_PACKAGES_LIST} \
     && /usr/bin/rosdep init
 
 # TASK [Install the Docker CLI]
@@ -198,9 +198,9 @@ RUN groupadd --system --gid "${DOCKER_GID}" docker \
     && echo -n "${USERNAME}:${USERNAME}" | chpasswd \
     && install -o "${USERNAME}" -g "${USERNAME}" -m 700 -d "/home/${USERNAME}/.ssh"
 
-# TASK [Provision the host environment gitconfig that was provided by setup.sh]
+# TASK [Provision the host environment git_config that was provided by setup.sh]
 
-COPY --chown="${USERNAME}:${USERNAME}" --chmod=644 [ "build/gitconfig", \
+COPY --chown="${USERNAME}:${USERNAME}" --chmod=644 [ "build/git_config", \
     "/home/${USERNAME}/.gitconfig" ]
 
 # TASK [Provision the ssh authorized_keys that was provided by setup.sh]

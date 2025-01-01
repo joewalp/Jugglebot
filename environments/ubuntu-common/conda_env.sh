@@ -14,40 +14,40 @@
 
 case "${EVENT_TYPE}" in
   activate)
-    
+
     # TASK [Initialize environment variables]
 
     export JUGGLEBOT_REPO_DIR="${HOME}/Jugglebot"
-    export JUGGLEBOT_RC_FILEPATH="${HOME}/.jugglebot/jugglebot_rc.yml"
+    export JUGGLEBOT_CONFIG_DIR="${HOME}/.jugglebot"
     export DISPLAY=':0'
 
     if [[ "${ROS_WORKAROUND_ENABLED:-no}" == 'yes' ]]; then
       echo '[INFO]: The ROS shell environment setup is skipped during the host setup' >&2
     else
-      
+
       # TASK [Determine the ROS shell setup script filepath]
-      
-      ROS_CODENAME="$(yq -r .ros.version_codename "${JUGGLEBOT_RC_FILEPATH}")"
+      JUGGLEBOT_CONFIG_FILEPATH="${JUGGLEBOT_CONFIG_DIR}/config.yml"
+      ROS_CODENAME="$( yq -r .ros.version_codename "${JUGGLEBOT_CONFIG_FILEPATH}" )"
       ROS_SETUP_FILEPATH="/opt/ros/${ROS_CODENAME}/setup.zsh"
-      
+
       if [[ -f "${ROS_SETUP_FILEPATH}" ]]; then
-        
+
         # TASK [Enable ROS by sourcing its setup script into the shell environment]
-        
+
         source "${ROS_SETUP_FILEPATH}"
-        
+
         # TASK [Specify the ROS domain id, which controls the discoverability of nodes]
 
-        export ROS_DOMAIN_ID="$(yq -r .ros.domain_id "${JUGGLEBOT_RC_FILEPATH}")"
-        
+        export ROS_DOMAIN_ID="$( yq -r .ros.domain_id "${JUGGLEBOT_CONFIG_FILEPATH}" )"
+
       else
         echo '[WARNING]: The ROS shell setup script was not found.' >&2
       fi
     fi
     ;;
-  
+
   deactivate)
-  
+
     # TASK [Cleanup environment variables]
 
     unset JUGGLEBOT_REPO_DIR
