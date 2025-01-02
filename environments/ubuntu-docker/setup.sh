@@ -93,11 +93,15 @@ done
 task 'Assert that an ssh identity was specified'
 
 if [[ -z "${SSH_IDENTITY_FILEPATH:-}" ]]; then
-  echo '[ERROR]: An ssh identity file is required. Invoke this command with the `-i [identity file]` switch (eg. `-i ~/.ssh/ed25519`)' >&2
+  echo '[ERROR]: An ssh identity file is required. Invoke this command with \
+the `-i [identity file]` switch (eg. `-i ~/.ssh/ed25519`)' >&2
   exit 2
 fi
 
 task 'Determine the ROS package requirements'
+
+# Note: We determine the ROS package requirements here rather than in the
+# playbook because the Dockerfile caches the installed packages.
 
 BASE_IMAGE_OS_RELEASE="${BASE_IMAGE_OS_RELEASE:-focal}"
 
@@ -105,22 +109,20 @@ if [[ -z "${DEBUG_REPO_DIR:-}" ]]; then
   JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
 else
   JUGGLEBOT_REPO_DIR="${DEBUG_REPO_DIR}"
-  echo -e "\n[WARNING]: Specifying an alternate repo location is not supported. The '--debug-repo-dir' flag should only be used when testing this script.\n" >&2
+  echo -e "\n[WARNING]: Specifying an alternate repo location is not \
+supported. The '--debug-repo-dir' flag should only be used when testing \
+this script.\n" >&2
 fi
 
 VERSION_LOOKUP_FILEPATH="${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/package_version_lookup_vars.yml"
 
-ROS_CODENAME="$( yq -r ".ubuntu_codename_to_ros_codename.${BASE_IMAGE_OS_RELEASE}" \
+ROS_CODENAME="$( yq -r \
+  ".ubuntu_codename_to_ros_codename.${BASE_IMAGE_OS_RELEASE}" \
   "${VERSION_LOOKUP_FILEPATH}" )"
 
 ROS_PACKAGES_LIST="$( yq -r -o csv --csv-separator ' ' \
   ".ros_codename_to_ros_package_names.${ROS_CODENAME}" \
   "${VERSION_LOOKUP_FILEPATH}" )"
-
-task 'Determine the Python version'
-
-PYTHON_VERSION="$(yq -r ".ros_codename_to_python_version.${ROS_CODENAME}" \
-  "${VERSION_LOOKUP_FILEPATH}")"
 
 task 'Determine the base image and the platform option'
 
@@ -139,7 +141,8 @@ case "${BASE_IMAGE_ARCHITECTURE}" in
     DENV_EXEC_COMMAND='denv exec --arch arm64'
     ;;
   *)
-    echo "[ERROR]: The specified architecture ${BASE_IMAGE_ARCHITECTURE} is not supported" >&2
+    echo "[ERROR]: The specified architecture ${BASE_IMAGE_ARCHITECTURE} is \
+not supported" >&2
     exit 2
     ;;
 esac
@@ -163,6 +166,7 @@ RETAIN_HOME_VOLUME="${RETAIN_HOME_VOLUME:-no}"
 DEV_ENV_USERNAME='devops' # This is also the default password for the user.
 SSH_PUBLIC_KEY_FILEPATH="${SSH_IDENTITY_FILEPATH}.pub"
 BUILD_CONTEXT_DIR="${JUGGLEBOT_REPO_DIR}/environments/ubuntu-docker"
+JUGGLEBOT_CONFIG_DIR="${JUGGLEBOT_CONFIG_DIR:-${HOME}/.jugglebot}"
 
 task 'Enable ssh-agent'
 
@@ -181,6 +185,9 @@ install -D -T "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/host_provisionin
 
 task 'Interpolate the jugglebot Conda environment file'
 
+PYTHON_VERSION="$(yq -r ".ros_codename_to_python_version.${ROS_CODENAME}" \
+  "${VERSION_LOOKUP_FILEPATH}")"
+
 python_version="${PYTHON_VERSION}" j2 \
   -o "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml" \
   -e 'python_version' "${JUGGLEBOT_REPO_DIR}/ros_ws/conda_env.yml.j2"
@@ -193,6 +200,16 @@ task "Copy ${SSH_PUBLIC_KEY_FILEPATH} to ssh_authorized_keys"
 
 install -D -T "${SSH_PUBLIC_KEY_FILEPATH}" \
   "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
+
+task 'Copy ~/.jugglebot/config.yml'
+
+install -D -T "${JUGGLEBOT_CONFIG_DIR}/config.yml" \
+  "${BUILD_CONTEXT_DIR}/build/config.yml"
+
+task 'Set the ROS version codename in config.yml'
+
+yq eval ".ros.version_codename = \"${ROS_CODENAME}\"" \
+  -i "${BUILD_CONTEXT_DIR}/build/config.yml"
 
 task "Build the Docker image named ${IMAGE_NAME}"
 
@@ -213,10 +230,11 @@ docker buildx build ${BUILD_NO_CACHE_OPTION} ${PLATFORM_OPTION} \
 
 task 'Cleanup the build context'
 
-rm -f "${BUILD_CONTEXT_DIR}/build/host_provisioning_conda_env.yml"
-rm -f "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
-rm -f "${BUILD_CONTEXT_DIR}/build/git_config"
-rm -f "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
+rm "${BUILD_CONTEXT_DIR}/build/host_provisioning_conda_env.yml"
+rm "${BUILD_CONTEXT_DIR}/build/jugglebot_conda_env.yml"
+rm "${BUILD_CONTEXT_DIR}/build/git_config"
+rm "${BUILD_CONTEXT_DIR}/build/ssh_authorized_keys"
+rm "${BUILD_CONTEXT_DIR}/build/config.yml"
 
 task 'Ensure that the Docker container is not running'
 
@@ -294,20 +312,10 @@ task 'Prompt next steps'
 
 echo -e "
 
-Run the following command to open a shell in the ${CONTAINER_NAME} container:
-
-  ${DENV_EXEC_COMMAND}
-
-Alternately, you can ssh into the container using the following command:
-
-  ssh ${SSH_HOST}
-
----
-
 Notes:
 
-1. By default, the user in the container is named ${DEV_ENV_USERNAME}, and the password
-   for that user is the same as the username.
+1. By default, the user in the container is named ${DEV_ENV_USERNAME}, and the
+   password for that user is the same as the username.
 
 2. Only the /home directory and the /tmp directory will persist across
    container restarts. The /home directory is a mounted docker volume named
@@ -327,7 +335,18 @@ Notes:
    internet-facing services within the container.
 
 5. The ~/.oh-my-zsh/custom directory in the WSL2 environment is mounted to the
-   /home/${DEV_ENV_USERNAME}/.oh-my-zsh/custom directory in the container. This simplifies
-   keeping the environments and aliases in sync.
+   /home/${DEV_ENV_USERNAME}/.oh-my-zsh/custom directory in the container. This
+   simplifies keeping the environments and aliases in sync.
+
+---
+
+Run the following command to open a shell in the ${CONTAINER_NAME} container:
+
+  ${DENV_EXEC_COMMAND}
+
+Alternately, you can ssh into the container using the following command:
+
+  ssh ${SSH_HOST}
+
 "
 

@@ -277,6 +277,8 @@ RUN --mount=type=ssh,mode=0666 cd "/home/${USERNAME}/Jugglebot" \
     && git pull \
     && git checkout "${JUGGLEBOT_REPO_BRANCH}"
 
+COPY build/config.yml ./.jugglebot/config.yml
+
 # TASK [Run the ubuntu-common base setup and then the playbook]
 
 RUN "./Jugglebot/environments/ubuntu-docker/base_setup_and_playbook.sh" \
