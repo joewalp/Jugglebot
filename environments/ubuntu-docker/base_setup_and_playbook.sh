@@ -60,6 +60,5 @@ ANSIBLE_LOCALHOST_WARNING=False \
   ANSIBLE_BECOME_PASS="${ANSIBLE_BECOME_PASS}" \
   ansible-playbook \
     "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-docker/main_playbook.yml" \
-    -e "upgrade_packages_enabled__='yes'" \
-    -e "ros_version_codename='${ROS_CODENAME}'"
+    -e "upgrade_packages_enabled__='yes'"
 
