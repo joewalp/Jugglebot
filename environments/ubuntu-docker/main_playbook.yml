@@ -8,6 +8,7 @@
     home_dir: "{{ ansible_facts['env']['HOME'] }}"
     ubuntu_codename: "{{ ansible_facts['distribution_release'] }}"
     upgrade_packages_enabled: "{{ upgrade_packages_enabled__ | bool }}"
+    jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
 
   tasks:
 
@@ -18,13 +19,42 @@
       dest: "{{ home_dir }}"
       force: no
 
+  - name: Read the config defaults file
+    slurp:
+      src: "{{ environments_dir }}/ubuntu-common/config_defaults.yml"
+    register: config_defaults_read_result
+
+  - name: Set the default_config variable
+    set_fact:
+      default_config: >
+        {{ config_defaults_read_result.content | b64decode | from_yaml }}
+
+  - name: Read the copied config file
+    slurp:
+      src: "{{ jugglebot_config_dir }}/config.yml"
+    register: copied_config_read_result
+
+  - name: Set the copied_config variable
+    set_fact:
+      copied_config: >
+        {{ copied_config_read_result.content | b64decode | from_yaml }}
+
+  - name: Import the package version lookup dicts
+    include_vars: "{{ environments_dir }}/ubuntu-common/package_version_lookup_vars.yml"
+
+  - name: Create the overlayed config
+    set_fact:
+      config: >
+        {{ default_config
+        | combine(copied_config, recursive=True) }}
+
   - name: Require that the host-provisioning Conda environment is activated
     assert:
       that: ansible_facts['env']['CONDA_DEFAULT_ENV'] == 'host-provisioning'
       fail_msg: >
         [ERROR]: This playbook expects for the host-provisioning Conda
-        environment to be activated. Activate that environment using the
-        following command: `conda activate host-provisioning`
+        environment to be activated. Typically, that should have been done by
+        sourcing `ubuntu-common/base_setup.sh` prior to running this playbook.
       quiet: yes
 
   - name: Provision the Ubuntu environment
@@ -36,13 +66,6 @@
     command:
       cmd: /usr/bin/rosdep update
 
-  - name: Import the package version lookup dicts
-    include_vars: "{{ environments_dir }}/ubuntu-common/package_version_lookup_vars.yml"
-
-  - name: Set the ros_version_codename variable
-    set_fact:
-      ros_version_codename: "{{ ubuntu_codename_to_ros_codename[ubuntu_codename] }}"
-
   - name: Install the Jugglebot ROS dependencies
     shell:
       cmd: >
@@ -50,4 +73,4 @@
         && rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}
       executable: /usr/bin/bash
       chdir: "{{ ros_workspace_dir }}"
- 
+
