@@ -69,7 +69,7 @@ do_build() {
     exit 2
   fi
 
-  local ssh_identity_filepath = "$( yq -r .denv.identity_filepath "${JUGGLEBOT_CONFIG_DIR}/config.yml" )"
+  local ssh_identity_filepath="$( yq -r .denv.identity_filepath "${JUGGLEBOT_CONFIG_DIR}/config.yml" )"
 
   # Note: The following setup.sh script has several features that support
   # development of the container. We do not expose those features in this script
