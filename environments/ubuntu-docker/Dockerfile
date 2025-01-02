@@ -279,7 +279,7 @@ RUN --mount=type=ssh,mode=0666 cd "/home/${USERNAME}/Jugglebot" \
 
 # TASK [Run the ubuntu-common base setup and then the playbook]
 
-RUN "${ENVIRONMENTS_DIR}/ubuntu-docker/base_setup_and_playbook.sh" \
+RUN "./Jugglebot/environments/ubuntu-docker/base_setup_and_playbook.sh" \
       --ansible-become-pass "${USERNAME}"
 
 # TASK [Install entrypoint.sh]
