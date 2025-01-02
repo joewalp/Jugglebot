@@ -6,8 +6,8 @@
     environments_dir: "{{ playbook_dir }}/.."
     ros_workspace_dir: "{{ playbook_dir }}/../../ros_ws"
     home_dir: "{{ ansible_facts['env']['HOME'] }}"
+    ubuntu_codename: "{{ ansible_facts['distribution_release'] }}"
     upgrade_packages_enabled: "{{ upgrade_packages_enabled__ | bool }}"
-    ros_version_codename: 'foxy'
 
   tasks:
 
@@ -35,6 +35,13 @@
   - name: Update the rosdep package manager
     command:
       cmd: /usr/bin/rosdep update
+
+  - name: Import the package version lookup dicts
+    include_vars: "{{ environments_dir }}/ubuntu-common/package_version_lookup_vars.yml"
+
+  - name: Set the ros_version_codename variable
+    set_fact:
+      ros_version_codename: "{{ ubuntu_codename_to_ros_codename[ubuntu_codename] }}"
 
   - name: Install the Jugglebot ROS dependencies
     shell:
