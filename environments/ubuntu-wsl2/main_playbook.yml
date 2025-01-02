@@ -146,20 +146,20 @@
   - name: Set the current_config variable
     set_fact:
       current_config: >
-        "{{ current_config_read_result.content | b64decode |
-        from_yaml if current_config_read_result is defined else {} }}"
+        {{ current_config_read_result.content | b64decode |
+        from_yaml if current_config_read_result is defined else {} }}
     when: (jugglebot_config_dir ~ '/config.yml') is file
 
   - name: Create the overlayed config
     set_fact:
       config: >
-        "{{ default_config
-        | combine(ros_config)
-        | combine(current_config)
-        | combine(editor_config)
-        | combine(git_name_config)
-        | combine(git_email_config)
-        | combine(ssh_identity_config) }}"
+        {{ default_config
+        | combine(ros_config, recursive=True)
+        | combine(current_config, recursive=True)
+        | combine(editor_config, recursive=True)
+        | combine(git_name_config, recursive=True)
+        | combine(git_email_config, recursive=True)
+        | combine(ssh_identity_config, recursive=True) }}
 
   - name: Ensure that the host setup defaults directory exists
     file:
@@ -179,15 +179,6 @@
       dest: "{{ jugglebot_config_dir }}/config.yml"
       readable_dest: ~/.jugglebot/config.yml
       mode: 0644
-
-  - name: Ensure that WSL uses systemd
-    # Note: Systemd is enabled by default, but this will change whitespace
-    community.general.ini_file:
-      path: '/etc/wsl.conf'
-      section: 'boot'
-      option: 'systemd'
-      value: 'true'
-    become: yes
 
   - name: Disable the WSL welcome message
     file:
@@ -255,7 +246,7 @@
 
   - name: Set the ros_version_codename variable
     set_fact:
-      ros_version_codename: "{{ runtime_config['ros']['version_codename'] }}"
+      ros_version_codename: "{{ config.ros.version_codename }}"
 
   - name: "Install ROS2 {{ ros_version_codename|capitalize }} Desktop .. please be very patient"
     package:
@@ -276,8 +267,8 @@
   - name: Install the Jugglebot ROS dependencies
     shell:
       cmd: >
-        "source /opt/ros/{{ ros_version_codename }}/setup.bash
-        && rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}"
+        source /opt/ros/{{ ros_version_codename }}/setup.bash
+        && rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}
       executable: /usr/bin/bash
-      chdir: "{{ home_dir }}/Jugglebot/ros_ws"
+      chdir: "{{ jugglebot_repo_dir }}/ros_ws"
 
