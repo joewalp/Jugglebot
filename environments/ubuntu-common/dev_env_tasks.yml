@@ -37,23 +37,36 @@
 
 - name: Set the packages upgraded timestamp
   set_fact:
-    packages_upgraded_timestamp: "{{ (packages_upgraded_read_result.content|int) if (packages_upgraded_filepath is file) else 0 }}"
+    packages_upgraded_timestamp: >
+      {{ (packages_upgraded_read_result.content|int) if
+      ( ( host_setup_dir ~ '/packages_upgraded_timestamp') is file ) else 0 }}
 
-- name: Interpret the packages upgraded timestamp
+- name: Determine whether the packages are more than a week stale
   set_fact:
-    packages_stale: "{{ ( now(utc=True, fmt='%s')|int - packages_upgraded_timestamp|int ) > ( 60 * 60 * 24 * 7 ) }}"
+    packages_stale: >
+      {{ ( now(utc=True, fmt='%s')|int - packages_upgraded_timestamp|int ) >
+      ( 60 * 60 * 24 * 7 ) }}
 
-- name: If the apt cache is more than a week stale and upgrade_packages isn't requested, offer to abort
+- name: Prompt to abort if package upgrade isn't enabled and packages are stale
   pause:
-    prompt: "\nTo perform safe package upgrades, run this playbook with `-e 'upgrade_packages_enabled__=yes'`.\n\nDo you want to continue without upgrading packages? (yes/no)"
+    prompt: >
+      \nTo perform safe package upgrades, run this playbook with
+      `-e 'upgrade_packages_enabled__=yes'`.\n\nDo you want to continue
+      without upgrading packages? (yes/no)
   register: continue_without_upgrades_result
   delegate_to: localhost
-  when: packages_stale and not upgrade_packages_enabled
+  when: not upgrade_packages_enabled and packages_stale
 
-- name: Interpret the response for the offer to abort
+- name: Interpret the response to the offer to abort
+  set_fact:
+    packages_stale_abort: >
+      not continue_without_upgrades_result.user_input | bool
+  when: not upgrade_packages_enabled and packages_stale
+
+- name: Abort if requested
   fail:
-    msg: "[WARNING]: Aborting as requested"
-  when: packages_stale and not upgrade_packages_enabled and not continue_without_upgrades_result.user_input|bool
+    msg: "[Warning]: Aborting as requested"
+  when: not upgrade_packages_enabled and packages_stale and packages_stale_abort
 
 - name: Run apt commands update, upgrade and autoremove .. please be patient
   apt:
@@ -67,7 +80,7 @@
 - name: Write the packages upgraded timestamp
   copy:
     content: "{{ now(utc=True, fmt='%s') }}"
-    dest: "{{ packages_upgraded_filepath }}"
+    dest: "{{ host_setup_dir ~ '/packages_upgraded_timestamp' }}"
   when: upgrade_packages_enabled and upgrade_packages_result is succeeded
 
 - name: Ensure that essential applications are installed .. please be patient
@@ -126,7 +139,9 @@
 - name: Warn if Oh My Zsh wasn't upgraded
   assert:
     that: True
-    success_msg: "[WARNING]: Oh My Zsh was not upgraded. To upgrade, run this playbook with `-e 'upgrade_packages_enabled__=yes'`."
+    success_msg: >
+      [WARNING]: Oh My Zsh was not upgraded. To upgrade, run this playbook
+      with `-e 'upgrade_packages_enabled__=yes'`.
   when: not upgrade_packages_enabled
 
 - name: Render the zsh runtime config file
@@ -197,7 +212,7 @@
   file:
     path: "{{ home_dir }}/.sudo_as_admin_successful"
     state: touch
-  when: not sudo_welcome_flag_filepath is file
+  when: not ( home_dir ~ '/.sudo_as_admin_successful' ) is file
 
 - name: Install ~/.tmux.conf
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
