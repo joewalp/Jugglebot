@@ -93,7 +93,7 @@
 
 - name: "Determine whether we need to generate a diff"
   set_fact:
-    diff_needed: dest_existed and not (dest_previously_installed and dest_vanilla)
+    diff_needed: "{{ dest_existed and not (dest_previously_installed and dest_vanilla) }}"
 
 - name: "Create a file for the {{ readable_dest }} diff if necessary"
   tempfile:

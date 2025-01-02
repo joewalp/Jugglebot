@@ -1,24 +1,24 @@
 ---
 denv:
-  identity_filepath: {{ config['denv']['identity_filepath'] }}
+  identity_filepath: {{ config.denv.identity_filepath }}
 git:
   core:
-    editor: {{ config['git']['core']['editor'] }}
+    editor: {{ config.git.core.editor }}
   user:
-    name: {{ config['git']['user']['name'] }}
-    email: {{ config['git']['user']['email'] }}
+    name: {{ config.git.user.name }}
+    email: {{ config.git.user.email }}
 oh_my_zsh:
-  theme: {{ config['oh_my_zsh']['theme'] }}
+  theme: {{ config.oh_my_zsh.theme }}
 ros:
-  version_codename: {{ config['ros']['ros_codename'] }}
-  domain_id: {{ config['ros']['domain_id'] }}
+  version_codename: {{ config.ros.version_codename }}
+  domain_id: {{ config.ros.domain_id }}
 ssh:
   github_com:
-    identity_filepath: {{ config['ssh']['github_com']['identity_filepath'] }}
+    identity_filepath: {{ config.ssh.github_com.identity_filepath }}
   docker_native_env:
-    identity_filepath: {{ config['ssh']['docker_native_env']['identity_filepath'] }}
+    identity_filepath: {{ config.ssh.docker_native_env.identity_filepath }}
   docker_arm64_env:
-    identity_filepath: {{ config['ssh']['docker_arm64_env']['identity_filepath'] }}
+    identity_filepath: {{ config.ssh.docker_arm64_env.identity_filepath }}
 zsh:
-  editor: {{ config['zsh']['editor'] }}
+  editor: {{ config.zsh.editor }}
 
