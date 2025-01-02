@@ -78,7 +78,7 @@ do_build() {
 
   "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-docker/setup.sh" \
     --arch "${base_image_architecture}" \
-    --debug-git-branch dev-env-provisioning \
+    --x-git-branch dev-env-provisioning \
     --container-name "${container_name}" \
     -i "${ssh_identity_filepath}" || rc=$?
 

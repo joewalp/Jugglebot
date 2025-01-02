@@ -4,9 +4,10 @@
   connection: local
   vars:
     environments_dir: "{{ playbook_dir }}/.."
+    ros_workspace_dir: "{{ playbook_dir }}/../../ros_ws"
     home_dir: "{{ ansible_facts['env']['HOME'] }}"
-    ros_workspace_dir: "{{ home_dir }}/Jugglebot/ros_ws"
-    jugglebot_rc_rendered_filepath: "{{ home_dir }}/.jugglebot/host_setup/defaults/jugglebot_rc.yml"
+    upgrade_packages_enabled: "{{ upgrade_packages_enabled__ | bool }}"
+    ros_version_codename: 'foxy'
 
   tasks:
 
@@ -20,7 +21,10 @@
   - name: Require that the host-provisioning Conda environment is activated
     assert:
       that: ansible_facts['env']['CONDA_DEFAULT_ENV'] == 'host-provisioning'
-      fail_msg: '[ERROR]: This playbook expects for the host-provisioning Conda environment to be activated. Activate that environment using the following command: `conda activate host-provisioning`'
+      fail_msg: >
+        [ERROR]: This playbook expects for the host-provisioning Conda
+        environment to be activated. Activate that environment using the
+        following command: `conda activate host-provisioning`
       quiet: yes
 
   - name: Provision the Ubuntu environment
@@ -32,19 +36,11 @@
     command:
       cmd: /usr/bin/rosdep update
 
-  - name: Read the ROS codename
-    command:
-      cmd: "/usr/bin/yq -r .ros.version_codename '{{ jugglebot_rc_rendered_filepath }}'"
-    register: yq_command_result
-    changed_when: False
-
-  - name: Set the ROS codename variable
-    set_fact:
-      ros_version_codename: "{{ yq_command_result.stdout }}"
-
   - name: Install the Jugglebot ROS dependencies
     shell:
-      cmd: "source /opt/ros/{{ ros_version_codename }}/setup.bash && rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}"
+      cmd: >
+        source /opt/ros/{{ ros_version_codename }}/setup.bash
+        && rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}
       executable: /usr/bin/bash
       chdir: "{{ ros_workspace_dir }}"
  

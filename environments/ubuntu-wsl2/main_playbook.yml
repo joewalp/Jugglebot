@@ -28,28 +28,37 @@
     assert:
       that: ssh_identity_filepath
       quiet: yes
-      fail_msg: 'When upgrade mode is not enabled, this playbook requires that the ssh identity file be specified using `-e "ssh_identity_filepath=''[identity file]''"`.'
+      fail_msg: >
+        When upgrade mode is not enabled, this playbook requires that the ssh
+        identity file be specified using
+        `-e "ssh_identity_filepath=''[identity file]''"`.
     when: not upgrade_mode_enabled
 
   - name: Ensure that the specified ssh keypair exists
     assert:
       that: "ssh_identity_filepath is file and (ssh_identity_filepath ~ '.pub') is file"
       quiet: yes
-      fail_msg: "The specified ssh keypair ('{{ ssh_identity_filepath }}', '{{ ssh_identity_filepath }}.pub') was not found."
+      fail_msg: >
+        The specified ssh keypair ('{{ ssh_identity_filepath }}',
+        '{{ ssh_identity_filepath }}.pub') was not found.
     when: not upgrade_mode_enabled
 
   - name: Ensure that the git_name was specified
     assert:
       that: git_name
       quiet: yes
-      fail_msg: 'When upgrade mode is not enabled, this playbook requires that the git name be specified using `-e "git_name=''[your full name]''"`.'
+      fail_msg: >
+        When upgrade mode is not enabled, this playbook requires that the git
+        name be specified using `-e "git_name=''[your full name]''"`.
     when: not upgrade_mode_enabled
 
   - name: Ensure that the git_email was specified
     assert:
       that: git_email
       quiet: yes
-      fail_msg: 'When upgrade mode is not enabled, this playbook requires that the git name be specified using `-e "git_email=''[your email address]''"`.'
+      fail_msg: >
+        When upgrade mode is not enabled, this playbook requires that the git
+        name be specified using `-e "git_email=''[your email address]''"`.
     when: not upgrade_mode_enabled
 
   - name: Check whether the specifed editor exists
@@ -248,7 +257,9 @@
     set_fact:
       ros_version_codename: "{{ config.ros.version_codename }}"
 
-  - name: "Install ROS2 {{ ros_version_codename|capitalize }} Desktop .. please be very patient"
+  - name: >
+      Install ROS2 {{ ros_version_codename|capitalize }} Desktop .. please be
+      very patient
     package:
       name: "{{ ros_codename_to_ros_package_names[ros_version_codename] }}"
       state: present
