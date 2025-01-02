@@ -177,7 +177,7 @@
   vars:
     src: "{{ environments_dir }}/ubuntu-common/vimrc"
     remote_src: no
-    dest: "{{ home_dir }}.vimrc"
+    dest: "{{ home_dir }}/.vimrc"
     readable_dest: ~/.vimrc
     mode: 0644
 

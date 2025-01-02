@@ -1,6 +1,6 @@
 Host github.com
     Hostname github.com
-    IdentityFile {{ config['ssh']['github_com']['identity_filepath'] }}
+    IdentityFile {{ config.ssh.github_com.identity_filepath }}
     IdentitiesOnly yes
     User git
     StrictHostKeyChecking accept-new
@@ -9,7 +9,7 @@ Host github.com
 Host docker-native-env
     Hostname localhost
     Port 4022
-    IdentityFile {{ config['ssh']['docker_native_env']['identity_filepath'] }}
+    IdentityFile {{ config.ssh.docker_native_env.identity_filepath }}
     IdentitiesOnly yes
     User devops
     StrictHostKeyChecking no
@@ -19,7 +19,7 @@ Host docker-native-env
 Host docker-arm64-env
     Hostname localhost
     Port 4122
-    IdentityFile {{ config['ssh']['docker_arm64_env']['identity_filepath'] }}
+    IdentityFile {{ config.ssh.docker_arm64_env.identity_filepath }}
     IdentitiesOnly yes
     User devops
     StrictHostKeyChecking no
