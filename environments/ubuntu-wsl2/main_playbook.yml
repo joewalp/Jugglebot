@@ -101,10 +101,10 @@
     set_fact:
       editor_config:
         zsh:
-          editor: editor
+          editor: "{{ editor }}"
         git:
           core:
-            editor: editor
+            editor: "{{ editor }}"
     when: editor
 
   - name: Set the git_name_config variable
