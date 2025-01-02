@@ -3,7 +3,6 @@
 # - environments_dir
 # - config
 # - upgrade_packages_enabled
-
 - name: Load variables
   include_vars: "{{ environments_dir }}/ubuntu-common/dev_env_vars.yml"
 
@@ -32,9 +31,9 @@
 
 - name: Read the packages upgraded timestamp
   slurp:
-    src: "{{ packages_upgraded_filepath }}"
+    src: "{{ host_setup_dir }}/packages_upgraded_timestamp"
   register: packages_upgraded_read_result
-  when: packages_upgraded_filepath is file
+  when: ( host_setup_dir ~ '/packages_upgraded_timestamp' ) is file
 
 - name: Set the packages upgraded timestamp
   set_fact:
@@ -121,7 +120,7 @@
 - name: Write the Oh My Zsh upgraded timestamp
   copy:
     content: "{{ now(utc=True, fmt='%s') }}"
-    dest: "{{ ohmyzsh_upgraded_filepath }}"
+    dest: "{{ host_setup_dir }}/ohmyzsh_upgraded_timestamp"
   when: ohmyzsh_update_result is changed or upgrade_packages_enabled
 
 - name: Warn if Oh My Zsh wasn't upgraded
@@ -196,7 +195,7 @@
 
 - name: Disable the sudo welcome message
   file:
-    path: "{{ sudo_welcome_flag_filepath }}"
+    path: "{{ home_dir }}/.sudo_as_admin_successful"
     state: touch
   when: not sudo_welcome_flag_filepath is file
 
