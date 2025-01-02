@@ -56,25 +56,25 @@ while [[ $# -gt 0 ]]; do
       shift;
       shift;
       ;;
-    -e|--debug-repo-dir)
-      DEBUG_REPO_DIR="$2"
-      shift
-      shift
-      ;;
-    -b|--debug-git-branch)
+    --x-git-branch)
       GIT_BRANCH="$2"
       shift
       shift
       ;;
-    --no-cache)
+    --x-repo-dir)
+      DEBUG_REPO_DIR="$2"
+      shift
+      shift
+      ;;
+    --x-no-cache)
       BUILD_NO_CACHE_OPTION='--no-cache'
       shift
       ;;
-    --no-repo-cache)
+    --x-no-repo-cache)
       REPO_CACHE_ID="$(date +%s)"
       shift
       ;;
-    --retain-home-volume)
+    --x-retain-home-volume)
       RETAIN_HOME_VOLUME="$2" # no|yes
       shift
       shift
@@ -198,6 +198,7 @@ task "Build the Docker image named ${IMAGE_NAME}"
 
 docker buildx build ${BUILD_NO_CACHE_OPTION} ${PLATFORM_OPTION} \
   --build-arg "BASE_IMAGE=${BASE_IMAGE}" \
+  --build-arg "ROS_CODENAME=${ROS_CODENAME}" \
   --build-arg "ROS_PACKAGES_LIST=${ROS_PACKAGES_LIST}" \
   --build-arg "USER_UID=$(id --user)" \
   --build-arg "USER_GID=$(id --group)" \
