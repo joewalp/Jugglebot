@@ -69,7 +69,8 @@ do_build() {
     exit 2
   fi
 
-  local ssh_identity_filepath="$( yq -r .denv.identity_filepath "${JUGGLEBOT_CONFIG_DIR}/config.yml" )"
+  local ssh_identity_filepath="$( yq -r .denv.identity_filepath \
+    "${JUGGLEBOT_CONFIG_DIR}/config.yml" )"
 
   # Note: The following setup.sh script has several features that support
   # development of the container. We do not expose those features in this script
@@ -136,11 +137,24 @@ do_exec() {
   # TASK [Ensure that the configured identity has been added]
 
   if [[ -f "${JUGGLEBOT_CONFIG_FILEPATH}" ]]; then
-    local ssh_identity_filepath="$( yq -r .denv.identity_filepath "${JUGGLEBOT_CONFIG_FILEPATH}" )"
-    if [[ -f "${ssh_identity_filepath}" ]]; then
-      ssh-add "${ssh_identity_filepath}"
+
+    local ssh_identity_filepath="$( yq -r .denv.identity_filepath \
+      "${JUGGLEBOT_CONFIG_FILEPATH}" )"
+
+    # TASK [Check whether the ssh-agent contains the configured identity]
+
+    if [[ -f "${ssh_identity_filepath}" && -f "${ssh_identity_filepath}.pub" ]]; then
+
+      if ! ssh-add -T "${ssh_identity_filepath}.pub" >/dev/null 2>&1; then
+
+        # TASK [Add the configured identity to the ssh-agent]
+
+        # Note: This will prompt for a passphrase if the key requires one.
+
+        ssh-add "${ssh_identity_filepath}"
+      fi
     else
-      echo '[WARNING]: The configured ssh key does not exist.' >&2
+      echo '[WARNING]: The configured ssh keypair does not exist.' >&2
     fi
   else
     echo '[WARNING]: No ssh key has been configured.' >&2
