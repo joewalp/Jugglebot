@@ -406,6 +406,8 @@ rqt
 Within the `rqt` UI, select `Plugins` > `Services` > `Service Caller`. See the
 `turtlesim` tutorial linked above for suggestions about which services to call.
 
+---
+
 #### Task 2. Drive WSL from VSCode for Windows
 
 The `WSL` extension for VSCode for Windows allows you to drive a WSL
