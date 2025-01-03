@@ -1,3 +1,4 @@
+---
 name: depgraph
 channels:
   - conda-forge
@@ -8,4 +9,3 @@ dependencies:
 
   - pip:
     - asciinet
-
