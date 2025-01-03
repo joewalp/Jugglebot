@@ -199,11 +199,23 @@ task 'Enable ssh-agent'
 
 eval "$(ssh-agent -s)"
 
-task 'Add the ssh private key'
+task 'Assert that the configured ssh keypair exists'
 
-# Note: This will prompt for the passphrase if the key requires one
+if [[ ! -f "${SSH_IDENTITY_FILEPATH}" || ! -f "${SSH_IDENTITY_FILEPATH}.pub" ]]; then
+  echo '[Error]: The specified ssh keypair does not exist.' >&2
+  exit $EX_UNAVAILABLE
+fi
 
-ssh-add "${SSH_IDENTITY_FILEPATH}"
+task 'Check whether the ssh-agent contains the configured identity'
+
+if ! ssh-add -T "${SSH_IDENTITY_FILEPATH}.pub" >/dev/null 2>&1; then
+
+  task 'Add the configured identity to the ssh-agent'
+
+  # Note: This will prompt for a passphrase if the key requires one.
+
+  ssh-add "${SSH_IDENTITY_FILEPATH}"
+fi
 
 task 'Source ubuntu-common/base_setup.sh'
 
