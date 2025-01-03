@@ -15,7 +15,7 @@ sudo /usr/bin/dbus-daemon --system &
 
 sudo /usr/sbin/sshd -D &
 
-# TASK [Determine whether the user's nome directory needs to be initialized]
+# TASK [Determine whether the user's home directory needs to be initialized]
 
 if [[ ! -f "${INIT_FLAG_FILEPATH}" ]]; then
 
