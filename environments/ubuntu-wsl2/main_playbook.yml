@@ -266,20 +266,28 @@
     become: yes
 
   - name: Initialize the rosdep package manager
+    # Note: We skip this during upgrade mode because it will have been
+    # performed by ubuntu-common/refresh-dependencies.
     command:
       cmd: /usr/bin/rosdep init
-    when: not '/etc/ros/rosdep/sources.list.d/20-default.list' is file
+    when: not '/etc/ros/rosdep/sources.list.d/20-default.list' is file and not upgrade_mode_enabled
     become: yes
 
   - name: Update the rosdep package manager
+    # Note: We skip this during upgrade mode because it will have been
+    # performed by ubuntu-common/refresh-dependencies.
     command:
       cmd: /usr/bin/rosdep update
+    when: not upgrade_mode_enabled
 
   - name: Install the Jugglebot ROS dependencies
+    # Note: We skip this during upgrade mode because it will have been
+    # performed by ubuntu-common/refresh-dependencies.
     shell:
       cmd: >
         source /opt/ros/{{ ros_version_codename }}/setup.bash
         && rosdep install -i --from-path src --rosdistro {{ ros_version_codename }}
       executable: /usr/bin/bash
       chdir: "{{ jugglebot_repo_dir }}/ros_ws"
+    when: not upgrade_mode_enabled
 
