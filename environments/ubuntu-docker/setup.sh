@@ -172,7 +172,7 @@ JUGGLEBOT_CONFIG_DIR="${JUGGLEBOT_CONFIG_DIR:-${HOME}/.jugglebot}"
 
 task 'Enable ssh-agent if necessary'
 
-if ! pgrep ssh-agent >/dev/null 2>&1; then
+if [[ -z "${SSH_AUTH_SOCK:-}" ]]; then
   eval "$(ssh-agent -s)"
 fi
 
