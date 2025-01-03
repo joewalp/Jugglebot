@@ -8,6 +8,28 @@ EX_OSFILE=72
 
 # TASK [Define functions]
 
+usage() {
+  echo '
+usage: setup.sh [Options]
+
+Options:
+  -h|--help              Display this usage message
+  -I|--install           Enable install mode, which will initialize the config
+                         file at ~/.jugglebot/config.yml
+  -e|--editor [vim|nano] Specify the preferred editor for git commits and the
+                         EDITOR environment variable
+  -i [ssh identity file] Specify the ssh private key that will be used for
+                         GitHub and the Docker containers
+  -E|--git-email [your email address]
+                         Specify your name for the user.email section of
+                         ~/.gitconfig
+  -N|--git-name [your full name]
+                         Specify your name for the user.name section of
+                         ~/.gitconfig
+
+'
+}
+
 task() {
   local task_desc="$1"
   echo -e "\nTASK [${task_desc}] ********"
@@ -17,6 +39,10 @@ task 'Parse the arguments'
 
 while [[ $# -gt 0 ]]; do
   case $1 in
+    -h|--help)
+      print_usage
+      exit 0
+      ;;
     -e|--editor)
       EDITOR="$2"
       shift
@@ -98,7 +124,9 @@ if [[ -z "${DEBUG_REPO_DIR}" ]]; then
   REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
 else
   REPO_DIR="${DEBUG_REPO_DIR}"
-  echo -e "\n[Warning]: Specifying an alternate repo location is not supported. The '--x-repo-dir' flag should only be used when testing this script.\n" >&2
+  echo -e "\n[Warning]: Specifying an alternate repo location is not \
+supported. The '--x-repo-dir' flag should only be used when testing this \
+script.\n" >&2
 fi
 
 task 'Assert that an ssh identity file was specified'
@@ -115,8 +143,8 @@ used until yq has been provisioned.' >&2
       exit $EX_UNAVAILABLE
     fi
   else
-    echo '[Error]: An ssh identity file is required when the `--upgrade` \
-option is not specified. Invoke this command with the `-i [identity file]` \
+    echo '[Error]: An ssh identity file is required when the `--install` \
+option is specified. Invoke this command with the `-i [identity file]` \
 switch (eg. `-i ~/.ssh/ed25519`)' >&2
     exit 2
   fi
@@ -132,20 +160,26 @@ fi
 task 'Assert that a git name was specified'
 
 if [[ -z "${GIT_NAME}" && "${UPGRADE_MODE_ENABLED}" == 'no' ]]; then
-  echo '[Error]: A git name is required when the `--upgrade` option is not specified. Invoke this command with the `--git-name "[Your full name]"` switch (eg. `--git-name "Jane Doe"`)' >&2
+  echo '[Error]: A git name is required when the `--install` option is \
+specified. Invoke this command with the `--git-name "[Your full name]"` \
+switch (eg. `--git-name "Jane Doe"`)' >&2
   exit 2
 fi
 
 task 'Assert that a git email was specified'
 
 if [[ -z "${GIT_EMAIL}" && "${UPGRADE_MODE_ENABLED}" == 'no' ]]; then
-  echo '[Error]: A git email is required when the `--upgrade` option is not specified. Invoke this command with the `--git-email "[your email address]"` switch (eg. `--git-email "jane.doe@gmail.com"`)' >&2
+  echo '[Error]: A git email is required when the `--install` option is \
+specified. Invoke this command with the `--git-email "[your email address]"` \
+switch (eg. `--git-email "jane.doe@gmail.com"`)' >&2
   exit 2
 fi
 
 if [[ -n "${EDITOR}" ]]; then
   if ! which "${EDITOR}" >/dev/null 2>&1 ; then
-    echo "[Error]: The specified editor ${EDITOR} is not installed. Supported editors include vim [recommended] and nano. If you want to use a different editor, install it before running this script." >&2
+    echo "[Error]: The specified editor ${EDITOR} is not installed. Supported \
+editors include vim [recommended] and nano. If you want to use a different \
+editor, install it before running this script." >&2
     exit $EX_UNAVAILABLE
   fi
 fi
@@ -166,9 +200,11 @@ source "${REPO_DIR}/environments/ubuntu-common/base_setup.sh"
 
 task 'Run the ubuntu-wsl2 Ansible playbook'
 
-echo -e "\nEnter your password to enable the playbook to configure this Ubuntu host"
+echo -e "\nEnter your password to enable the playbook to configure this \
+Ubuntu host"
 
-ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False ansible-playbook \
+ANSIBLE_LOCALHOST_WARNING=False ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
+  ansible-playbook \
   "${REPO_DIR}/environments/ubuntu-wsl2/main_playbook.yml" \
   --ask-become-pass \
   -e "git_email='${GIT_EMAIL}'" \
@@ -187,4 +223,6 @@ if [[ $rc -ne 0 ]]; then
   exit $rc
 fi
 
-echo -e "\nPlease exit and create a new terminal session to enable all changes\n"
+echo -e "\nPlease exit and create a new terminal session to enable all \
+changes\n"
+
