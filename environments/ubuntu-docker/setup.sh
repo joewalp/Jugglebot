@@ -3,6 +3,8 @@ set -o nounset -o pipefail -o errexit
 IFS=$'\t\n' # For predictability
 rc=0
 
+EX_UNAVAILABLE=69
+
 # TASK [Define functions]
 
 task() {
@@ -172,11 +174,23 @@ task 'Enable ssh-agent'
 
 eval "$(ssh-agent -s)"
 
-task 'Add the ssh private key'
+task 'Assert that the configured ssh keypair exists'
 
-# Note: This will prompt for the passphrase if the key requires one
+if [[ ! -f "${SSH_IDENTITY_FILEPATH}" || ! -f "${SSH_IDENTITY_FILEPATH}.pub" ]]; then
+  echo '[Error]: The configured keypair does not exist.' >&2
+  exit $EX_UNAVAILABLE
+fi
 
-ssh-add "${SSH_IDENTITY_FILEPATH}"
+task 'Check whether the ssh-agent contains the configured identity'
+
+if ! ssh-add -T "${SSH_IDENTITY_FILEPATH}.pub" >/dev/null 2>&1; then
+
+  task 'Add the configured identity to the ssh-agent'
+
+  # Note: This will prompt for a passphrase if the key requires one.
+
+  ssh-add "${SSH_IDENTITY_FILEPATH}"
+fi
 
 task 'Copy the host-provisioning Conda environment file'
 
@@ -328,7 +342,7 @@ Notes:
    SSH_AUTH_SOCK environment variable into the container. You can add the key
    to the keychain using the following command:
 
-   ssh-add "${SSH_PRIVATE_KEY_FILEPATH}"
+   ssh-add "${SSH_IDENTITY_FILEPATH}"
 
 4. You can control the Docker Engine that is hosted by the WSL2 environment
    from within the container. This has some security implications. Do not host
