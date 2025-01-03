@@ -8,7 +8,7 @@ EX_OSFILE=72
 
 # TASK [Define functions]
 
-usage() {
+print_usage() {
   echo '
 usage: setup.sh [Options]
 
