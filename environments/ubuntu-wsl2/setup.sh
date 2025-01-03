@@ -37,9 +37,8 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
-    -u|--upgrade-mode)
-      UPGRADE_MODE_ENABLED="$2"
-      shift
+    -I|--install)
+      UPGRADE_MODE_ENABLED='no'
       shift
       ;;
     --x-clone-repo)
@@ -87,7 +86,7 @@ EDITOR="${EDITOR:-}"
 GIT_EMAIL="${GIT_EMAIL:-}"
 GIT_NAME="${GIT_NAME:-}"
 SSH_IDENTITY_FILEPATH="${SSH_IDENTITY_FILEPATH:-}"
-UPGRADE_MODE_ENABLED="${UPGRADE_MODE_ENABLED:-no}"
+UPGRADE_MODE_ENABLED="${UPGRADE_MODE_ENABLED:-yes}"
 
 CLONE_REPO_ENABLED="${CLONE_REPO_ENABLED:-yes}"
 REFRESH_HOST_PROVISIONING_ENV_ENABLED="${REFRESH_HOST_PROVISIONING_ENV_ENABLED:-yes}"

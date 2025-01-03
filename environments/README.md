@@ -222,8 +222,18 @@ applications.
 ```bash
 # WSL Ubuntu-20.04
 
-~/Jugglebot/environments/ubuntu-wsl2/setup.sh --ssh-keypair-name id_ed25519 --git-name '[Your full name]' --git-email '[Your email address]'
+~/Jugglebot/environments/ubuntu-wsl2/setup.sh --install -i ~/.ssh/id_ed25519 --git-name '[Your full name]' --git-email '[Your email address]'
 ```
+
+By default, this will set the preferred text editor to `nano`. If you prefer vim
+[recommended], you can specify the `--editor vim` option. This script can be
+re-run without the `--install` option to reconfigure the environment. See [Task
+5](#task-5-refresh-project-dependencies-or-upgrade-the-environment) later in
+this readme for details.
+
+Regardless whether you specify `vim` as your preferred editor, this script will
+provision a `~/.vimrc` that features good settings for editing scripts or config
+files. (We do not configure Emacs.)
 
 ### Step 8. Exit and then start a new terminal session to enable all changes
 
@@ -304,7 +314,7 @@ connection. It does not prompt for passwords, so you don't need to supervise it.
 ```zsh
 # WSL Ubuntu-20.04
 
-denv build --ssh-keypair-name id_ed25519
+denv build
 ```
 
 If you performed Step 9, you will be able to use Docker Desktop to monitor the
@@ -506,7 +516,62 @@ lsusb
 
 ---
 
-#### Task 5. Determine whether WSLg can use accelerated rendering
+#### Task 5. Refresh project dependencies or upgrade the environment
+
+The Python dependencies for the ROS workspace are configured using the jugglebot
+Conda environment specification within the following file:
+
+https://github.com/joewalp/Jugglebot/blob/dev-env-provisioning/ros_ws/conda_env.yml.j2
+
+We use that Conda environment specification instead of the pip
+`requirements.txt` files because Conda handles dependencies for us. As of this
+writing, the `conda_env.yml.j2` doesn't yet constrain the version of every
+package. In the near future, we will constrain at least the major version number
+of each package that our code calls directly.
+
+Suppose that you want to constrain a package version number or add a dependency.
+The prototypical process goes like this:
+
+1. Edit `conda_env.yml.j2`
+2. Run `refresh-dependencies`
+3. Verify that the new dependencies work
+4. Commit the changed `conda_env.yml.j2` to the repo
+
+A lengthy comment at the top of `conda_env.yml.j2`, describes all of the work
+that the `refresh-dependencies` utility performs.
+
+The WSL environment setup script that we ran in Step 7 of the Instructions
+behaves similarly to the `refresh-dependencies` script in the sense that you can
+safely re-run the setup script to automatically upgrade the provisioned
+resources to their latest versions that are checked-in to the `environments`
+subtree of the repo.
+
+A collaborator can keep their WSL environment in sync merely by running either
+the `refresh-dependencies` script or the `ubuntu-wsl/setup.sh` script.
+
+If you manually make changes to a provisioned file such as the `~/.zshrc`, the
+setup script won't clobber those changes. Instead, it will produce a diff in
+`~/.jugglebot/host_setup/diffs`.
+
+Suppose that you want to upgrade your environment with the latest provisioning
+changes and that you want to change the editor from `nano` to `vim`. You can run
+the following commands:
+
+```zsh
+# WSL Ubuntu-20.04
+
+cd $JUGGLEBOT_REPO_DIR
+
+git co dev-env-provisioning
+
+git pull
+
+./environments/ubuntu-wsl2/setup.sh --editor vim
+```
+
+---
+
+#### Task 6. Determine whether WSLg can use accelerated rendering
 
 WSL ships with a component called WSLg that acts as a display server for X11 and
 Wayland graphical applications. WSLg supports accelerated rendering only if your
@@ -538,7 +603,7 @@ regardless whether WSLg is providing accelerated rendering.
 
 ---
 
-#### Task 6. Try the arm64-based Docker container environment
+#### Task 7. Try the arm64-based Docker container environment
 
 The arm64-based Docker container environment is not currently intended to be
 used for development. It's primarily a testbed for the development environment
@@ -548,7 +613,7 @@ with an Intel i7-8550U and 16GB, this takes approximately two hours.
 ```zsh
 # WSL Ubuntu-20.04
 
-denv build --ssh-keypair-name id_ed25519 --arch arm64
+denv build --arch arm64
 
 denv exec --arch arm64
 
@@ -566,45 +631,6 @@ ssh docker-arm64-env
 > Issue 2. We've encountered a 'nosuid' error upon executing the first task that
 > requires sudo in `ubuntu-docker/main_playbook.yml`. This error remains
 > mysterious. It disappeared upon rebooting Windows 11.
-
----
-
-#### Task 7. Refresh project dependencies or upgrade the environment
-
-The Python dependencies for the ROS workspace are configured using the jugglebot
-Conda environment specification in the following file:
-
-https://github.com/joewalp/Jugglebot/blob/dev-env-provisioning/ros_ws/conda_env.yml.j2
-
-We use that Conda environment specification instead of the pip
-`requirements.txt` files because Conda handles dependencies for us. As of this
-writing, the `conda_env.yml.j2` doesn't yet constrain the version of every
-package. In the near future, we will constrain at least the major version number
-of each package that our code calls directly.
-
-Suppose that you want to constrain a package version number or add a dependency.
-The prototypical process goes like this:
-
-1. Edit `conda_env.yml.j2`
-2. Run `refresh-dependencies`
-3. Verify that the new dependencies work
-4. Commit the changed `conda_env.yml.j2` to the repo
-
-A lengthy comment at the top of `conda_env.yml.j2`, describes all of the work
-that the `refresh-dependencies` utility performs.
-
-The WSL environment setup script that we ran in Step 7 of the Instructions
-behaves similarly to the `refresh-dependencies` script in the sense that you can
-safely re-run the setup script to automatically upgrade the provisioned
-resources to their latest versions that are checked-in to the `environments`
-subtree of the repo. Most of these files are in `environments/ubuntu-common`.
-
-A collaborator can keep their WSL environment in sync merely by running either
-the `refresh-dependencies` script or the `ubuntu-wsl/setup.sh` script.
-
-If you manually make changes to a provisioned script such as the `~/.zshrc`, the
-setup script won't clobber those changes. Instead, it will produce a diff in
-`~/.jugglebot/host_setup/diffs`.
 
 ---
 
