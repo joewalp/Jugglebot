@@ -19,7 +19,7 @@ sudo /usr/sbin/sshd -D &
 
 if [[ ! -f "${INIT_FLAG_FILEPATH}" ]]; then
 
-  # TASK [Initializes the user's home directory in the /home volume`]
+  # TASK [Initialize the user's home directory in the /home volume`]
 
   rm -rf "${HOME}"
   mv "/entrypoint/${USER}" "${HOME}"
