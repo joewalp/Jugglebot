@@ -646,12 +646,12 @@ easier.
 The Jugglebot repo is checked out separately in each environment. If anyone ends
 up using a Docker container environment in tandem with the WSL2 environment for
 interactive coding and testing, we may end up mounting the WSL2 Jugglebot repo
-into the container. However, I currently consider the Docker native platform
-container environment to be a stepping stone toward building the Ubuntu for
-arm64 Docker container. The native platform container environment is
-considerably faster than the arm64 platform container environment, so I want to
-use it for iterating on features before confirming that the same provisioning
-and features work within an arm64 platform environment.
+into the container. However, the Docker native platform container environment
+thus far has been conceived as a stepping stone toward building the Ubuntu for
+arm64 Docker container. The native platform container environment is considerably
+faster than the arm64 platform container environment, so we use it for iterating
+on features before confirming that the same provisioning and features work within
+an arm64 platform environment.
 
 ## Noteworthy future milestones
 
