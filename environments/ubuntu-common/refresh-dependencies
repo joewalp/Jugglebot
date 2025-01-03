@@ -47,6 +47,11 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    --x-ansible-become-pass)
+      ANSIBLE_BECOME_PASS="$2"
+      shift
+      shift
+      ;;
     -*|--*)
       echo "[ERROR]: Unknown option $1" >&2
       print_usage
@@ -63,6 +68,7 @@ task 'Initialize variables'
 
 REFRESH_HOST_PROVISIONING_ENV_ENABLED="${REFRESH_HOST_PROVISIONING_ENV_ENABLED:-yes}"
 REFRESH_JUGGLEBOT_ENV_ENABLED="${REFRESH_JUGGLEBOT_ENV_ENABLED:-yes}"
+ANSIBLE_BECOME_PASS="${ANSIBLE_BECOME_PASS:-}"
 CONDA_FILEPATH="${HOME}/miniforge3/bin/conda"
 JUGGLEBOT_REPO_DIR="${JUGGLEBOT_REPO_DIR:-${HOME}/Jugglebot}"
 HOST_PROVISIONING_CONDA_ENV_FILEPATH="${HOST_PROVISIONING_CONDA_ENV_FILEPATH:-${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/host_provisioning_conda_env.yml}"
@@ -99,11 +105,20 @@ conda activate host-provisioning
 
 task 'Run the refresh jugglebot Conda environment playbook'
 
-ANSIBLE_LOCALHOST_WARNING=False \
-  ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
-  ansible-playbook "${REFRESH_PLAYBOOK_FILEPATH}" \
-    -e "refresh_jugglebot_conda_env_enabled__='${REFRESH_JUGGLEBOT_ENV_ENABLED}'" \
-  || rc="$?"
+if [[ -n "${ANSIBLE_BECOME_PASS}" ]]; then
+  ANSIBLE_LOCALHOST_WARNING=False \
+    ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
+    ansible-playbook "${REFRESH_PLAYBOOK_FILEPATH}" \
+      -e "refresh_jugglebot_conda_env_enabled__='${REFRESH_JUGGLEBOT_ENV_ENABLED}'" \
+    || rc="$?"
+else
+  ANSIBLE_LOCALHOST_WARNING=False \
+    ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
+    ANSIBLE_BECOME_PASS="${ANSIBLE_BECOME_PASS}"
+    ansible-playbook "${REFRESH_PLAYBOOK_FILEPATH}" \
+      -e "refresh_jugglebot_conda_env_enabled__='${REFRESH_JUGGLEBOT_ENV_ENABLED}'" \
+    || rc="$?"
+fi
 
 # failed_when: the return code is nonzero
 
