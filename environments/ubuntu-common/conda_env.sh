@@ -26,6 +26,7 @@ case "${EVENT_TYPE}" in
     else
 
       # TASK [Determine the ROS shell setup script filepath]
+
       JUGGLEBOT_CONFIG_FILEPATH="${JUGGLEBOT_CONFIG_DIR}/config.yml"
       ROS_CODENAME="$( yq -r .ros.version_codename "${JUGGLEBOT_CONFIG_FILEPATH}" )"
       ROS_SETUP_FILEPATH="/opt/ros/${ROS_CODENAME}/setup.zsh"
