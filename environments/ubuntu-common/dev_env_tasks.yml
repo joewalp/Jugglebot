@@ -243,6 +243,19 @@
     readable_name: Docker
     update_cache: yes
 
+- name: Render the rosdep_sudoers file
+  template:
+    src: "{{ environments_dir }}/ubuntu-common/rosdep_sudoers.j2"
+    dest: "{{ host_setup_defaults_dir }}/rosdep_sudoers"
+
+- name: Install /etc/sudoers.d/rosdep_sudoers
+  copy:
+    src: "{{ host_setup_defaults_dir }}/rosdep_sudoers"
+    remote_src: yes
+    dest: "/etc/sudoers.d/rosdep_sudoers"
+    force: yes
+  become: yes
+
 - name: Install ~/bin/install-savvycan
   import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"
   vars:
