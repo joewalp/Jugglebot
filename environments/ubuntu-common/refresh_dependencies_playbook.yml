@@ -199,4 +199,3 @@
       chdir: "{{ repo_dir }}/ros_ws"
     when: "'/etc/ros/rosdep/sources.list.d/20-default.list' is file"
 
-
