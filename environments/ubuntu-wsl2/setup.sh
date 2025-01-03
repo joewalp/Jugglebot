@@ -15,7 +15,8 @@ usage: setup.sh [Options]
 Options:
   -h|--help              Display this usage message
   -I|--install           Enable install mode, which will initialize the config
-                         file at ~/.jugglebot/config.yml
+                         file at ~/.jugglebot/config.yml and provision the
+                         development environment
   -e|--editor [vim|nano] Specify the preferred editor for git commits and the
                          EDITOR environment variable
   -i [ssh identity file] Specify the ssh private key that will be used for
@@ -138,8 +139,9 @@ if [[ -z "${SSH_IDENTITY_FILEPATH}" ]]; then
       SSH_IDENTITY_FILEPATH="$( yq -r .ssh.github_com.identity_filepath \
         "${JUGGLEBOT_CONFIG_FILEPATH}" )"
     else
-      echo '[Error]: The yq utility is not available. Upgrade mode cannot be \
-used until yq has been provisioned.' >&2
+      echo '[Error]: The yq utility is not available. Run setup.sh with the \
+`--install` option.' >&2
+      print_usage
       exit $EX_UNAVAILABLE
     fi
   else
