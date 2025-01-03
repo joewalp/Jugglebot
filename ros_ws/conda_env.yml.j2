@@ -1,6 +1,6 @@
 ---
 # TASK [Educate about how to apply changes]
-# 
+#
 # After editing this file, you can apply changes by running the following
 # utility:
 #
@@ -23,10 +23,16 @@
 # However, it will not overwrite those `~/.jugglebot` config files if you have
 # manually made changes to the installed versions.
 #
-# Finally, it will ensure that fnm has installed the Node.js version that is
+# It will then ensure that fnm has installed the Node.js version that is
 # specifed in the following file:
 #
 #   $JUGGLEBOT_REPO_DIR/ros_ws/gui/.node_version
+#
+# Lastly, it will ensure that rosdep has installed the jugglebot ROS project
+# dependencies that are specified in the following file:
+#
+#   $JUGGLEBOT_REPO_DIR/ros_ws/src/jugglebot/package.xml
+#
 
 
 name: jugglebot
@@ -37,14 +43,14 @@ dependencies:
   - pip
 
   # TASK [Specify the Jugglebot project requirements]
-  
+
   - cantools
   - matplotlib
   - numpy
   - python-can
-  
+
   # TASK [Specify the Yasmin requirements]
-  
+
   - expiringdict
   - flask
   - waitress
@@ -58,21 +64,22 @@ dependencies:
     # required_by: $JUGGLEBOT_REPO_DIR/environments/ubuntu-docker/setup.sh
 
   # TASK [Specify the pip requirements]
-  # 
+  #
   # Note: We prefer to specify the Conda package unless (a) no Conda package
   # exists or (b) the Conda package would install a binary that we prefer to
   # manage via an apt repository package.
 
   - pip:
-    
+
     # TASK [Specify the Jugglebot project pip requirements]
-    
+
     - numpy-quaternion==2022.4.4
     - pyspacemouse==1.0.9
+    - qtm-rt
 
     # TASK [Specify the shell environment pip requirements]
     #
     # Note: We choose the pip package for tmuxp because we prefer to use the
     # tmux binary that is provided by the Ubuntu apt repository.
-    
+
     - tmuxp

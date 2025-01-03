@@ -43,7 +43,7 @@
     # Note: We don't use Bash for development, but we still want that shell to
     # be usable for exploration by a potential contributor who may not be
     # familiar with Z Shell.
-    shell: 
+    shell:
       cmd: conda init bash
 
   - name: Set the conda_base_update_needed variable
@@ -89,7 +89,7 @@
     register: conda_info_grep_result
     failed_when: conda_info_grep_result.rc not in [0, 1]
     changed_when: False
-  
+
   - name: Set the jugglebot_env_exists variable
     set_fact:
       jugglebot_env_exists: "{{ conda_info_grep_result.rc == 0 }}"
@@ -98,7 +98,7 @@
     command:
       cmd: "conda env create -f '{{ host_setup_defaults_dir }}/conda_env.yml'"
     when: not jugglebot_env_exists
-  
+
   - name: Create a file for the jugglebot Conda environment backup
     tempfile:
       path: "{{ host_setup_backups_dir }}"
@@ -184,4 +184,19 @@
         && {{ home_dir }}/.local/share/fnm/fnm use \
         --install-if-missing {{ node_version }}
       executable: /usr/bin/bash
+
+  - name: Update the rosdep package manager
+    command:
+      cmd: /usr/bin/rosdep update
+    when: "'/etc/ros/rosdep/sources.list.d/20-default.list' is file"
+
+  - name: Install the Jugglebot ROS dependencies
+    shell:
+      cmd: >
+        source /opt/ros/{{ ros_version_codename }}/setup.bash
+        && rosdep install -i --from-path src --rosdistro {{ ros_codename }}
+      executable: /usr/bin/bash
+      chdir: "{{ repo_dir }}/ros_ws"
+    when: "'/etc/ros/rosdep/sources.list.d/20-default.list' is file"
+
 
