@@ -36,8 +36,6 @@ hi CursorLine term=bold cterm=none ctermbg=233 guibg=Grey40
 set viminfo='10,\"100,:20,%,n~/.vim/viminfo
 
 " TASK [Restore the cursor position except in git buffers]
-" 
-" ref: https://vimhelp.org/usr_05.txt.html#last-position-jump
 
 augroup RestoreCursor
   autocmd!
