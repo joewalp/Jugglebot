@@ -7,6 +7,7 @@
     repo_dir: "{{ playbook_dir }}/../.."
     ubuntu_codename: "{{ ansible_facts['distribution_release'] }}"
     home_dir: "{{ ansible_facts['env']['HOME'] }}"
+    refresh_jugglebot_conda_env_enabled: "{{ refresh_jugglebot_conda_env_enabled__ | bool }}"
     jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
     host_setup_dir: "{{ home_dir }}/.jugglebot/host_setup"
     host_setup_backups_dir: "{{ home_dir }}/.jugglebot/host_setup/backups"
@@ -114,7 +115,7 @@
   - name: Refresh the jugglebot Conda environment .. please be patient
     shell:
       cmd: "conda env update -n jugglebot -f '{{ host_setup_defaults_dir }}/conda_env.yml' --prune"
-    when: jugglebot_env_exists and refresh_jugglebot_conda_env_enabled is truthy(convert_bool=True)
+    when: jugglebot_env_exists and refresh_jugglebot_conda_env_enabled
 
   - name: Install ~/.jugglebot/conda_env.sh
     import_tasks: "{{ environments_dir }}/ansible-common/copy_or_diff.yml"

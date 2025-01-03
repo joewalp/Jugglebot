@@ -102,7 +102,7 @@ task 'Run the refresh jugglebot Conda environment playbook'
 ANSIBLE_LOCALHOST_WARNING=False \
   ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
   ansible-playbook "${REFRESH_PLAYBOOK_FILEPATH}" \
-    -e "refresh_jugglebot_conda_env_enabled='${REFRESH_JUGGLEBOT_ENV_ENABLED}'" \
+    -e "refresh_jugglebot_conda_env_enabled__='${REFRESH_JUGGLEBOT_ENV_ENABLED}'" \
   || rc="$?"
 
 # failed_when: the return code is nonzero
