@@ -27,6 +27,15 @@ Options:
   -N|--git-name [your full name]
                          Specify your name for the user.name section of
                          ~/.gitconfig
+  --x-clone-repo [yes|no]
+                         Enable/disable ensuring that Jugglebot repo is cloned
+                         and clean (default: yes)
+  --x-refresh-host-provisioning-conda-env [yes|no]
+                         Enable/disable refreshing the host-provisining Conda
+                         environment (default: yes)
+  --x-refresh-jugglebot-conda-env)
+                         Enable/disable refreshing the jugglebot Conda
+                         environment (default: yes)
 
 '
 }
