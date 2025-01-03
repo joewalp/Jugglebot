@@ -170,9 +170,11 @@ SSH_PUBLIC_KEY_FILEPATH="${SSH_IDENTITY_FILEPATH}.pub"
 BUILD_CONTEXT_DIR="${JUGGLEBOT_REPO_DIR}/environments/ubuntu-docker"
 JUGGLEBOT_CONFIG_DIR="${JUGGLEBOT_CONFIG_DIR:-${HOME}/.jugglebot}"
 
-task 'Enable ssh-agent'
+task 'Enable ssh-agent if necessary'
 
-eval "$(ssh-agent -s)"
+if ! pgrep ssh-agent >/dev/null 2>&1; then
+  eval "$(ssh-agent -s)"
+fi
 
 task 'Assert that the configured ssh keypair exists'
 

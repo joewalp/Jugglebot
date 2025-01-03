@@ -195,9 +195,11 @@ editor, install it before running this script." >&2
   fi
 fi
 
-task 'Enable ssh-agent'
+task 'Enable ssh-agent if necessary'
 
-eval "$(ssh-agent -s)"
+if ! pgrep ssh-agent >/dev/null 2>&1; then
+  eval "$(ssh-agent -s)"
+fi
 
 task 'Assert that the configured ssh keypair exists'
 
