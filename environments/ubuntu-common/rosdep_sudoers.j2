@@ -1,1 +1,1 @@
-{{ ansible_facts['env']['USER'] }} ALL=(ALL:ALL) NOPASSWD: rosdep install -y -i --from-path src --rosdistro {{ config.ros.version_codename }}
+{{ ansible_facts['env']['USER'] }} ALL=(ALL:ALL) NOPASSWD: /usr/bin/rosdep install -y -i --from-path src --rosdistro {{ config.ros.version_codename }}
