@@ -80,4 +80,5 @@
         {{ config.ros.version_codename }}
       executable: /usr/bin/bash
       chdir: "{{ ros_workspace_dir }}"
+    become: yes
 
