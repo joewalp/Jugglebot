@@ -22,7 +22,6 @@ task 'Initialize variables'
 
 REFRESH_HOST_PROVISIONING_ENV_ENABLED="${REFRESH_HOST_PROVISIONING_ENV_ENABLED:-yes}"
 REFRESH_JUGGLEBOT_ENV_ENABLED="${REFRESH_JUGGLEBOT_ENV_ENABLED:-yes}"
-ANSIBLE_BECOME_PASS="${ANSIBLE_BECOME_PASS:-}"
 CONDA_SETUP_SCRIPT_URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$( uname )-$( uname -m ).sh"
 HOST_SETUP_DIR="${HOME}/.jugglebot/host_setup"
 CONDA_SETUP_SCRIPT_FILEPATH="${HOME}/.jugglebot/host_setup/miniforge_setup.sh"
@@ -66,8 +65,7 @@ task 'Run the repo copy of refresh-dependencies'
 
 "${JUGGLEBOT_REPO_DIR}/environments/ubuntu-common/refresh-dependencies" \
   --refresh-host-provisioning-conda-env "${REFRESH_HOST_PROVISIONING_ENV_ENABLED}" \
-  --refresh-jugglebot-conda-env "${REFRESH_JUGGLEBOT_ENV_ENABLED}" \
-  --x-ansible-become-pass "${ANSIBLE_BECOME_PASS}"
+  --refresh-jugglebot-conda-env "${REFRESH_JUGGLEBOT_ENV_ENABLED}"
 
 eval "$("${CONDA_FILEPATH}" 'shell.bash' 'hook' 2> /dev/null)"
 

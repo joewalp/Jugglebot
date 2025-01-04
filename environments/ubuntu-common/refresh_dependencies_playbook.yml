@@ -185,11 +185,6 @@
         --install-if-missing {{ node_version }}
       executable: /usr/bin/bash
 
-  - name: Update the rosdep package manager
-    command:
-      cmd: /usr/bin/rosdep update
-    when: "'/etc/ros/rosdep/sources.list.d/20-default.list' is file"
-
   - name: Install the Jugglebot ROS dependencies
     # Note: The `/etc/sudoers.d/rosdep_sudoers` (from
     # `ubuntu-common/rosdep_sudoers.j2`) enables this to be run without
@@ -197,7 +192,8 @@
     shell:
       cmd: >
         source /opt/ros/{{ ros_codename }}/setup.bash
-        && sudo /usr/bin/rosdep install -y -i --from-path src --rosdistro {{ ros_codename }}
+        && /usr/bin/rosdep update
+        && /usr/bin/rosdep install -i --from-path src -y --rosdistro {{ ros_codename }}
       executable: /usr/bin/bash
       chdir: "{{ repo_dir }}/ros_ws"
     when: "'/etc/ros/rosdep/sources.list.d/20-default.list' is file"

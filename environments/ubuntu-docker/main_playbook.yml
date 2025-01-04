@@ -62,10 +62,6 @@
     vars:
       environments_dir: "{{ playbook_dir }}/.."
 
-  - name: Update the rosdep package manager
-    command:
-      cmd: /usr/bin/rosdep update
-
   - name: Install the Jugglebot ROS dependencies
     # Note: The ROS version codename is set by ubuntu-docker/setup.sh. It is
     # set to the ROS version that has tier 1 support for the Ubuntu release of
@@ -74,7 +70,8 @@
     shell:
       cmd: >
         source /opt/ros/{{ config.ros.version_codename }}/setup.bash
-        && sudo /usr/bin/rosdep install -i --from-path src --rosdistro
+        && /usr/bin/rosdep update
+        && /usr/bin/rosdep install -i --from-path src -y --rosdistro
         {{ config.ros.version_codename }}
       executable: /usr/bin/bash
       chdir: "{{ ros_workspace_dir }}"
