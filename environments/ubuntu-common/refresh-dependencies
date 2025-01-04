@@ -114,7 +114,7 @@ if [[ -n "${ANSIBLE_BECOME_PASS}" ]]; then
 else
   ANSIBLE_LOCALHOST_WARNING=False \
     ANSIBLE_INVENTORY_UNPARSED_WARNING=False \
-    ANSIBLE_BECOME_PASS="${ANSIBLE_BECOME_PASS}"
+    ANSIBLE_BECOME_PASS="${ANSIBLE_BECOME_PASS}" \
     ansible-playbook "${REFRESH_PLAYBOOK_FILEPATH}" \
       -e "refresh_jugglebot_conda_env_enabled__='${REFRESH_JUGGLEBOT_ENV_ENABLED}'" \
     || rc="$?"
