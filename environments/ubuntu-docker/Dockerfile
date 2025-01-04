@@ -140,8 +140,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       http://packages.ros.org/ros2/ubuntu $(lsb_release -c -s) main" \
       | tee /etc/apt/sources.list.d/ros2.list > /dev/null \
     && apt-get update \
-    && apt-get install -yq --no-install-recommends ${ROS_PACKAGES_LIST} \
-    && /usr/bin/rosdep init
+    && apt-get install -yq --no-install-recommends ${ROS_PACKAGES_LIST}
 
 # TASK [Install the Docker CLI]
 #
