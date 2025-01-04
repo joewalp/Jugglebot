@@ -197,7 +197,7 @@
     shell:
       cmd: >
         source /opt/ros/{{ ros_codename }}/setup.bash
-        && sudo rosdep install -y -i --from-path src --rosdistro {{ ros_codename }}
+        && sudo /usr/bin/rosdep install -y -i --from-path src --rosdistro {{ ros_codename }}
       executable: /usr/bin/bash
       chdir: "{{ repo_dir }}/ros_ws"
     when: "'/etc/ros/rosdep/sources.list.d/20-default.list' is file"
