@@ -19,6 +19,7 @@
     jugglebot_repo_dir: "{{ home_dir }}/Jugglebot"
     jugglebot_config_dir: "{{ home_dir }}/.jugglebot"
     host_setup_defaults_dir: "{{ home_dir }}/.jugglebot/host_setup/defaults"
+    host_setup_diffs_dir: "{{ home_dir }}/.jugglebot/host_setup/diffs"
     wsl_welcome_flag_filepath: "{{ home_dir }}/.hushlogin"
     jugglebot_repo_ssh_url: 'git@github.com:joewalp/Jugglebot.git'
 
