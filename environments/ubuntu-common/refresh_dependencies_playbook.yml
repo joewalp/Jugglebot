@@ -186,9 +186,6 @@
       executable: /usr/bin/bash
 
   - name: Install the Jugglebot ROS dependencies
-    # Note: The `/etc/sudoers.d/rosdep_sudoers` (from
-    # `ubuntu-common/rosdep_sudoers.j2`) enables this to be run without
-    # `become: yes`.
     shell:
       cmd: >
         source /opt/ros/{{ ros_codename }}/setup.bash
