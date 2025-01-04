@@ -70,8 +70,7 @@
   - name: Install the Jugglebot ROS dependencies
     # Note: The ROS version codename is set by ubuntu-docker/setup.sh. It is
     # set to the ROS version that has tier 1 support for the Ubuntu release of
-    # the base image. Also, note that the rosdep_sudoers that was installed by
-    # dev_env_tasks.yml enables us to run rosdep install without `become: yes`.
+    # the base image.
     shell:
       cmd: >
         source /opt/ros/{{ config.ros.version_codename }}/setup.bash
