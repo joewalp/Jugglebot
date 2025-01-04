@@ -74,7 +74,7 @@
     shell:
       cmd: >
         source /opt/ros/{{ config.ros.version_codename }}/setup.bash
-        && sudo rosdep install -i --from-path src --rosdistro
+        && sudo /usr/bin/rosdep install -i --from-path src --rosdistro
         {{ config.ros.version_codename }}
       executable: /usr/bin/bash
       chdir: "{{ ros_workspace_dir }}"
