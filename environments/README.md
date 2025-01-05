@@ -324,7 +324,7 @@ ongoing `Active build` that denv has initiated:
 in-progress item > `Logs` tab of the `Builds / environments/ubuntu-docker` pane
 
 
-### Step 11. Try the Docker container native platform environment
+### Step 11 [Optional]. Try the Docker container native platform environment
 
 The command in Step 10 will print some information about the container that it
 has built. After reading that info, run the following command to enter the
