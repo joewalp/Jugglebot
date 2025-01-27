@@ -46,7 +46,7 @@ wsl -d Ubuntu -e lsb_release --description
 
 If neither of the commands above indicates that some version of Ubuntu 20.04
 (such as `Ubuntu-20.04` or `Ubuntu 20.04.1 LTS`) is registered, then you can
-proceed to step 2.
+proceed to step 3.
 
 If either of the commands above indicates that you have a prexisting Ubuntu
 20.04 distribution, then you have a few options for how to proceed. If you just
